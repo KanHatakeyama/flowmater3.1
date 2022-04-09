@@ -10,11 +10,14 @@ export default class PropertiesPanel {
 
     const {
       modeler,
-      container
+      container,
+      original_record,
     } = options;
 
+    //console.log(original_record)
+
     ReactDOM.render(
-      <PropertiesView modeler={ modeler } />,
+      <PropertiesView modeler={modeler} />,
       container
     );
   }

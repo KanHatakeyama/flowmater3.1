@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('graph/', include('graph.urls')),
     path('molecules/', include('molecules.urls')),
+    path('', admin.site.urls),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL,
