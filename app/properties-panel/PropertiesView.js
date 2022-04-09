@@ -9,12 +9,24 @@ export default class PropertiesView extends Component {
 
   constructor(props) {
     super(props);
+    this.saveData = this.saveData.bind(this);
 
     this.state = {
       selectedElements: [],
       element: null
     };
   }
+
+  saveData() {
+    const {
+      modeler
+    } = this.props;
+
+    modeler.saveXML({ format: true }, function (err, xml) {
+      console.log(xml)
+    });
+  }
+
 
   componentDidMount() {
 
@@ -56,6 +68,7 @@ export default class PropertiesView extends Component {
         });
       }
 
+
     });
   }
 
@@ -73,19 +86,22 @@ export default class PropertiesView extends Component {
     return (
       <div>
 
+        <div>
+          <button onClick={this.saveData} modeler={modeler}>Save</button>
+        </div>
         {
           selectedElements.length === 1
-            && <ElementProperties modeler={ modeler } element={ element } />
+          && <ElementProperties modeler={modeler} element={element} />
         }
 
         {
           selectedElements.length === 0
-            && <span>Please select an element.</span>
+          && <span>Please select an element.</span>
         }
 
         {
           selectedElements.length > 1
-            && <span>Please select a single element.</span>
+          && <span>Please select a single element.</span>
         }
       </div>
     );
@@ -109,6 +125,9 @@ function ElementProperties(props) {
     const modeling = modeler.get('modeling');
 
     modeling.updateLabel(element, name);
+
+
+
   }
 
   function updateTopic(topic) {
@@ -136,6 +155,8 @@ function ElementProperties(props) {
       type: 'bpmn:ServiceTask'
     });
   }
+
+
 
   function attachTimeout() {
     const modeling = modeler.get('modeling');
@@ -178,45 +199,30 @@ function ElementProperties(props) {
   };
 
   return (
-    <div className="element-properties" key={ element.id }>
-      <fieldset>
-        <label>id</label>
-        <span>{ element.id }</span>
-      </fieldset>
+    <div className="element-properties" key={element.id}>
 
       <fieldset>
         <label>name</label>
-        <input value={ element.businessObject.name || '' } onChange={ (event) => {
+        <input value={element.businessObject.name || ''} onChange={(event) => {
           updateName(event.target.value)
-        } } />
+        }} />
       </fieldset>
-
-      {
-        is(element, 'custom:TopicHolder') &&
-          <fieldset>
-            <label>topic (custom)</label>
-            <input value={ element.businessObject.get('custom:topic') } onChange={ (event) => {
-              updateTopic(event.target.value)
-            } } />
-          </fieldset>
-      }
 
       <fieldset>
         <label>actions</label>
-
         {
           is(element, 'bpmn:Task') && !is(element, 'bpmn:ServiceTask') &&
-            <button onClick={ makeServiceTask }>Make Service Task</button>
+          <button onClick={makeServiceTask}>Make Service Task</button>
         }
 
         {
           is(element, 'bpmn:Event') && !hasDefinition(element, 'bpmn:MessageEventDefinition') &&
-            <button onClick={ makeMessageEvent }>Make Message Event</button>
+          <button onClick={makeMessageEvent}>Make Message Event</button>
         }
 
         {
           is(element, 'bpmn:Task') && !isTimeoutConfigured(element) &&
-            <button onClick={ attachTimeout }>Attach Timeout</button>
+          <button onClick={attachTimeout}>Attach Timeout</button>
         }
       </fieldset>
     </div>
