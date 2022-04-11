@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
-import { SuggestTextArea } from './Suggest/SuggestTextArea';
+import Suggest from './Suggest/Suggest';
+export let textData = {}
 
 export function ElementProperties(props) {
 
@@ -14,9 +15,18 @@ export function ElementProperties(props) {
         element = element.labelTarget;
     }
 
+    textData.content = element.businessObject.name
+
     function updateName(name) {
         const modeling = modeler.get('modeling');
         modeling.updateLabel(element, name);
+        textData.content = name
+    }
+
+    function addSuggestion() {
+        element.businessObject.name = "aa"
+        const modeling = modeler.get('modeling');
+        modeling.updateLabel(element, element.businessObject.name);
     }
 
     function makeMessageEvent() {
@@ -79,6 +89,8 @@ export function ElementProperties(props) {
         return autoPlace.append(element, shape);
     };
 
+
+
     return (
         <div className="element-properties" key={element.id}>
 
@@ -88,6 +100,9 @@ export function ElementProperties(props) {
                     updateName(event.target.value)
                 }} />
             </fieldset>
+
+            <Suggest />
+            <button onClick={addSuggestion}>{textData.content}</button>
 
             <fieldset>
                 <label>actions</label>
