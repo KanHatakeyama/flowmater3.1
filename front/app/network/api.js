@@ -1,4 +1,3 @@
-import { graph_id } from "../app";
 
 //export const host_ip = process.env.REACT_APP_DIP
 export const host_ip = "http://133.9.195.84:49088/"

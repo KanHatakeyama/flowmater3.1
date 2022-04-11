@@ -17,7 +17,7 @@ export default class PropertiesPanel {
     //console.log(original_record)
 
     ReactDOM.render(
-      <PropertiesView modeler={modeler} />,
+      <PropertiesView modeler={modeler} original_record={original_record} />,
       container
     );
   }
