@@ -29,10 +29,12 @@
     "webpack-dev-server": "^3.2.1"
   },
   "dependencies": {
+    "@pathofdev/react-tag-input": "^1.0.7",
     "bpmn-js": "^3.2.1",
     "downloadjs": "^1.4.7",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^6.3.0",
+    "react-tag-input": "^6.8.0"
   }
 }

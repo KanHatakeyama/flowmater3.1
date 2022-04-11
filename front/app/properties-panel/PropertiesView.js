@@ -2,7 +2,7 @@ import { is } from 'bpmn-js/lib/util/ModelUtil';
 import React, { Component } from 'react';
 import './PropertiesView.css';
 import { updateGraph, newGraph } from '../network/api';
-//import { CustomTags } from './fields/CustomTags';
+import { CustomTags } from './fields/CustomTags';
 
 export let currentGraph = {}
 
@@ -126,6 +126,7 @@ export default class PropertiesView extends Component {
         <div>
           <h5>Title: {currentGraph.pk}_</h5>
           <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "30%" }} />
+          <h5 style={{ padding: "0px 10px" }}>Tags: </h5><CustomTags></CustomTags>
         </div>
 
         <div>

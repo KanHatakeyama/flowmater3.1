@@ -239,6 +239,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@pathofdev/react-tag-input@^1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@pathofdev/react-tag-input/-/react-tag-input-1.0.7.tgz#ace16c8903a65bb86f136623a761d6d505c7bd86"
+  integrity sha512-FxlX+rQhsun7uLDS7PzscJex4Vutq9+RjYlJR+Bf6rh/fH8Drxhl+klrUFxaMRtaTF44tM/jHVl5dxWIhUwejw==
+
 "@types/glob@^7.1.1":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.2.0.tgz#bc1b5bf3aa92f25bd5dd39f35c57361bdce5b2eb"
@@ -990,6 +995,11 @@ class-utils@^0.3.5:
     define-property "^0.2.5"
     isobject "^3.0.0"
     static-extend "^0.1.1"
+
+classnames@~2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.3.1.tgz#dfcfa3891e306ec1dad105d0e88f4417b8535e8e"
+  integrity sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==
 
 cliui@^5.0.0:
   version "5.0.0"
@@ -2603,7 +2613,7 @@ locate-path@^5.0.0:
   dependencies:
     p-locate "^4.1.0"
 
-lodash@^4.17.11, lodash@^4.17.14:
+lodash@^4.17.11, lodash@^4.17.14, lodash@~4.17.12:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -3340,7 +3350,7 @@ promise-inflight@^1.0.1:
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
   integrity sha1-mEcocL8igTL8vdhoEputEsPAKeM=
 
-prop-types@^15.6.2:
+prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -3501,6 +3511,15 @@ react-router@6.3.0:
   integrity sha512-7Wh1DzVQ+tlFjkeo+ujvjSqSJmkt1+8JO+T5xklPlgrh70y7ogx75ODRW0ThWhY7S+6yEDks8TYrtQe/aoboBQ==
   dependencies:
     history "^5.2.0"
+
+react-tag-input@^6.8.0:
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/react-tag-input/-/react-tag-input-6.8.0.tgz#d87322d5a76cb22859b9ed238bff5172ba034cbf"
+  integrity sha512-b8XhTXxWIVhrwInqEtT40fA2wooqat3qT6ZTA+2wao6ooA0cB4kVT+/wWDSftSTzHz3iyr69xq1ZqDsFfaz4Kw==
+  dependencies:
+    classnames "~2.3.1"
+    lodash "~4.17.12"
+    prop-types "^15.7.2"
 
 react@^16.8.3:
   version "16.14.0"

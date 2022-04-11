@@ -2,8 +2,8 @@ import React from 'react';
 import ReactTagInput from "@pathofdev/react-tag-input";
 import "@pathofdev/react-tag-input/build/index.css";
 
-import { updateGraph } from "./../../graphs/routing"
-import { currentGraph } from '..';
+import { updateGraph } from '../../network/api';
+import { currentGraph } from '../PropertiesView';
 
 // custom tag box
 export function CustomTags() {
