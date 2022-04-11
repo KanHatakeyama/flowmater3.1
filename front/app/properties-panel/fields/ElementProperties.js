@@ -94,7 +94,7 @@ export function ElementProperties(props) {
 
             <fieldset>
                 <label>name</label>
-                <input value={element.businessObject.name || ''} onChange={(event) => {
+                <textarea value={element.businessObject.name || ''} onChange={(event) => {
                     updateName(event.target.value)
                 }} />
             </fieldset>
