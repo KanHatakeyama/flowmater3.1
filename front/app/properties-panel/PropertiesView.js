@@ -12,13 +12,16 @@ export default class PropertiesView extends Component {
     // funcs
     this.saveData = this.saveData.bind(this);
     this.saveNewData = this.saveNewData.bind(this);
+    this.handleTitleChange = this.handleTitleChange.bind(this);
 
     this.state = {
       selectedElements: [],
-      element: null
+      element: null,
+      record: this.props.original_record,
+      title: this.props.original_record.title,
     };
   }
-
+  //---------- exporting funcs------------------
   saveData() {
     const {
       modeler, original_record
@@ -40,14 +43,21 @@ export default class PropertiesView extends Component {
     });
   }
 
+  // ------- title editing ----------
+  //save title change
+  handleTitleChange(event) {
+    this.state.record.title = event.target.value
+    this.setState({ title: this.state.record.title });
+    updateGraph(this.state.record.pk, { "title": this.state.record.title })
+  };
 
 
   componentDidMount() {
-
     const {
       modeler
     } = this.props;
 
+    //---------- diagram editing-----
     modeler.on('selection.changed', (e) => {
 
       const {
@@ -89,6 +99,7 @@ export default class PropertiesView extends Component {
     });
   }
 
+  // --------- rendering-------------
   render() {
 
     const {
@@ -101,7 +112,12 @@ export default class PropertiesView extends Component {
     } = this.state;
 
     return (
+      //Rendering
       <div>
+        <div>
+          <h5>Title: {this.state.record.pk}_</h5>
+          <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "30%" }} />
+        </div>
 
         <div>
           <button onClick={this.saveNewData} modeler={modeler}>Save as New</button>
