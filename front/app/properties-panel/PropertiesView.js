@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import './PropertiesView.css';
 import { updateGraph, newGraph } from '../network/api';
 import { CustomTags } from './fields/CustomTags';
+import { FileForm } from './fields/DropZone';
 
 export let currentGraph = {}
 
@@ -146,7 +147,12 @@ export default class PropertiesView extends Component {
           selectedElements.length > 1
           && <span>Please select a single element.</span>
         }
+
+        <div>
+          <FileForm></FileForm>
+        </div>
       </div>
+
     );
   }
 

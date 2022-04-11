@@ -30,10 +30,14 @@
   },
   "dependencies": {
     "@pathofdev/react-tag-input": "^1.0.7",
+    "axios": "^0.26.1",
     "bpmn-js": "^3.2.1",
     "downloadjs": "^1.4.7",
+    "final-form": "^4.20.6",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
+    "react-dropzone": "^12.0.5",
+    "react-final-form": "^6.5.9",
     "react-router-dom": "^6.3.0",
     "react-tag-input": "^6.8.0"
   }
