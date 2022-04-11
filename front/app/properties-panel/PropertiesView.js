@@ -2,7 +2,9 @@ import { is } from 'bpmn-js/lib/util/ModelUtil';
 import React, { Component } from 'react';
 import './PropertiesView.css';
 import { updateGraph, newGraph } from '../network/api';
+//import { CustomTags } from './fields/CustomTags';
 
+export let currentGraph = {}
 
 export default class PropertiesView extends Component {
 
@@ -17,9 +19,16 @@ export default class PropertiesView extends Component {
     this.state = {
       selectedElements: [],
       element: null,
-      record: this.props.original_record,
       title: this.props.original_record.title,
     };
+
+
+    currentGraph = {
+      "title": this.props.original_record.title,
+      "graph": this.props.original_record.graph,
+      "pk": this.props.original_record.pk,
+      "tags": this.props.original_record.tags.split(","),    // split string with comma
+    }
   }
   //---------- exporting funcs------------------
   saveData() {
@@ -46,9 +55,9 @@ export default class PropertiesView extends Component {
   // ------- title editing ----------
   //save title change
   handleTitleChange(event) {
-    this.state.record.title = event.target.value
-    this.setState({ title: this.state.record.title });
-    updateGraph(this.state.record.pk, { "title": this.state.record.title })
+    currentGraph.title = event.target.value
+    this.setState({ title: currentGraph.title });
+    updateGraph(currentGraph.pk, { "title": currentGraph.title })
   };
 
 
@@ -115,7 +124,7 @@ export default class PropertiesView extends Component {
       //Rendering
       <div>
         <div>
-          <h5>Title: {this.state.record.pk}_</h5>
+          <h5>Title: {currentGraph.pk}_</h5>
           <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "30%" }} />
         </div>
 
