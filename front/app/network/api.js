@@ -39,7 +39,7 @@ export const getTargetGraph = async () => {
 }
 
 // new graph
-export const postNewGraph = async (json) => {
+export const newGraph = async (json) => {
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

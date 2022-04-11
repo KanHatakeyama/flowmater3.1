@@ -1,14 +1,18 @@
 import { is } from 'bpmn-js/lib/util/ModelUtil';
 import React, { Component } from 'react';
 import './PropertiesView.css';
-import { updateGraph } from '../network/api';
+import { updateGraph, newGraph } from '../network/api';
 
 
 export default class PropertiesView extends Component {
 
   constructor(props) {
     super(props);
+
+    // funcs
     this.saveData = this.saveData.bind(this);
+    this.saveNewData = this.saveNewData.bind(this);
+
     this.state = {
       selectedElements: [],
       element: null
@@ -24,6 +28,18 @@ export default class PropertiesView extends Component {
       updateGraph(original_record.pk, { "graph": xml })
     });
   }
+  saveNewData() {
+    const {
+      modeler, original_record
+    } = this.props;
+
+    modeler.saveXML({ format: true }, function (err, xml) {
+      // TODO, save other data (e.g., title)
+      newGraph({ "graph": xml })
+      window.alert("saved as a new graph");
+    });
+  }
+
 
 
   componentDidMount() {
@@ -43,7 +59,6 @@ export default class PropertiesView extends Component {
         element: e.newSelection[0]
       });
       this.saveData()
-      //console.log("saved")
     });
 
 
@@ -89,7 +104,7 @@ export default class PropertiesView extends Component {
       <div>
 
         <div>
-          <button onClick={this.saveData} modeler={modeler}>Save</button>
+          <button onClick={this.saveNewData} modeler={modeler}>Save as New</button>
         </div>
         {
           selectedElements.length === 1
