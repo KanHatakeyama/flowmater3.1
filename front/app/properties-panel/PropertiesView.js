@@ -125,16 +125,6 @@ export default class PropertiesView extends Component {
     return (
       //Rendering
       <div>
-        <Menu right width={250} />
-        <div style={{ whiteSpace: "nowrap" }}>
-          <p style={{ display: "inline-flex", whiteSpace: "nowrap", padding: "3px 30px" }}>
-            <h5>Title: {currentGraph.pk}_</h5>
-            <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "30%" }} />
-            <h5 style={{ padding: "0px 10px" }}>Tags: </h5><CustomTags></CustomTags>
-            <button onClick={this.saveNewData} modeler={modeler}>Save as New</button>
-          </p>
-        </div>
-
         {
           selectedElements.length === 1
           && <ElementProperties modeler={modeler} element={element} />
@@ -142,7 +132,21 @@ export default class PropertiesView extends Component {
 
         {
           selectedElements.length === 0
-          && <span>Please select an element.</span>
+          && <span>
+
+            <Menu right width={250} />
+            <div style={{ whiteSpace: "nowrap" }}>
+              <p style={{ display: "inline-flex", whiteSpace: "nowrap", padding: "3px 30px" }}>
+                <h5>Title: {currentGraph.pk}_</h5>
+                <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "30%" }} />
+                <h5 style={{ padding: "0px 10px" }}>Tags: </h5><CustomTags></CustomTags>
+                <button onClick={this.saveNewData} modeler={modeler}>Save as New</button>
+              </p>
+              <FileForm></FileForm>
+            </div>
+
+
+          </span>
         }
 
         {
@@ -150,9 +154,7 @@ export default class PropertiesView extends Component {
           && <span>Please select a single element.</span>
         }
 
-        <div>
-          <FileForm></FileForm>
-        </div>
+
       </div>
 
     );
