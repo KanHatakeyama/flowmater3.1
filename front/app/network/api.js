@@ -1,3 +1,5 @@
+import { graph_id } from "../app";
+
 //export const host_ip = process.env.REACT_APP_DIP
 export const host_ip = "http://133.9.195.84:49088/"
 
@@ -21,16 +23,10 @@ export const getGraph = async () => {
 
 export const getTargetGraph = async () => {
 
-    // get current url
-    //TODO: this is not a beutiful solution
-    const current_url_l = window.location.href.split("/")
-    let id = current_url_l[current_url_l.length - 1]
-    if (id === "") {
-        id = current_url_l[current_url_l.length - 2]
-    }
-
-    //for debug
-    id = 100
+    //get graph id from url (e.g., http://...?gid=100)
+    const current_url = new URL(window.location.href);
+    const params = current_url.searchParams;
+    const id = params.get('gid');
 
     const url = host_ip + `graph/` + String(id)
     const res = await fetch(url, {
