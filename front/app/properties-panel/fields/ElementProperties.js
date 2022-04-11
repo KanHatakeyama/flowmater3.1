@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
+import { SuggestTextArea } from './Suggest/SuggestTextArea';
 
 export function ElementProperties(props) {
 
@@ -15,18 +16,7 @@ export function ElementProperties(props) {
 
     function updateName(name) {
         const modeling = modeler.get('modeling');
-
         modeling.updateLabel(element, name);
-
-
-    }
-
-    function updateTopic(topic) {
-        const modeling = modeler.get('modeling');
-
-        modeling.updateProperties(element, {
-            'custom:topic': topic
-        });
     }
 
     function makeMessageEvent() {
@@ -93,7 +83,7 @@ export function ElementProperties(props) {
         <div className="element-properties" key={element.id}>
 
             <fieldset>
-                <label>name</label>
+                <label>Data</label>
                 <textarea value={element.businessObject.name || ''} onChange={(event) => {
                     updateName(event.target.value)
                 }} />
