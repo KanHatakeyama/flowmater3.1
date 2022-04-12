@@ -84,6 +84,11 @@ def parse_file_list(file_data):
 # TODO: this would take a long time with large databases.
 # cached data should be used instead in some cases (and avoid too much json data transfer)
 def collect_all_graphs(request):
+
+    current_line = request.GET['cl']
+    upper_line = request.GET['ul']
+    print(current_line, upper_line)
+
     graph_list = Graph.objects.all()
     graph_list = list(graph_list.values())
     frequency_list = graph_list_to_line_counts(graph_list)

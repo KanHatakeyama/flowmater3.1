@@ -34,7 +34,7 @@ export function ElementProperties(props) {
         content = name
         updateCurrentLineInfo()
 
-        fetch(host_ip + "graph/dump-lines")
+        fetch(host_ip + "graph/dump-lines?cl=" + currentLineText + "&ul=" + upperLineText)
             .then(res => res.json())
             .then(json => {
                 setSuggestions(json)
