@@ -1,6 +1,7 @@
 
 import React from 'react';
 //import Suggest from './Suggest/Suggest';
+import { getCurrentLineNumber, getCurrentLineText } from './ButtonSuggest/TextParse';
 
 export function ElementProperties(props) {
 
@@ -9,6 +10,8 @@ export function ElementProperties(props) {
         modeler,
         content,
         cursor,
+        currentLineText,
+        currentLineNumber,
     } = props;
 
     if (element.labelTarget) {
@@ -21,8 +24,12 @@ export function ElementProperties(props) {
         const modeling = modeler.get('modeling');
         modeling.updateLabel(element, name);
         content = name
+        updateCurrentLineInfo()
+    }
 
-        console.log(content, cursor)
+    function updateCurrentLineInfo() {
+        currentLineNumber = (getCurrentLineNumber(content, cursor))
+        currentLineText = (getCurrentLineText(content, cursor))
     }
 
     function addSuggestion() {
@@ -45,7 +52,7 @@ export function ElementProperties(props) {
 
             </fieldset>
 
-            <button onClick={addSuggestion}>{content + String(cursor)}</button>
+            <button onClick={addSuggestion}>{content + currentLineText}</button>
 
         </div>
     );
