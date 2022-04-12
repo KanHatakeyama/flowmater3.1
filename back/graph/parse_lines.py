@@ -46,7 +46,7 @@ def graph_list_to_line_counts(all_data):
         pk_list.append(d["id"])
 
     # prepare load modules
-    load_list = [{"name": f"load {p}_{t}", "freq": 1000}
+    load_list = [{"name": f"load {p}_{t}", "freq": 10}
                  for (t, p) in zip(title_list, pk_list)]
 
     # parse lines
@@ -94,11 +94,17 @@ def collect_all_graphs(request):
     frequency_list = graph_list_to_line_counts(graph_list)
 
     file_list = parse_file_list(list(MediaFile.objects.all().values()))
-    # joblib.dump(file_list,"graph/debug/media.bin")
 
     frequency_list.extend(file_list)
 
+    filt_list = [{"name": "", "freq": 0}]
+    filt_list = []
+    for i in frequency_list:
+        if i["name"].startswith(current_line):
+            filt_list.append(({"name": i["name"], "freq": i["freq"]}))
+
     return JsonResponse(
-        data=frequency_list,
+        # data=frequency_list,
+        data=filt_list,
         safe=False
     )
