@@ -59,18 +59,23 @@ export function ElementProperties(props) {
     // Suggestion components
     class SuggestButtons extends React.Component {
         // download suggestion data
+
         render() {
-            let target = "a"
+
+            let target = ""
             if (suggestions.length > 0) {
                 target = suggestions[0].name
             }
 
+            let list = [];
+            for (var i in suggestions) {
+                //  list.push(<li>{suggestions[i].name}</li>);
+                list.push(<SuggestButton value={suggestions[i].name} />)
+            }
+
             return (
                 <>
-                    <SuggestButton value={target} />
-                    <SuggestButton value={currentLineText + "b"} />
-                    <SuggestButton value={currentLineText + "c"} />
-                    <SuggestButton value={currentLineText + "d"} />
+                    {list}
                 </>
 
             )
