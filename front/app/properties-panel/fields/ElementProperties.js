@@ -38,22 +38,19 @@ export function ElementProperties(props) {
         modeling.updateLabel(element, element.businessObject.name);
     }
 
-
-
     return (
         <div className="element-properties" key={element.id}>
 
             <fieldset>
                 <textarea value={element.businessObject.name || ''}
-                    onChange={(event) => { updateField(event.target.value) }}
+                    onChange={(e) => { updateField(e.target.value) }}
                     onKeyDown={(e) => { cursor = e.target.selectionStart }}
                     onClick={(e) => { cursor = e.target.selectionStart }}
                 />
 
             </fieldset>
 
-            <button onClick={addSuggestion}>{content + currentLineText}</button>
-
+            <button onClick={addSuggestion}>{content + props.currentLineText}</button>
         </div>
     );
 }
