@@ -2,7 +2,7 @@ import React from "react";
 import Autosuggest from 'react-autosuggest';
 import { host_ip } from "../../../network/api";
 export let inputtedText = ""
-
+import { textData } from "../ElementProperties";
 
 const languages = [
     {
@@ -44,11 +44,12 @@ const getSuggestions = value => {
 }
 
 class Suggest extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
-            value: '',
+            //value: textData.content + String(textData.cursor),
+            value: this.props.value,
             suggestions: [],
             title: "",
         };
@@ -122,9 +123,7 @@ class Suggest extends React.Component {
         fetch(host_ip + "graph/dump-lines")
             .then(res => res.json())
             .then(json => {
-                //console.log(json);
                 this.setState({
-                    //isLoaded: true,
                     items: json
                 });
             });
@@ -132,9 +131,8 @@ class Suggest extends React.Component {
     }
 
     render() {
-        //var { items, isLoaded } = this.state;
         var { items } = this.state;
-        //console.log("render:",items);
+        var { value } = this.prop.value
         //languages = items
 
         const { value, suggestions } = this.state;
@@ -147,10 +145,6 @@ class Suggest extends React.Component {
 
         return (
             <>
-                <br></br>
-                <br></br>
-                <br></br>
-                <br></br>
                 <Autosuggest
                     suggestions={suggestions}
                     onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
