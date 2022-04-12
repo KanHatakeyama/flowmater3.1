@@ -18,7 +18,6 @@ export function ElementProperties(props) {
     const [currentLineNumber, setcurrentLineNumber] = useState(0)
 
 
-
     if (element.labelTarget) {
         element = element.labelTarget;
     }
@@ -38,10 +37,16 @@ export function ElementProperties(props) {
     }
 
     function addSuggestion() {
-        element.businessObject.name = "aa"
+        const replaceText = "aa"
+        let textLines = content.split("\n")
+        textLines[currentLineNumber - 1] = replaceText
+        const newContent = textLines.join("\n")
+        element.businessObject.name = newContent
         const modeling = modeler.get('modeling');
         modeling.updateLabel(element, element.businessObject.name);
     }
+
+
 
     return (
         <div className="element-properties" key={element.id}>
@@ -58,7 +63,6 @@ export function ElementProperties(props) {
                         updateCurrentLineInfo()
                     }}
                 />
-
             </fieldset>
 
             <button onClick={addSuggestion}>{currentLineText}</button>
