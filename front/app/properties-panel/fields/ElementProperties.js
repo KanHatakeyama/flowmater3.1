@@ -2,7 +2,7 @@
 import React from 'react';
 //import Suggest from './Suggest/Suggest';
 import { getCurrentLineNumber, getCurrentLineText } from './ButtonSuggest/TextParse';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function ElementProperties(props) {
 

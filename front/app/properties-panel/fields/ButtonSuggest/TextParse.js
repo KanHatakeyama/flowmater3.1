@@ -4,7 +4,7 @@ export function getCurrentLineNumber(content, cursor) {
 
     while (true) {
         let targetPos = content.indexOf("\n", curretPos)
-        if (cursor <= targetPos - 1 || targetPos == -1) {
+        if (cursor <= targetPos || targetPos == -1) {
             return currentLine
         }
 
