@@ -16,6 +16,7 @@ export function ElementProperties(props) {
     const [cursor, setCursor] = useState(0)
     const [currentLineText, setCurrentLineText] = useState("")
     const [currentLineNumber, setcurrentLineNumber] = useState(0)
+    //const [replaceText, setReplaceText] = useState("")
 
 
     if (element.labelTarget) {
@@ -36,8 +37,7 @@ export function ElementProperties(props) {
         setCurrentLineText(getCurrentLineText(content, cursor))
     }
 
-    function addSuggestion() {
-        const replaceText = "aa"
+    function addSuggestion(replaceText) {
         let textLines = content.split("\n")
         textLines[currentLineNumber - 1] = replaceText
         const newContent = textLines.join("\n")
@@ -46,6 +46,16 @@ export function ElementProperties(props) {
         modeling.updateLabel(element, element.businessObject.name);
     }
 
+    class SuggestButton extends React.Component {
+        render() {
+            return (
+                <button onClick={(e) => {
+                    addSuggestion(this.props.value + "aaab")
+                }
+                }> {this.props.value + "aaab"}</button >
+            )
+        }
+    }
 
 
     return (
@@ -64,8 +74,7 @@ export function ElementProperties(props) {
                     }}
                 />
             </fieldset>
-
-            <button onClick={addSuggestion}>{currentLineText}</button>
+            <SuggestButton value={currentLineText + "b"} />
         </div>
     );
 }
