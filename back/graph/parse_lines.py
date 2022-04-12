@@ -1,7 +1,6 @@
 # parse lines in nodes of graphs
 
 from .models import Graph, MediaFile
-import json
 import itertools
 import collections
 from django.http import JsonResponse
@@ -20,10 +19,6 @@ def clean_line(line):
 
 
 def extract_lines(str_graph):
-    #graph = json.loads(str_graph)
-    #nested_line_list = [node["name"].split("\n") for node in graph]
-    #line_list = list(itertools.chain.from_iterable(nested_line_list))
-
     # extract texts
     raw_lines = re.findall('name=".*?"', str_graph, re.S)
     return [clean_line(i) for i in raw_lines]

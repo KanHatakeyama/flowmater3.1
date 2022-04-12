@@ -2,7 +2,8 @@
 import React from 'react';
 //import Suggest from './Suggest/Suggest';
 import { getCurrentLineNumber, getCurrentLineText } from './ButtonSuggest/TextParse';
-import { useState, useEffect } from 'react';
+import { useState, setState } from 'react';
+import { host_ip } from "../../network/api"
 
 export function ElementProperties(props) {
 
@@ -17,6 +18,8 @@ export function ElementProperties(props) {
     const [currentLineText, setCurrentLineText] = useState("")
     const [currentLineNumber, setcurrentLineNumber] = useState(0)
     //const [replaceText, setReplaceText] = useState("")
+    const [suggestions, setSuggestions] = useState({})
+
 
 
     if (element.labelTarget) {
@@ -30,6 +33,13 @@ export function ElementProperties(props) {
         modeling.updateLabel(element, name);
         content = name
         updateCurrentLineInfo()
+
+        fetch(host_ip + "graph/dump-lines")
+            .then(res => res.json())
+            .then(json => {
+                setSuggestions(json)
+            });
+
     }
 
     function updateCurrentLineInfo() {
@@ -46,10 +56,18 @@ export function ElementProperties(props) {
         modeling.updateLabel(element, element.businessObject.name);
     }
 
+    // Suggestion components
     class SuggestButtons extends React.Component {
+        // download suggestion data
         render() {
+            let target = "a"
+            if (suggestions.length > 0) {
+                target = suggestions[0].name
+            }
+
             return (
                 <>
+                    <SuggestButton value={target} />
                     <SuggestButton value={currentLineText + "b"} />
                     <SuggestButton value={currentLineText + "c"} />
                     <SuggestButton value={currentLineText + "d"} />
