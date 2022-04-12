@@ -2,6 +2,7 @@
 import React from 'react';
 //import Suggest from './Suggest/Suggest';
 import { getCurrentLineNumber, getCurrentLineText } from './ButtonSuggest/TextParse';
+import { useState } from 'react';
 
 export function ElementProperties(props) {
 
@@ -9,10 +10,14 @@ export function ElementProperties(props) {
         element,
         modeler,
         content,
-        cursor,
-        currentLineText,
-        currentLineNumber,
     } = props;
+
+
+    const [cursor, setCursor] = useState(0)
+    const [currentLineText, setCurrentLineText] = useState("")
+    const [currentLineNumber, setcurrentLineNumber] = useState(0)
+
+
 
     if (element.labelTarget) {
         element = element.labelTarget;
@@ -28,8 +33,8 @@ export function ElementProperties(props) {
     }
 
     function updateCurrentLineInfo() {
-        currentLineNumber = (getCurrentLineNumber(content, cursor))
-        currentLineText = (getCurrentLineText(content, cursor))
+        setcurrentLineNumber(getCurrentLineNumber(content, cursor))
+        setCurrentLineText(getCurrentLineText(content, cursor))
     }
 
     function addSuggestion() {
@@ -44,13 +49,19 @@ export function ElementProperties(props) {
             <fieldset>
                 <textarea value={element.businessObject.name || ''}
                     onChange={(e) => { updateField(e.target.value) }}
-                    onKeyDown={(e) => { cursor = e.target.selectionStart }}
-                    onClick={(e) => { cursor = e.target.selectionStart }}
+                    onKeyDown={(e) => {
+                        setCursor(e.target.selectionStart)
+                        updateCurrentLineInfo()
+                    }}
+                    onClick={(e) => {
+                        setCursor(e.target.selectionStart)
+                        updateCurrentLineInfo()
+                    }}
                 />
 
             </fieldset>
 
-            <button onClick={addSuggestion}>{content + props.currentLineText}</button>
+            <button onClick={addSuggestion}>{currentLineText}</button>
         </div>
     );
 }
