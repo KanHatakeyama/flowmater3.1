@@ -46,13 +46,26 @@ export function ElementProperties(props) {
         modeling.updateLabel(element, element.businessObject.name);
     }
 
+    class SuggestButtons extends React.Component {
+        render() {
+            return (
+                <>
+                    <SuggestButton value={currentLineText + "b"} />
+                    <SuggestButton value={currentLineText + "c"} />
+                    <SuggestButton value={currentLineText + "d"} />
+                </>
+
+            )
+        }
+    }
+
     class SuggestButton extends React.Component {
         render() {
             return (
                 <button onClick={(e) => {
-                    addSuggestion(this.props.value + "aaab")
+                    addSuggestion(this.props.value)
                 }
-                }> {this.props.value + "aaab"}</button >
+                }> {this.props.value}</button >
             )
         }
     }
@@ -74,7 +87,7 @@ export function ElementProperties(props) {
                     }}
                 />
             </fieldset>
-            <SuggestButton value={currentLineText + "b"} />
+            <SuggestButtons />
         </div>
     );
 }
