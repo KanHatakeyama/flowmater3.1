@@ -89,15 +89,13 @@ def collect_all_graphs(request):
     upper_line = request.GET['ul']
     print(current_line, upper_line)
 
+    # TODO: 1分以内のアクセスは、キャッシュデータを使うようにすべき
     graph_list = Graph.objects.all()
     graph_list = list(graph_list.values())
     frequency_list = graph_list_to_line_counts(graph_list)
-
     file_list = parse_file_list(list(MediaFile.objects.all().values()))
-
     frequency_list.extend(file_list)
 
-    filt_list = [{"name": "", "freq": 0}]
     filt_list = []
     for i in frequency_list:
         if i["name"].startswith(current_line):
