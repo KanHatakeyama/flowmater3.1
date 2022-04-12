@@ -1,23 +1,32 @@
 # parse lines in nodes of graphs
 
-from rest_framework.views import APIView
 from .models import Graph, MediaFile
-from django.http import HttpResponse
-import joblib
 import json
 import itertools
 import collections
 from django.http import JsonResponse
 import os
+import re
+
 
 # extract lines in a graph
 
+def clean_line(line):
+    for i in ['"', 'name=']:
+        line = line.replace(i, "")
+
+    line = line.replace("&#10;", "\n")
+    return line
+
 
 def extract_lines(str_graph):
-    graph = json.loads(str_graph)
-    nested_line_list = [node["name"].split("\n") for node in graph]
-    line_list = list(itertools.chain.from_iterable(nested_line_list))
-    return line_list
+    #graph = json.loads(str_graph)
+    #nested_line_list = [node["name"].split("\n") for node in graph]
+    #line_list = list(itertools.chain.from_iterable(nested_line_list))
+
+    # extract texts
+    raw_lines = re.findall('name=".*?"', str_graph, re.S)
+    return [clean_line(i) for i in raw_lines]
 
 # extract lines in a graph
 
@@ -61,7 +70,6 @@ def graph_list_to_line_counts(all_data):
 def parse_file_list(file_data):
     title_list = []
     pk_list = []
-    time_list = []
 
     for d in file_data:
         title_list.append(os.path.basename(d["upload"]))
