@@ -1,7 +1,7 @@
 
 import React from 'react';
 //import Suggest from './Suggest/Suggest';
-import { getCurrentLineNumber, getCurrentLineText } from './ButtonSuggest/TextParse';
+import { getLineData } from './ButtonSuggest/TextParse';
 import { useState, setState } from 'react';
 import { host_ip } from "../../network/api"
 
@@ -16,8 +16,8 @@ export function ElementProperties(props) {
 
     const [cursor, setCursor] = useState(0)
     const [currentLineText, setCurrentLineText] = useState("")
+    const [upperLineText, setUpperlineText] = useState("")
     const [currentLineNumber, setcurrentLineNumber] = useState(0)
-    //const [replaceText, setReplaceText] = useState("")
     const [suggestions, setSuggestions] = useState({})
 
 
@@ -43,8 +43,12 @@ export function ElementProperties(props) {
     }
 
     function updateCurrentLineInfo() {
-        setcurrentLineNumber(getCurrentLineNumber(content, cursor))
-        setCurrentLineText(getCurrentLineText(content, cursor))
+
+        let [currentLine, currentText, upperText] = getLineData(content, cursor)
+        setcurrentLineNumber(currentLine)
+        setCurrentLineText(currentText)
+        setUpperlineText(upperText)
+
     }
 
     function addSuggestion(replaceText) {
@@ -69,7 +73,6 @@ export function ElementProperties(props) {
 
             let list = [];
             for (var i in suggestions) {
-                //  list.push(<li>{suggestions[i].name}</li>);
                 list.push(<SuggestButton value={suggestions[i].name} />)
             }
 

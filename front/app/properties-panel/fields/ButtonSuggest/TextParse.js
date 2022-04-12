@@ -26,3 +26,19 @@ export function getCurrentLineText(content, cursor) {
     return lines[currentLine - 1]
 
 }
+
+export function getLineData(content, cursor) {
+    const currentLine = getCurrentLineNumber(content, cursor)
+    const lines = content.split("\n")
+    const currentText = lines[currentLine - 1]
+
+    let upperText = ""
+    if (currentLine >= 2) {
+        upperText = lines[currentLine - 2]
+    }
+
+    return [currentLine, currentText, upperText]
+
+
+
+}
