@@ -31,9 +31,10 @@ export function ElementProperties(props) {
         currentTextField.content = name
     }
 
-    function updateCurrentLineInfo() {
+
+    //get suggestion data from server
+    function fetchSuggestions() {
         currentTextField = getLineData(currentTextField.content, currentTextField.cursor)
-        //console.log(currentTextField)
         fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
             .then(res => res.json())
             .then(json => {
@@ -54,7 +55,6 @@ export function ElementProperties(props) {
     class SuggestButtons extends React.Component {
 
         render() {
-
             let target = ""
             if (suggest.length > 0) {
                 target = suggest[0].name
@@ -93,15 +93,15 @@ export function ElementProperties(props) {
                 <textarea value={element.businessObject.name || ''}
                     onChange={(e) => {
                         updateField(e.target.value)
-                        updateCurrentLineInfo()
+                        fetchSuggestions()
                     }}
                     onKeyDown={(e) => {
                         currentTextField.cursor = e.target.selectionStart
-                        updateCurrentLineInfo()
+                        fetchSuggestions()
                     }}
                     onClick={(e) => {
                         currentTextField.cursor = e.target.selectionStart
-                        updateCurrentLineInfo()
+                        fetchSuggestions()
                     }}
                 />
             </fieldset>
