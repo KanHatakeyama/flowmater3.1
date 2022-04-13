@@ -16,10 +16,6 @@ export function ElementProperties(props) {
     } = props;
 
 
-    //const [cursor, setCursor] = useState(0)
-    //const [currentLineText, setCurrentLineText] = useState("")
-    //const [upperLineText, setUpperlineText] = useState("")
-    //const [currentLineNumber, setcurrentLineNumber] = useState(0)
     const [suggestions, setSuggestions] = useState({})
 
 
@@ -40,7 +36,7 @@ export function ElementProperties(props) {
 
     function updateCurrentLineInfo() {
         currentTextField = getLineData(content, currentTextField.cursor)
-        console.log(currentTextField)
+        //console.log(currentTextField)
         fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
             .then(res => res.json())
             .then(json => {
@@ -59,7 +55,6 @@ export function ElementProperties(props) {
 
     // Suggestion components
     class SuggestButtons extends React.Component {
-        // download suggestion data
 
         render() {
 
