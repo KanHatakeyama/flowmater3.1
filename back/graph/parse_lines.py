@@ -6,9 +6,15 @@ import collections
 from django.http import JsonResponse
 import os
 import re
+import time
 
+# to cache DB info
+last_call_time = time.time()
+COOL_TIME = 30
+frequency_list = []
 
 # extract lines in a graph
+
 
 def clean_line(line):
     for i in ['"', 'name=']:
@@ -84,17 +90,22 @@ def parse_file_list(file_data):
 # TODO: this would take a long time with large databases.
 # cached data should be used instead in some cases (and avoid too much json data transfer)
 def collect_all_graphs(request):
+    global frequency_list, last_call_time, COOL_TIME
 
     current_line = request.GET['cl']
     upper_line = request.GET['ul']
-    print(current_line, upper_line)
 
-    # TODO: 1分以内のアクセスは、キャッシュデータを使うようにすべき
-    graph_list = Graph.objects.all()
-    graph_list = list(graph_list.values())
-    frequency_list = graph_list_to_line_counts(graph_list)
-    file_list = parse_file_list(list(MediaFile.objects.all().values()))
-    frequency_list.extend(file_list)
+    current_time = time.time()
+    # reload DB
+    if len(frequency_list) == 0 or (current_time-last_call_time) > COOL_TIME:
+        print(current_line, upper_line)
+        graph_list = Graph.objects.all()
+        graph_list = list(graph_list.values())
+        frequency_list = graph_list_to_line_counts(graph_list)
+        file_list = parse_file_list(list(MediaFile.objects.all().values()))
+        frequency_list.extend(file_list)
+
+        last_call_time = current_time
 
     filt_list = []
     for i in frequency_list:
