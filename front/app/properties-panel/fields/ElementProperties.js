@@ -5,7 +5,6 @@ import { getLineData } from './ButtonSuggest/TextParse';
 import { host_ip } from "../../network/api"
 let currentTextField = { content: "*", text: "*", upperText: "" }
 let oldTextField = {}
-
 let suggest = {}
 
 export function ElementProperties(props) {
@@ -35,11 +34,13 @@ export function ElementProperties(props) {
     //get suggestion data from server
     function fetchSuggestions() {
         //check for update fields
-
+        var target = document.getElementById('textarea');
+        currentTextField.cursor = target.selectionStart
+        currentTextField.content = target.value
         currentTextField = getLineData(currentTextField.content, currentTextField.cursor)
 
-        if (
-            (currentTextField.content !== oldTextField.content) &&
+
+        if ((currentTextField.content !== oldTextField.content) ||
             (currentTextField.line !== oldTextField.line)) {
 
             Object.assign(oldTextField, JSON.parse(JSON.stringify(currentTextField)));
@@ -70,6 +71,7 @@ export function ElementProperties(props) {
                 suggest: {}
             };
         }
+
         componentDidMount() {
             //fetch suggestion data every 1000 ms
             this.intervalId = setInterval(() => {
@@ -110,24 +112,31 @@ export function ElementProperties(props) {
         }
     }
 
+    const intervalMs = 1000;
+
+    React.useEffect(() => {
+
+        const intervalId = setInterval(() => {
+            fetchSuggestions();
+        }, intervalMs);
+        return () => {
+            clearInterval(intervalId)
+        };
+
+    }, []);
+
+
 
     return (
         <div className="element-properties" key={element.id}>
 
             <fieldset>
-                <textarea value={element.businessObject.name || ''}
+                <textarea value={element.businessObject.name || ''} id="textarea"
                     onChange={(e) => {
                         updateField(e.target.value)
-                        fetchSuggestions()
+                        //fetchSuggestions()
                     }}
-                    onKeyDown={(e) => {
-                        currentTextField.cursor = e.target.selectionStart
-                        fetchSuggestions()
-                    }}
-                    onClick={(e) => {
-                        currentTextField.cursor = e.target.selectionStart
-                        fetchSuggestions()
-                    }}
+
                 />
             </fieldset>
             <SuggestButtons />
