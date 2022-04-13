@@ -5,7 +5,7 @@ import { getLineData } from './ButtonSuggest/TextParse';
 import { useState } from 'react';
 import { host_ip } from "../../network/api"
 
-let currentTextField = {}
+let currentTextField = { content: "" }
 let suggest = {}
 
 export function ElementProperties(props) {

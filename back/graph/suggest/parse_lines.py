@@ -9,12 +9,13 @@ import time
 last_call_time = time.time()
 COOL_TIME = 30
 frequency_list = []
+pair_frequency_list = []
 
 
 # parse all lines in all graphs and return their line counts
 
 def calc_suggest_data(request):
-    global frequency_list, last_call_time, COOL_TIME
+    global frequency_list, pair_frequency_list, last_call_time, COOL_TIME
 
     current_line = request.GET['cl']
     upper_line = request.GET['ul']
@@ -22,19 +23,34 @@ def calc_suggest_data(request):
 
     # reload whole DB after cool time
     if len(frequency_list) == 0 or (current_time-last_call_time) > COOL_TIME:
-        print(current_line, upper_line)
+
+        # load graph data
         graph_list = Graph.objects.all()
         graph_list = list(graph_list.values())
-        frequency_list = graph_list_to_line_counts(graph_list)
+
+        # calc frequency info
+        frequency_list, pair_frequency_list = graph_list_to_line_counts(
+            graph_list)
+
+        # extend file data
         file_list = parse_file_list(list(MediaFile.objects.all().values()))
         frequency_list.extend(file_list)
 
         last_call_time = current_time
 
     filt_list = []
-    for i in frequency_list:
-        if i["name"].startswith(current_line):
-            filt_list.append(({"name": i["name"], "freq": i["freq"]}))
+
+    # normal search
+    if current_line != "":
+        for i in frequency_list:
+            if i["name"].startswith(current_line):
+                filt_list.append(({"name": i["name"], "freq": i["freq"]}))
+
+    # if the current field is blank
+    else:
+        for i in pair_frequency_list:
+            if i["name"][0].startswith(upper_line):
+                filt_list.append(({"name": i["name"][1], "freq": i["freq"]}))
 
     return JsonResponse(
         # data=frequency_list,
