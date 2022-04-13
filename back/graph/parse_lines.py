@@ -87,16 +87,14 @@ def parse_file_list(file_data):
 
 # parse all lines in all graphs and return their line counts
 
-# TODO: this would take a long time with large databases.
-# cached data should be used instead in some cases (and avoid too much json data transfer)
 def collect_all_graphs(request):
     global frequency_list, last_call_time, COOL_TIME
 
     current_line = request.GET['cl']
     upper_line = request.GET['ul']
-
     current_time = time.time()
-    # reload DB
+
+    # reload whole DB after cool time
     if len(frequency_list) == 0 or (current_time-last_call_time) > COOL_TIME:
         print(current_line, upper_line)
         graph_list = Graph.objects.all()
