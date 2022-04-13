@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { host_ip } from "../../network/api"
 
 let currentTextField = {}
+let suggest = {}
 
 export function ElementProperties(props) {
 
@@ -14,9 +15,6 @@ export function ElementProperties(props) {
         modeler,
         content,
     } = props;
-
-
-    const [suggestions, setSuggestions] = useState({})
 
 
 
@@ -40,8 +38,9 @@ export function ElementProperties(props) {
         fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
             .then(res => res.json())
             .then(json => {
-                setSuggestions(json)
+                suggest = json
             });
+        console.log(suggest, currentTextField)
     }
 
     function addSuggestion(replaceText) {
@@ -59,13 +58,13 @@ export function ElementProperties(props) {
         render() {
 
             let target = ""
-            if (suggestions.length > 0) {
-                target = suggestions[0].name
+            if (suggest.length > 0) {
+                target = suggest[0].name
             }
 
             let list = [];
-            for (var i in suggestions) {
-                list.push(<SuggestButton value={suggestions[i].name} />)
+            for (var i in suggest) {
+                list.push(<SuggestButton value={suggest[i].name} />)
             }
 
             return (
