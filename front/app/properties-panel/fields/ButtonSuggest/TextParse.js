@@ -37,7 +37,12 @@ export function getLineData(content, cursor) {
         upperText = lines[currentLine - 2]
     }
 
-    return [currentLine, currentText, upperText]
+    return {
+        "cursor": cursor,
+        "line": currentLine,
+        "text": currentText,
+        "upperText": upperText
+    }
 
 
 

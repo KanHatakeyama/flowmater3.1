@@ -5,6 +5,8 @@ import { getLineData } from './ButtonSuggest/TextParse';
 import { useState } from 'react';
 import { host_ip } from "../../network/api"
 
+let currentTextField = {}
+
 export function ElementProperties(props) {
 
     let {
@@ -14,10 +16,10 @@ export function ElementProperties(props) {
     } = props;
 
 
-    const [cursor, setCursor] = useState(0)
-    const [currentLineText, setCurrentLineText] = useState("")
-    const [upperLineText, setUpperlineText] = useState("")
-    const [currentLineNumber, setcurrentLineNumber] = useState(0)
+    //const [cursor, setCursor] = useState(0)
+    //const [currentLineText, setCurrentLineText] = useState("")
+    //const [upperLineText, setUpperlineText] = useState("")
+    //const [currentLineNumber, setcurrentLineNumber] = useState(0)
     const [suggestions, setSuggestions] = useState({})
 
 
@@ -34,7 +36,7 @@ export function ElementProperties(props) {
         content = name
         updateCurrentLineInfo()
 
-        fetch(host_ip + "graph/dump-lines?cl=" + currentLineText + "&ul=" + upperLineText)
+        fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
             .then(res => res.json())
             .then(json => {
                 setSuggestions(json)
@@ -43,17 +45,14 @@ export function ElementProperties(props) {
     }
 
     function updateCurrentLineInfo() {
-
-        let [currentLine, currentText, upperText] = getLineData(content, cursor)
-        setcurrentLineNumber(currentLine)
-        setCurrentLineText(currentText)
-        setUpperlineText(upperText)
+        currentTextField = getLineData(content, currentTextField.cursor)
+        console.log(currentTextField)
 
     }
 
     function addSuggestion(replaceText) {
         let textLines = content.split("\n")
-        textLines[currentLineNumber - 1] = replaceText
+        textLines[currentTextField.line - 1] = replaceText
         const newContent = textLines.join("\n")
         element.businessObject.name = newContent
         const modeling = modeler.get('modeling');
@@ -104,11 +103,11 @@ export function ElementProperties(props) {
                 <textarea value={element.businessObject.name || ''}
                     onChange={(e) => { updateField(e.target.value) }}
                     onKeyDown={(e) => {
-                        setCursor(e.target.selectionStart)
+                        currentTextField.cursor = e.target.selectionStart
                         updateCurrentLineInfo()
                     }}
                     onClick={(e) => {
-                        setCursor(e.target.selectionStart)
+                        currentTextField.cursor = e.target.selectionStart
                         updateCurrentLineInfo()
                     }}
                 />
