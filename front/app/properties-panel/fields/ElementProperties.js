@@ -34,20 +34,18 @@ export function ElementProperties(props) {
         const modeling = modeler.get('modeling');
         modeling.updateLabel(element, name);
         content = name
-        updateCurrentLineInfo()
 
-        fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
-            .then(res => res.json())
-            .then(json => {
-                setSuggestions(json)
-            });
 
     }
 
     function updateCurrentLineInfo() {
         currentTextField = getLineData(content, currentTextField.cursor)
         console.log(currentTextField)
-
+        fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
+            .then(res => res.json())
+            .then(json => {
+                setSuggestions(json)
+            });
     }
 
     function addSuggestion(replaceText) {
