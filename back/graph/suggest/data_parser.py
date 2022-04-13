@@ -81,8 +81,6 @@ def graph_list_to_line_counts(all_data):
     all_line_pair_list = list(
         itertools.chain.from_iterable(all_nested_line_pair_list))
 
-    print(all_line_pair_list)
-
     # process lines
     counter = collections.Counter(all_line_list)
     sorted_counter = sorted(counter.items(), key=lambda x: x[1], reverse=True)
@@ -91,11 +89,12 @@ def graph_list_to_line_counts(all_data):
 
     # process line pairs
     pair_counter = collections.Counter(all_line_pair_list)
-    sorted_pair_counter = sorted(pair_counter.items(), key=lambda x: x[1], reverse=True)
-    pair_frequency_list = [{"name": k, "freq": v} for (k, v) in sorted_pair_counter]
+    sorted_pair_counter = sorted(
+        pair_counter.items(), key=lambda x: x[1], reverse=True)
+    pair_frequency_list = [{"name": k, "freq": v}
+                           for (k, v) in sorted_pair_counter]
 
-
-    return load_list,pair_frequency_list
+    return load_list, pair_frequency_list
 
 
 def parse_file_list(file_data):

@@ -10,6 +10,7 @@ last_call_time = time.time()
 COOL_TIME = 30
 frequency_list = []
 pair_frequency_list = []
+MAX_SUGGESTIONS = 10
 
 
 # parse all lines in all graphs and return their line counts
@@ -54,6 +55,6 @@ def calc_suggest_data(request):
 
     return JsonResponse(
         # data=frequency_list,
-        data=filt_list,
+        data=filt_list[:MAX_SUGGESTIONS],
         safe=False
     )
