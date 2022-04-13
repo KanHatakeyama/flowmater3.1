@@ -28,19 +28,17 @@ export function ElementProperties(props) {
         const modeling = modeler.get('modeling');
         modeling.updateLabel(element, name);
         content = name
-
-
+        currentTextField.content = name
     }
 
     function updateCurrentLineInfo() {
-        currentTextField = getLineData(content, currentTextField.cursor)
+        currentTextField = getLineData(currentTextField.content, currentTextField.cursor)
         //console.log(currentTextField)
         fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
             .then(res => res.json())
             .then(json => {
                 suggest = json
             });
-        console.log(suggest, currentTextField)
     }
 
     function addSuggestion(replaceText) {
@@ -93,7 +91,10 @@ export function ElementProperties(props) {
 
             <fieldset>
                 <textarea value={element.businessObject.name || ''}
-                    onChange={(e) => { updateField(e.target.value) }}
+                    onChange={(e) => {
+                        updateField(e.target.value)
+                        updateCurrentLineInfo()
+                    }}
                     onKeyDown={(e) => {
                         currentTextField.cursor = e.target.selectionStart
                         updateCurrentLineInfo()
