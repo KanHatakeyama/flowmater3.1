@@ -2,10 +2,10 @@
 import React from 'react';
 //import Suggest from './Suggest/Suggest';
 import { getLineData } from './ButtonSuggest/TextParse';
-import { useState } from 'react';
 import { host_ip } from "../../network/api"
+let currentTextField = { content: "*", text: "*", upperText: "" }
+let oldTextField = {}
 
-let currentTextField = { content: "" }
 let suggest = {}
 
 export function ElementProperties(props) {
@@ -34,12 +34,22 @@ export function ElementProperties(props) {
 
     //get suggestion data from server
     function fetchSuggestions() {
+        //check for update fields
+
         currentTextField = getLineData(currentTextField.content, currentTextField.cursor)
-        fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
-            .then(res => res.json())
-            .then(json => {
-                suggest = json
-            });
+
+        if (
+            (currentTextField.content !== oldTextField.content) &&
+            (currentTextField.line !== oldTextField.line)) {
+
+            Object.assign(oldTextField, JSON.parse(JSON.stringify(currentTextField)));
+
+            fetch(host_ip + "graph/dump-lines?cl=" + currentTextField.text + "&ul=" + currentTextField.upperText)
+                .then(res => res.json())
+                .then(json => {
+                    suggest = json
+                });
+        }
     }
 
     function addSuggestion(replaceText) {
@@ -54,11 +64,26 @@ export function ElementProperties(props) {
     // Suggestion components
     class SuggestButtons extends React.Component {
 
+        constructor(props) {
+            super(props);
+            this.state = {
+                suggest: {}
+            };
+        }
+        componentDidMount() {
+            //fetch suggestion data every 1000 ms
+            this.intervalId = setInterval(() => {
+                //console.log("aa")
+                this.setState({
+                    suggest: suggest
+                });
+            }, 1000);
+        }
+        componentWillUnmount() {
+            clearInterval(this.intervalId);
+        }
+
         render() {
-            let target = ""
-            if (suggest.length > 0) {
-                target = suggest[0].name
-            }
 
             let list = [];
             for (var i in suggest) {
