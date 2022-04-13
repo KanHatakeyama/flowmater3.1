@@ -7,6 +7,8 @@ let currentTextField = { content: "*", text: "*", upperText: "" }
 let oldTextField = {}
 let suggest = {}
 
+const suggestFetchIntervalMs = 1000;
+
 export function ElementProperties(props) {
 
     let {
@@ -72,6 +74,7 @@ export function ElementProperties(props) {
             };
         }
 
+        //TODO: this part doesnt have to be periodic process
         componentDidMount() {
             //fetch suggestion data every 1000 ms
             this.intervalId = setInterval(() => {
@@ -112,13 +115,13 @@ export function ElementProperties(props) {
         }
     }
 
-    const intervalMs = 1000;
 
+    //periorically check curso position etc and fetch suggestions
     React.useEffect(() => {
 
         const intervalId = setInterval(() => {
             fetchSuggestions();
-        }, intervalMs);
+        }, suggestFetchIntervalMs);
         return () => {
             clearInterval(intervalId)
         };
