@@ -12,7 +12,7 @@ export function getCurrentLineNumber(content, cursor) {
 
         curretPos += targetPos
 
-        // for safety
+        // for safety (avoid infinite loop by bug)
         if (currentLine > 10) {
             return -1
         }

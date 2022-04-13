@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react'
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone'
 import { Form } from 'react-final-form'
-import { host_ip } from '../../network/api';
+import { host_ip } from '../../../network/api';
 
 let file
 export function FileDropzone() {

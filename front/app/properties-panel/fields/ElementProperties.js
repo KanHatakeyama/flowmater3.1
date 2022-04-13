@@ -2,7 +2,7 @@
 import React from 'react';
 //import Suggest from './Suggest/Suggest';
 import { getLineData } from './ButtonSuggest/TextParse';
-import { useState, setState } from 'react';
+import { useState } from 'react';
 import { host_ip } from "../../network/api"
 
 export function ElementProperties(props) {

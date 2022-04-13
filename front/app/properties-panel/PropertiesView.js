@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './PropertiesView.css';
 import { updateGraph, newGraph } from '../network/api';
 import { CustomTags } from './fields/CustomTags';
-import { FileForm } from './fields/DropZone';
+import { FileForm } from './fields/DropZone/DropZone';
 import { ElementProperties } from './fields/ElementProperties';
 import Menu from './fields/Menu/Menu';
 
