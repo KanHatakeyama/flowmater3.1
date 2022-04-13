@@ -7,7 +7,8 @@ let currentTextField = { content: "*", text: "*", upperText: "" }
 let oldTextField = {}
 let suggest = {}
 
-const suggestFetchIntervalMs = 1000;
+// interval (ms) to check inputted data and fetch suggestions from server
+const suggestFetchIntervalMs = 100;
 
 export function ElementProperties(props) {
 
@@ -76,13 +77,16 @@ export function ElementProperties(props) {
 
         //TODO: this part doesnt have to be periodic process
         componentDidMount() {
-            //fetch suggestion data every 1000 ms
+            //check change of suggestion data at every 100 ms
             this.intervalId = setInterval(() => {
-                //console.log("aa")
-                this.setState({
-                    suggest: suggest
-                });
-            }, 1000);
+                // if suggestion has changed, change this.state (this induces re-rendering of buttons. this.state.suggest itself is not necessary)
+                if (JSON.stringify(suggest) !== JSON.stringify(this.state.suggest)) {
+                    this.setState({
+                        suggest: suggest
+                    });
+                }
+
+            }, 100);
         }
         componentWillUnmount() {
             clearInterval(this.intervalId);
@@ -94,7 +98,6 @@ export function ElementProperties(props) {
             for (var i in suggest) {
                 list.push(<SuggestButton value={suggest[i].name} />)
             }
-
             return (
                 <>
                     {list}
