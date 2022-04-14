@@ -40,18 +40,25 @@ def calc_suggest_data(request):
         last_call_time = current_time
 
     filt_list = []
+    name_list = []
 
     # normal search
     if current_line != "":
         for i in frequency_list:
             if i["name"].startswith(current_line):
-                filt_list.append(({"name": i["name"], "freq": i["freq"]}))
+                name = i["name"]
+                if name not in name_list:
+                    filt_list.append(({"name": name, "freq": i["freq"]}))
+                    name_list.append(name)
 
     # if the current field is blank
     else:
         for i in pair_frequency_list:
             if i["name"][0].startswith(upper_line):
-                filt_list.append(({"name": i["name"][1], "freq": i["freq"]}))
+                name = i["name"][1]
+                if name not in name_list:
+                    filt_list.append(({"name": name, "freq": i["freq"]}))
+                    name_list.append(name)
 
     return JsonResponse(
         # data=frequency_list,
