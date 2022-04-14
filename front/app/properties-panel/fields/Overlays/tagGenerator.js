@@ -6,8 +6,10 @@ export const parseLine = (item) => {
     if (item.indexOf("load") === 0) {
 
         //get pk
-        const pk = (item.split(" ")[1]).split("_")[0]
-        return '<a id="load-graph" className="item" href="/?gid=' + String(pk) + '"style={{ color: "#FF570D" }} target="_blank">' + item + '</a>'
+        try {
+            const pk = (item.split(" ")[1]).split("_")[0]
+            return '<a id="load-graph" className="item" href="/?gid=' + String(pk) + '"style={{ color: "#FF570D" }} target="_blank">' + item + '</a>'
+        } catch (e) { }
     }
 
 

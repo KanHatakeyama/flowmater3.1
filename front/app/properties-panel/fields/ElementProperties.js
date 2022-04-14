@@ -55,10 +55,8 @@ export function ElementProperties(props) {
         currentTextField.content = target.value
         currentTextField = getLineData(currentTextField.content, currentTextField.cursor)
 
-        console.log(currentTextField)
         if ((currentTextField.content !== oldTextField.content) ||
             (currentTextField.line !== oldTextField.line)) {
-            console.log("c", currentTextField)
 
             Object.assign(oldTextField, JSON.parse(JSON.stringify(currentTextField)));
 
@@ -111,7 +109,7 @@ export function ElementProperties(props) {
         render() {
             let list = [];
             for (var i in suggest) {
-                if (suggest[i] !== "") {
+                if ((suggest[i].name !== "") && (suggest[i].name != currentTextField.text)) {
                     list.push(<SuggestButton value={suggest[i].name} />)
                 }
             }
