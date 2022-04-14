@@ -19,7 +19,7 @@ function parseText(nodeID, content, overlays) {
         overlays.add(nodeID, {
             position: {
                 top: 0,
-                right: -10
+                right: -50
             },
             //   html: '<div>Mixed up the labels?</div>'
             html: '<img class="fit-picture" src="https://cdn-bst.freetls.fastly.net/prod-gixo/assets/img/header/head_logo.png">'
