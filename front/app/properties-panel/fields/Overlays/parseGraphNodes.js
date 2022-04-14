@@ -23,20 +23,13 @@ function parseText(nodeID, content, overlays) {
         tag += (parseLine(line))
     }
 
-    // if (content.indexOf("load") >= 0) {
-    // }
 
-
-
-    //if (content === "start") {
     if (tag !== "") {
         overlays.add(nodeID, {
             position: {
                 bottom: 0,
                 left: 0
             },
-            //   html: '<div>Mixed up the labels?</div>'
-            //html: '<img class="fit-picture" src="https://cdn-bst.freetls.fastly.net/prod-gixo/assets/img/header/head_logo.png">'
             html: String(tag)
         });
     }
