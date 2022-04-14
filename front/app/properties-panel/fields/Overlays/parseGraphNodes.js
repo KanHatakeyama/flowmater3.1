@@ -22,7 +22,7 @@ function parseText(nodeID, content, overlays) {
                 right: -10
             },
             //   html: '<div>Mixed up the labels?</div>'
-            html: '<img class="fit-picture" src="https://bst-image.imgix.net/prod-gixo/content/uploads/2020/12/test.png?auto=compress%2Cformat&fit=scale&h=881&ixlib=php-3.3.0&w=1536&wpsize=1536x1536">'
+            html: '<img class="fit-picture" src="https://cdn-bst.freetls.fastly.net/prod-gixo/assets/img/header/head_logo.png">'
         });
     }
 
