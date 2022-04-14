@@ -108,7 +108,11 @@ export default class PropertiesView extends Component {
       //console.log("saved")
 
     });
+
+
+
   }
+
 
   // --------- rendering-------------
   render() {

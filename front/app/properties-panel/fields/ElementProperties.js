@@ -16,6 +16,9 @@ export function ElementProperties(props) {
         element,
         modeler,
         content,
+        rootElement,
+        canvas,
+        overlays,
     } = props;
 
 
@@ -24,8 +27,17 @@ export function ElementProperties(props) {
         element = element.labelTarget;
     }
 
+
     content = element.businessObject.name
 
+    canvas = modeler.get('canvas');
+    rootElement = canvas.getRootElement();
+    overlays = modeler.get('overlays');
+    console.log(rootElement.children)
+
+
+
+    // apply textarea change to graph object
     function updateField(name) {
         const modeling = modeler.get('modeling');
         modeling.updateLabel(element, name);
@@ -42,7 +54,6 @@ export function ElementProperties(props) {
         currentTextField.content = target.value
         currentTextField = getLineData(currentTextField.content, currentTextField.cursor)
 
-
         if ((currentTextField.content !== oldTextField.content) ||
             (currentTextField.line !== oldTextField.line)) {
 
@@ -56,6 +67,7 @@ export function ElementProperties(props) {
         }
     }
 
+    // apply suggestions to the graph object
     function addSuggestion(replaceText) {
         let textLines = content.split("\n")
         textLines[currentTextField.line - 1] = replaceText
@@ -75,7 +87,6 @@ export function ElementProperties(props) {
             };
         }
 
-        //TODO: this part doesnt have to be periodic process
         componentDidMount() {
             //check change of suggestion data at every 100 ms
             this.intervalId = setInterval(() => {
@@ -85,19 +96,24 @@ export function ElementProperties(props) {
                         suggest: suggest
                     });
                 }
-
             }, 100);
+
+
+
         }
         componentWillUnmount() {
             clearInterval(this.intervalId);
+
+
         }
 
         render() {
-
             let list = [];
             for (var i in suggest) {
                 list.push(<SuggestButton value={suggest[i].name} />)
             }
+
+
             return (
                 <>
                     {list}
@@ -119,20 +135,25 @@ export function ElementProperties(props) {
     }
 
 
-    //periorically check curso position etc and fetch suggestions
+    //periorically check cursor position etc and fetch suggestions from server
     React.useEffect(() => {
-
         const intervalId = setInterval(() => {
             fetchSuggestions();
         }, suggestFetchIntervalMs);
         return () => {
             clearInterval(intervalId)
         };
-
     }, []);
 
-
-
+    // attach an overlay to a node
+    overlays.add('SequenceFlow_19f489h', {
+        position: {
+            bottom: 0,
+            right: 0
+        },
+        html: '<div>Mixed up the labels?</div>'
+    });
+    // main rendering
     return (
         <div className="element-properties" key={element.id}>
 
@@ -140,7 +161,6 @@ export function ElementProperties(props) {
                 <textarea value={element.businessObject.name || ''} id="textarea"
                     onChange={(e) => {
                         updateField(e.target.value)
-                        //fetchSuggestions()
                     }}
 
                 />
