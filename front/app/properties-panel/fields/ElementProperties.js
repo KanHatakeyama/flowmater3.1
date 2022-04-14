@@ -55,8 +55,10 @@ export function ElementProperties(props) {
         currentTextField.content = target.value
         currentTextField = getLineData(currentTextField.content, currentTextField.cursor)
 
+        console.log(currentTextField)
         if ((currentTextField.content !== oldTextField.content) ||
             (currentTextField.line !== oldTextField.line)) {
+            console.log("c", currentTextField)
 
             Object.assign(oldTextField, JSON.parse(JSON.stringify(currentTextField)));
 

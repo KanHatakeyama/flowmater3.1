@@ -1,23 +1,9 @@
 export function getCurrentLineNumber(content, cursor) {
-    let currentLine = 1
-    let curretPos = 1
+    let str = content.substring(0, cursor) + "a";
+    let lines = str.split("\n");
+    return lines.length
 
-    while (true) {
-        let targetPos = content.indexOf("\n", curretPos)
-        if (cursor <= targetPos || targetPos == -1) {
-            return currentLine
-        }
 
-        currentLine += 1
-
-        curretPos += targetPos
-
-        // for safety (avoid infinite loop by bug)
-        if (currentLine > 10) {
-            return -1
-        }
-
-    }
 }
 
 export function getCurrentLineText(content, cursor) {
