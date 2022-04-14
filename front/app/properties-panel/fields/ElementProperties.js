@@ -7,7 +7,7 @@ let currentTextField = { content: "*", text: "*", upperText: "" }
 let oldTextField = {}
 let suggest = {}
 import { renderOverlays } from './Overlays/parseGraphNodes';
-
+import "./ButtonSuggest/suggest.css"
 // interval (ms) to check inputted data and fetch suggestions from server
 const suggestFetchIntervalMs = 100;
 
@@ -104,14 +104,14 @@ export function ElementProperties(props) {
         }
         componentWillUnmount() {
             clearInterval(this.intervalId);
-
-
         }
 
         render() {
             let list = [];
             for (var i in suggest) {
-                list.push(<SuggestButton value={suggest[i].name} />)
+                if (suggest[i] !== "") {
+                    list.push(<SuggestButton value={suggest[i].name} />)
+                }
             }
 
 
@@ -127,7 +127,7 @@ export function ElementProperties(props) {
     class SuggestButton extends React.Component {
         render() {
             return (
-                <button onClick={(e) => {
+                <button className="suggestButton" onClick={(e) => {
                     addSuggestion(this.props.value)
                 }
                 }> {this.props.value}</button >

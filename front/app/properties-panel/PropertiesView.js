@@ -140,9 +140,9 @@ export default class PropertiesView extends Component {
 
             <Menu right width={250} />
             <div style={{ whiteSpace: "nowrap" }}>
-              <p style={{ display: "inline-flex", whiteSpace: "nowrap", padding: "3px 30px" }}>
+              <p style={{ display: "flex", whiteSpace: "nowrap", padding: "3px 3px" }}>
                 <h5>Title: {currentGraph.pk}_</h5>
-                <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "30%" }} />
+                <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "70%" }} />
                 <h5 style={{ padding: "0px 10px" }}>Tags: </h5><CustomTags></CustomTags>
                 <button onClick={this.saveNewData} modeler={modeler}>Save as New</button>
               </p>
