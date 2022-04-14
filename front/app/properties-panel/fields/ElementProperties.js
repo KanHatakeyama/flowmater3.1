@@ -6,6 +6,7 @@ import { host_ip } from "../../network/api"
 let currentTextField = { content: "*", text: "*", upperText: "" }
 let oldTextField = {}
 let suggest = {}
+import { renderOverlays } from './Overlays/parseGraphNodes';
 
 // interval (ms) to check inputted data and fetch suggestions from server
 const suggestFetchIntervalMs = 100;
@@ -33,7 +34,7 @@ export function ElementProperties(props) {
     canvas = modeler.get('canvas');
     rootElement = canvas.getRootElement();
     overlays = modeler.get('overlays');
-    console.log(rootElement.children)
+    renderOverlays(rootElement.children, overlays)
 
 
 
@@ -145,14 +146,7 @@ export function ElementProperties(props) {
         };
     }, []);
 
-    // attach an overlay to a node
-    overlays.add('SequenceFlow_19f489h', {
-        position: {
-            bottom: 0,
-            right: 0
-        },
-        html: '<div>Mixed up the labels?</div>'
-    });
+
     // main rendering
     return (
         <div className="element-properties" key={element.id}>
