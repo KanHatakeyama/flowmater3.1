@@ -9,8 +9,6 @@ export const parseLine = (item) => {
         const pk = (item.split(" ")[1]).split("_")[0]
         return '<a id="load-graph" className="item" href="/?gid=' + String(pk) + '"style={{ color: "#FF570D" }} target="_blank">' + item + '</a>'
     }
-    //        return <a id="load-graph" className="item" href={"/graph/" + String(pk)} style={{ color: '#FF570D' }}
-    //            target="_blank">{item}</a>
 
 
     if (item.indexOf("file") === 0) {
@@ -18,13 +16,12 @@ export const parseLine = (item) => {
         //const title = (item.split(" ")[1]).split("_").slice(1)
         const title = (item.slice(item.indexOf("_"))).slice(1)
 
-        return (
-            <>
-                <img src={host_ip + "uploaded/" + String(title)} alt=""></img>
-                <a id="load-graph" className="item" href={host_ip + "uploaded/" + String(title)} style={{ color: '#696969' }}
-                    target="_blank">{item}</a>
-            </>
-        )
+
+        let tag = '<img src=' + host_ip + 'uploaded/' + String(title)
+        tag += ' alt=""></img><a id="load-graph" className="item" href='
+        tag += host_ip + 'uploaded/' + String(title) + ' style={{ color: "#696969" }}target="_blank">' + item + '</a>'
+        return tag
+
     }
 
     //smiles: show chemical strucrures

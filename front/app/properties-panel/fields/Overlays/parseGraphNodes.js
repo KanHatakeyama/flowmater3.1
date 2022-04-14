@@ -1,7 +1,7 @@
 import { parseLine } from "./tagGenerator"
 
 export function renderOverlays(children, overlays) {
-
+    overlays.clear();
     for (var i in children) {
         let node = children[i]
         let nodeID = node.id
@@ -32,8 +32,8 @@ function parseText(nodeID, content, overlays) {
     if (tag !== "") {
         overlays.add(nodeID, {
             position: {
-                top: 0,
-                right: -50
+                bottom: 0,
+                left: 0
             },
             //   html: '<div>Mixed up the labels?</div>'
             //html: '<img class="fit-picture" src="https://cdn-bst.freetls.fastly.net/prod-gixo/assets/img/header/head_logo.png">'
