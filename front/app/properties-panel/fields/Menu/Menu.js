@@ -9,7 +9,7 @@ const listURLs = (data) => {
     return (
       data.map((v) => (
         <li>
-          <a id="home" className="menu-item" href={"/?gid=" + String(v.pk)} style={{ color: "white" }}>  {String(v.pk)} {String(v.title)} </a><br></br>
+          <a id="home" className="menu-item" href={"/?gid=" + String(v.pk)} style={styles.linkButton}>  {String(v.pk)} {String(v.title)} </a>
         </li>
       )))
   } catch (e) {
@@ -38,16 +38,16 @@ export default props => {
 
   //<a id="home" className="menu-item" href="/" style={{ color: 'white' }}>Home</a>
   return (
-    <Menu styles={styles} {...props} width={"50%"} >
-      <a id="home" className="menu-item" href={host_ip + "admin/"} style={{ color: 'white' }} target="_blank">Admin</a>
-      <br></br>
+    <Menu styles={styles} {...props} width={"100%"} >
+      <a id="home" className="menu-item" href={host_ip + "admin/"} style={styles.linkButton} target="_blank"> [Admin]</a>
+      {listURLs(data)}
 
-      <a id="home" className="menu-item" href="/" style={{ color: 'white' }}>{listURLs(data)}</a>
     </Menu>
   );
 };
 
 
+//<a id="home" className="menu-item" href="/" style={{ color: 'white' }}>{listURLs(data)}</a>
 /*
       <a id="home" className="menu-item" href="/graph/create" style={{ color: 'white' }}>Create New</a>
       <br></br>

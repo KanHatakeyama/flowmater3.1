@@ -148,7 +148,7 @@ export default class PropertiesView extends Component {
           selectedElements.length === 0
           && <span>
 
-            <Menu right width={250} />
+            <Menu />
             <div style={{ whiteSpace: "nowrap" }}>
               <p style={{ display: "flex", whiteSpace: "nowrap", padding: "3px 3px" }}>
                 <h5>Title: {currentGraph.pk}_</h5>

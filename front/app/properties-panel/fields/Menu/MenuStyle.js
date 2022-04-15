@@ -4,7 +4,7 @@ export const styles = {
     width: '36px',
     height: '20px',
     left: '10px',
-    bottom: "170pt",
+    bottom: "100pt",
   },
   bmBurgerBars: {
     background: '#373a47'
@@ -25,7 +25,7 @@ export const styles = {
   },
   bmMenu: {
     background: '#373a47',
-    padding: '2.5em 1.5em 0',
+    padding: '1.5em 1.5em 0',
     fontSize: '1.15em'
   },
   bmMorphShape: {
@@ -40,5 +40,17 @@ export const styles = {
   },
   bmOverlay: {
     background: 'rgba(0, 0, 0, 0.3)'
+  },
+
+  linkButton: {
+    margin: "0.5em",
+    color: "white",
+    display: "inline-block",
+    textDecoration: "none",
+    color: "#FFF",
+    borderBottom: "solid 4px #627295",
+    borderRadius: "3px",
+
   }
 }
+
