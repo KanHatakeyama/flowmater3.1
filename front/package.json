@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "description": "A custom react properties panel example",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --open --watch --host 0.0.0.0 --port 18849"
+    "start": "webpack-dev-server --open --watch --host 0.0.0.0 --port 18849",
+    "build": "webpack --progress --mode development",
+    "prod": "webpack --progress --mode production"
   },
   "author": {
     "name": "Niklas Kiefer",
