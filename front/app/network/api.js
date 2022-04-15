@@ -4,7 +4,8 @@ import axios from 'axios';
 //export const host_ip = process.env.REACT_APP_DIP
 export const host_ip = "http://133.9.195.84:49088/"
 export const storageKey = "E08i733GpZvFaqCe1G61kPcKJud2Z6"
-//Store JWT_in localstorage
+
+//Store JWT in localstorage
 //CAUTION: This is not a great idea for seuciry
 export const myJWT = "JWT " + localStorage.getItem(storageKey);
 
