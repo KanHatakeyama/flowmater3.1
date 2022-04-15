@@ -14,7 +14,7 @@ MAX_SUGGESTIONS = 10
 
 
 # parse all lines in all graphs and return their line counts
-
+# CAUTION: no authorization needed!
 def calc_suggest_data(request):
     global frequency_list, pair_frequency_list, last_call_time, COOL_TIME
 
@@ -26,7 +26,7 @@ def calc_suggest_data(request):
     if len(frequency_list) == 0 or (current_time-last_call_time) > COOL_TIME:
 
         # load graph data
-        graph_list = Graph.objects.all()
+        graph_list = Graph.objects.all().order_by("-updated_at")
         graph_list = list(graph_list.values())
 
         # calc frequency info
@@ -34,7 +34,8 @@ def calc_suggest_data(request):
             graph_list)
 
         # extend file data
-        file_list = parse_file_list(list(MediaFile.objects.all().values()))
+        file_list = parse_file_list(
+            list(MediaFile.objects.all().order_by("-updated_at").values()))
         frequency_list.extend(file_list)
 
         last_call_time = current_time
