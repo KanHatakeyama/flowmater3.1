@@ -4,6 +4,7 @@ import PropertiesPanel from './properties-panel';
 import customModdleExtension from './moddle/custom.json';
 import { getTargetGraph } from './network/api';
 import { AuthForm } from './properties-panel/auth';
+import BpmnColorPickerModule from 'bpmn-js-color-picker';
 
 const $modelerContainer = document.querySelector('#modeler-container');
 const $propertiesContainer = document.querySelector('#properties-container');
@@ -15,7 +16,10 @@ const modeler = new Modeler({
   },
   keyboard: {
     bindTo: document.body
-  }
+  },
+  additionalModules: [
+    BpmnColorPickerModule
+  ]
 });
 
 
