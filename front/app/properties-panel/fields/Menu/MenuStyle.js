@@ -4,7 +4,7 @@ export const styles = {
     width: '36px',
     height: '20px',
     left: '10px',
-    bottom: "140pt",
+    bottom: "170pt",
   },
   bmBurgerBars: {
     background: '#373a47'

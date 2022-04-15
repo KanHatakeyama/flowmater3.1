@@ -38,12 +38,10 @@ export default props => {
 
   //<a id="home" className="menu-item" href="/" style={{ color: 'white' }}>Home</a>
   return (
-    <Menu styles={styles} {...props} width={"20%"} >
+    <Menu styles={styles} {...props} width={"50%"} >
       <a id="home" className="menu-item" href={host_ip + "admin/"} style={{ color: 'white' }} target="_blank">Admin</a>
       <br></br>
 
-      <h3>Recent data</h3>
-      <br></br>
       <a id="home" className="menu-item" href="/" style={{ color: 'white' }}>{listURLs(data)}</a>
     </Menu>
   );
