@@ -39,6 +39,9 @@ class ListGraph(APIView):
 
 
 class DetailGraph(APIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request, pk):
         try:
             try:

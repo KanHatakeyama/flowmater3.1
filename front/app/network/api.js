@@ -15,6 +15,7 @@ export const toJson = async (res) => {
 export const getGraph = async () => {
     const res = await fetch(host_ip + "graph/", {
         method: "GET",
+
     })
     return await toJson(res)
 }
@@ -30,6 +31,9 @@ export const getTargetGraph = async () => {
     const url = host_ip + `graph/` + String(id)
     const res = await fetch(url, {
         method: "GET",
+        headers: {
+            "Authorization": "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjUwMDAwMjYxLCJqdGkiOiIyNzU0YjY3ZDdhODY0Yjk5OTAxMzVjMmJkNGQ1Y2FhNyIsInVzZXJfaWQiOjF9.dB-ZXYPLj9U6wrmENyg92WESSvsqaHlL3lpw96DMky0",
+        },
     })
 
 
