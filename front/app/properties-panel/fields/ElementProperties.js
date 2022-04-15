@@ -29,10 +29,7 @@ export function ElementProperties(props) {
     }
 
 
-    content = element.businessObject.name
-
-
-
+    content = String(element.businessObject.name)
 
     // apply textarea change to graph object
     function updateField(name) {
