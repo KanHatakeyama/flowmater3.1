@@ -1,6 +1,13 @@
 
+import axios from 'axios';
+
 //export const host_ip = process.env.REACT_APP_DIP
 export const host_ip = "http://133.9.195.84:49088/"
+export const storageKey = "E08i733GpZvFaqCe1G61kPcKJud2Z6"
+
+//Store JWT_in localstorage
+//CAUTION: This is not a great idea for seuciry
+const myJWT = "JWT " + localStorage.getItem(storageKey);
 
 export const toJson = async (res) => {
     const json = await res.json();
@@ -11,11 +18,25 @@ export const toJson = async (res) => {
     }
 }
 
+export const getToken = async (user, pass) => {
+    await axios.post(host_ip + "api/auth/jwt/create/",
+        {
+            "username": user,
+            "password": pass,
+        },
+    )
+        .then(response => (
+            localStorage.setItem(storageKey, response.data.access))
+        )
+
+}
+
+
 
 export const getGraph = async () => {
     const res = await fetch(host_ip + "graph/", {
         method: "GET",
-
+        headers: { "Authorization": myJWT },
     })
     return await toJson(res)
 }
@@ -31,9 +52,7 @@ export const getTargetGraph = async () => {
     const url = host_ip + `graph/` + String(id)
     const res = await fetch(url, {
         method: "GET",
-        headers: {
-            "Authorization": "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjUwMDAwMjYxLCJqdGkiOiIyNzU0YjY3ZDdhODY0Yjk5OTAxMzVjMmJkNGQ1Y2FhNyIsInVzZXJfaWQiOjF9.dB-ZXYPLj9U6wrmENyg92WESSvsqaHlL3lpw96DMky0",
-        },
+        headers: { "Authorization": myJWT },
     })
 
 
@@ -46,7 +65,10 @@ export const getTargetGraph = async () => {
 export const newGraph = async (json) => {
     const requestOptions = {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": myJWT
+        },
         body: JSON.stringify(json),
     };
     const res = await fetch(host_ip + "graph/create", requestOptions)
@@ -58,7 +80,10 @@ export const newGraph = async (json) => {
 export const updateGraph = async (id, json) => {
     const requestOptions = {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": myJWT
+        },
         body: JSON.stringify(json),
     };
     fetch(host_ip + "graph/update/" + String(id), requestOptions)

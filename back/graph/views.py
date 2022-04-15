@@ -60,14 +60,19 @@ class DetailGraph(APIView):
 
 
 class UpdateGraph(generics.UpdateAPIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Graph.objects.all()
     serializer_class = GraphSeriarizer
 
 
 class CreateGraph(generics.CreateAPIView):
+
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = GraphSeriarizer
 
 
+# caution! no auth for file upload!
 def file_upload(request):
     if request.method == "POST":
         my_file = request.FILES.get('file')

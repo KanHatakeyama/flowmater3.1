@@ -3,6 +3,7 @@ import Modeler from 'bpmn-js/lib/Modeler';
 import PropertiesPanel from './properties-panel';
 import customModdleExtension from './moddle/custom.json';
 import { getTargetGraph } from './network/api';
+import { AuthForm } from './properties-panel/auth';
 
 const $modelerContainer = document.querySelector('#modeler-container');
 const $propertiesContainer = document.querySelector('#properties-container');
@@ -29,5 +30,9 @@ getTargetGraph().then((original_record) => {
 
   const diagramXML = original_record.graph
   modeler.importXML(diagramXML);
-})
+}).catch(err => {
+  AuthForm()
+}
+)
+
 
