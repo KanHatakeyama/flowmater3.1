@@ -7,13 +7,17 @@ from rest_framework import status, viewsets, filters
 from rest_framework import generics
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView
-
+from rest_framework import permissions
 MAX_RETURN_GRAPHS = 30
 
 # return recently updated graph lists
 
 
 class ListGraph(APIView):
+
+    # api auth
+    permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request):
         # if True:
         try:
