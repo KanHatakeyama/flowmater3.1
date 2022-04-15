@@ -22,7 +22,10 @@ export function ElementProperties(props) {
         overlays,
     } = props;
 
-
+    canvas = modeler.get('canvas');
+    rootElement = canvas.getRootElement();
+    overlays = modeler.get('overlays');
+    renderOverlays(rootElement.children, overlays)   // apply textarea change to graph object
 
     if (element.labelTarget) {
         element = element.labelTarget;
@@ -31,7 +34,7 @@ export function ElementProperties(props) {
 
     content = String(element.businessObject.name)
 
-    // apply textarea change to graph object
+
     function updateField(name) {
         const modeling = modeler.get('modeling');
         modeling.updateLabel(element, name);
@@ -139,10 +142,6 @@ export function ElementProperties(props) {
         };
     }, []);
 
-    canvas = modeler.get('canvas');
-    rootElement = canvas.getRootElement();
-    overlays = modeler.get('overlays');
-    renderOverlays(rootElement.children, overlays)
 
     // main rendering
     return (
