@@ -1,7 +1,7 @@
 import { parseLine } from "./tagGenerator"
 
 export function renderOverlays(children, overlays) {
-    overlays.clear();
+    //overlays.clear();
     for (var i in children) {
         let node = children[i]
         let nodeID = node.id

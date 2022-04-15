@@ -31,10 +31,6 @@ export function ElementProperties(props) {
 
     content = element.businessObject.name
 
-    canvas = modeler.get('canvas');
-    rootElement = canvas.getRootElement();
-    overlays = modeler.get('overlays');
-    renderOverlays(rootElement.children, overlays)
 
 
 
@@ -146,6 +142,10 @@ export function ElementProperties(props) {
         };
     }, []);
 
+    canvas = modeler.get('canvas');
+    rootElement = canvas.getRootElement();
+    overlays = modeler.get('overlays');
+    renderOverlays(rootElement.children, overlays)
 
     // main rendering
     return (

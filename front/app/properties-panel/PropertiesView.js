@@ -7,7 +7,6 @@ import { ElementProperties } from './fields/ElementProperties';
 import Menu from './fields/Menu/Menu';
 
 export let currentGraph = {}
-
 export default class PropertiesView extends Component {
 
   constructor(props) {
