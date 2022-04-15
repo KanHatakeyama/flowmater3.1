@@ -15,9 +15,7 @@ MAX_RETURN_GRAPHS = 30
 
 class ListGraph(APIView):
 
-    # TODO: auth does not work correctly
-    #  api auth
-    #permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
         # if True:
@@ -68,7 +66,6 @@ class UpdateGraph(generics.UpdateAPIView):
 
 
 class CreateGraph(generics.CreateAPIView):
-
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = GraphSeriarizer
 

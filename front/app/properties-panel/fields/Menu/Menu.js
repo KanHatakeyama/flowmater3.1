@@ -2,8 +2,7 @@ import React from "react";
 import { useEffect, useState } from 'react';
 import { slide as Menu } from "react-burger-menu";
 import { styles } from "./MenuStyle"
-import { host_ip } from "../../../network/api";
-
+import { host_ip, myJWT } from "../../../network/api";
 const listURLs = (data) => {
   try {
     return (
@@ -23,12 +22,12 @@ export default props => {
   //get graph data list by api
   const [data, setData] = useState();
   useEffect(() => {
-    //console.log('fetching data...');
 
-    fetch(host_ip + "graph/")
-      .then(res => res.json(), {
-        method: "GET",
-      })
+    fetch(host_ip + "graph/", {
+      method: "GET",
+      headers: { "Authorization": myJWT }
+    })
+      .then(res => res.json())
       .then(json => {
         setData(json);
       });
