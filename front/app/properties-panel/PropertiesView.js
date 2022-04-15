@@ -16,7 +16,9 @@ export default class PropertiesView extends Component {
     // funcs
     this.saveData = this.saveData.bind(this);
     this.saveNewData = this.saveNewData.bind(this);
+    this.createNewRecord = this.createNewRecord.bind(this);
     this.handleTitleChange = this.handleTitleChange.bind(this);
+
 
     this.state = {
       selectedElements: [],
@@ -49,9 +51,17 @@ export default class PropertiesView extends Component {
 
     modeler.saveXML({ format: true }, function (err, xml) {
       // TODO, save other data (e.g., title)
-      newGraph({ "graph": xml, "title": currentGraph.title, "tags": currentGraph.tags })
+      newGraph({ "graph": xml, "title": currentGraph.title + "_copy", "tags": currentGraph.tags.join(",") })
       window.alert("saved as a new graph");
+      window.location.reload();
     });
+  }
+
+  createNewRecord() {
+    newGraph({ "title": "new record" })
+    window.alert("made a new graph");
+    window.location.reload();
+
   }
 
   // ------- title editing ----------
@@ -145,6 +155,7 @@ export default class PropertiesView extends Component {
                 <input type="title" value={this.state.title} onChange={this.handleTitleChange} style={{ width: "70%" }} />
                 <h5 style={{ padding: "0px 10px" }}>Tags: </h5><CustomTags></CustomTags>
                 <button onClick={this.saveNewData} modeler={modeler}>Save as New</button>
+                <button onClick={this.createNewRecord} >New record</button>
               </p>
               <FileForm></FileForm>
             </div>

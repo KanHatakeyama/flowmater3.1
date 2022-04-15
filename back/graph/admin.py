@@ -22,7 +22,7 @@ class GraphAdmin(ImportExportModelAdmin):
                    "created_at", "updated_at"]
 
     def edit(self, obj):
-        html = f'<a href={settings.REACT_URL}/graph/{obj.pk} target="_blank">edit</a>'
+        html = f'<a href={settings.REACT_URL}/?gid={obj.pk} target="_blank">edit</a>'
         return mark_safe(html)
 
     def tag_names(self, obj):
