@@ -6,4 +6,5 @@ export function AuthForm() {
 
     getToken(user, pass)
 
+    window.location.reload();
 }
