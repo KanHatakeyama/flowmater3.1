@@ -82,3 +82,7 @@ def file_upload(request):
 
 class UploadHome(TemplateView):
     template_name = 'upload_form/upload.html'
+
+
+class Reactview(TemplateView):
+    template_name = 'public/index.html'
