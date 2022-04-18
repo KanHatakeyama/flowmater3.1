@@ -1,6 +1,6 @@
 import networkx as nx
 import numpy as np
-from .basic_utils import get_node_contents, get_node_ids
+from .basic_utils import get_node_contents, get_node_ids, search_target_word_re
 from .graph_checker.analyze_tips import search_start_end_nodes
 
 
@@ -22,3 +22,7 @@ class ExpGraph:
         # check start and end nodes
         self.start_node, self.end_node = search_start_end_nodes(
             self.g, self.node_array, self.content_array)
+
+        # search "load" labels
+        load_nums = search_target_word_re(self.content_array, "^load")
+        self.load_nodes = [self.node_array[n] for n in load_nums]
