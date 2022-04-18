@@ -2,11 +2,12 @@ import networkx as nx
 import numpy as np
 from .basic_utils import get_node_contents, get_node_ids, search_target_word_re
 from .graph_checker.analyze_tips import search_start_end_nodes
+import copy
 
 
 class ExpGraph:
     def __init__(self, g: nx.DiGraph):
-        self.g = g
+        self.g = copy.deepcopy(g)
 
         self.content_array = np.array(get_node_contents(g))
         self.node_array = np.array(get_node_ids(g))
