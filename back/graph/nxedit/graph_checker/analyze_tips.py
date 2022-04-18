@@ -1,13 +1,6 @@
-from ..basic_utils import search_target_word
+from ..basic_utils import random_name, search_target_word
 import networkx as nx
-import random
-import string
-
-
-def random_name(n):
-    randlst = [random.choice(string.ascii_letters + string.digits)
-               for i in range(n)]
-    return ''.join(randlst)
+from ..basic_utils random_name
 
 
 def search_start_end_nodes(g: nx.DiGraph, node_array, content_array):

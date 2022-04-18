@@ -3,6 +3,7 @@ import bpmn_python.bpmn_diagram_rep as diagram
 import io
 from .ExpGraph import ExpGraph
 from .integrator.cut_and_connect import load_another_graph
+from .basic_utils import search_target_word_re
 
 MAX_NEST_GRAPH = 4
 
@@ -35,7 +36,10 @@ class ExpManager:
 
             self.exp_dict[int(record["id"])] = data
 
+        # load son graphs
         self._load_son_graphs()
+        self._delete_memos()
+        self._attibute_val_nodes()
 
     def _load_son_graphs(self):
         # load son graphs according to "load ****" command
@@ -55,3 +59,18 @@ class ExpManager:
             if len(load_commands) > 0:
                 raise ValueError(
                     "Too many nesting of graphs! over ", MAX_NEST_GRAPH)
+
+    def _delete_memos(self):
+        for pk in list(self.exp_dict):
+            exp = self.exp_dict[pk]["exp"]
+            # search for  [Memo] nodes, which should be deleted for ML
+            memo_node_nums = search_target_word_re(
+                exp.content_array, ".*\[Memo\]")
+
+            for target_num in memo_node_nums:
+                exp.g.remove_node(exp.node_array[target_num])
+
+    def _attibute_val_nodes(self):
+        for pk in list(self.exp_dict):
+            exp = self.exp_dict[pk]["exp"]
+            exp.attribute_val_nodes()
