@@ -25,5 +25,6 @@ class ExpGraph:
             self.g, self.node_array, self.content_array)
 
         # search "load" labels
-        load_nums = search_target_word_re(self.content_array, "^load")
-        self.load_nodes = [self.node_array[n] for n in load_nums]
+        self.load_node_nums = search_target_word_re(
+            self.content_array, "^load")
+        self.load_nodes = [self.node_array[n] for n in self.load_node_nums]

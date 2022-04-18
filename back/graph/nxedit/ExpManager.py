@@ -20,12 +20,13 @@ class ExpManager:
             data = {}
             data["title"] = record["title"]
             data["tags"] = record["tags"]
-            #data["bpmn"] = record["graph"]
 
             # parse bpmn data
             bpmn_graph = diagram.BpmnDiagramGraph()
             bpmn_graph.load_diagram_from_xml_file(io.StringIO(record["graph"]))
             data["bpmn"] = bpmn_graph
+
+            # initialize nx graph object
             exp = ExpGraph(bpmn_graph.diagram_graph)
             data["exp"] = exp
 

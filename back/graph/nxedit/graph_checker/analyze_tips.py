@@ -1,5 +1,13 @@
 from ..basic_utils import search_target_word
 import networkx as nx
+import random
+import string
+
+
+def random_name(n):
+    randlst = [random.choice(string.ascii_letters + string.digits)
+               for i in range(n)]
+    return ''.join(randlst)
 
 
 def search_start_end_nodes(g: nx.DiGraph, node_array, content_array):
@@ -10,14 +18,17 @@ def search_start_end_nodes(g: nx.DiGraph, node_array, content_array):
     start_num, end_num = search_tips(content_array)
     start_node = node_array[start_num]
 
-    # if end node is not defined clearly, search for the tip node in the directed graph
+    # if end node is not defined clearly, add  it
     if end_num == -1:
-        end_node = [x for x in g.nodes() if g.out_degree(x) == 0]
+        # search for the tip node in the directed graph
+        tip_node = [x for x in g.nodes() if g.out_degree(x) == 0]
 
-        if len(end_node) != 1:
+        if len(tip_node) != 1:
             raise ValueError("you should clarify the end node")
 
-    end_node = end_node[0]
+        end_node = "end_"+random_name(15)
+        g.add_node(end_node, node_name='end')
+        g.add_edge(tip_node[0], end_node)
 
     return start_node, end_node
 

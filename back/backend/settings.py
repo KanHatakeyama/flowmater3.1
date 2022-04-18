@@ -154,7 +154,14 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 
 # react URL
+# for client rendering (download js from server)
+REACT_URL = ""
+
+# for server rendering (set custom url for development with nodejs)
 REACT_URL = "http://192.168.11.7:18849"
 
+
+# this should be false for file upload form
+# TODO: fix this for higher safety
 CSRF_COOKIE_SECURE = False
 #CSRF_TRUSTED_ORIGINS = [REACT_URL]
