@@ -101,6 +101,8 @@ __webpack_require__.r(__webpack_exports__);
 var _moddle_custom_json__WEBPACK_IMPORTED_MODULE_2___namespace = /*#__PURE__*/__webpack_require__.t(/*! ./moddle/custom.json */ "./app/moddle/custom.json", 1);
 /* harmony import */ var _network_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./network/api */ "./app/network/api.js");
 /* harmony import */ var _properties_panel_auth__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./properties-panel/auth */ "./app/properties-panel/auth.js");
+/* harmony import */ var bpmn_js_color_picker__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! bpmn-js-color-picker */ "./node_modules/bpmn-js-color-picker/index.js");
+
 
 
 
@@ -115,7 +117,8 @@ const modeler = new bpmn_js_lib_Modeler__WEBPACK_IMPORTED_MODULE_0__["default"](
   },
   keyboard: {
     bindTo: document.body
-  }
+  },
+  additionalModules: [bpmn_js_color_picker__WEBPACK_IMPORTED_MODULE_5__["default"]]
 }); // load json data of the record and launch editor
 
 Object(_network_api__WEBPACK_IMPORTED_MODULE_3__["getTargetGraph"])().then(original_record => {
@@ -127,7 +130,7 @@ Object(_network_api__WEBPACK_IMPORTED_MODULE_3__["getTargetGraph"])().then(origi
   const diagramXML = original_record.graph;
   modeler.importXML(diagramXML);
 }).catch(err => {
-  Object(_properties_panel_auth__WEBPACK_IMPORTED_MODULE_4__["AuthForm"])();
+  Object(_properties_panel_auth__WEBPACK_IMPORTED_MODULE_4__["AuthForm"])(err);
 });
 
 /***/ }),
@@ -147,13 +150,13 @@ module.exports = JSON.parse("{\"name\":\"custom\",\"uri\":\"http://custom/ns\",\
 /*!****************************!*\
   !*** ./app/network/api.js ***!
   \****************************/
-/*! exports provided: host_ip, storageKey, myJWT, toJson, getToken, getTargetGraph, newGraph, updateGraph */
+/*! exports provided: storageKey, host_ip, myJWT, toJson, getToken, getTargetGraph, newGraph, updateGraph */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "host_ip", function() { return host_ip; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "storageKey", function() { return storageKey; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "host_ip", function() { return host_ip; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "myJWT", function() { return myJWT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toJson", function() { return toJson; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getToken", function() { return getToken; });
@@ -164,11 +167,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
  //export const host_ip = process.env.REACT_APP_DIP
 
-const host_ip = "http://133.9.195.84:49088/";
-const storageKey = "E08i733GpZvFaqCe1G61kPcKJud2Z6"; //Store JWT in localstorage
+const storageKey = {
+  user: "JY6kb8N99co5Y5jjRlWJif7X59gMP3",
+  token: "6aH3o2M8G7b9Is6iPaQbz9dRYsAL55",
+  url: "wJ2eAz9iW4Z1Wag54p1EJDu7m4rK5N"
+};
+const host_ip = localStorage.getItem(storageKey.url); //Store JWT in localstorage
 //CAUTION: This is not a great idea for seuciry
 
-const myJWT = "JWT " + localStorage.getItem(storageKey);
+const myJWT = "JWT " + localStorage.getItem(storageKey.token);
 const toJson = async res => {
   const json = await res.json();
 
@@ -178,11 +185,17 @@ const toJson = async res => {
     throw new Error(json.message);
   }
 };
-const getToken = async (user, pass) => {
-  await axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(host_ip + "api/auth/jwt/create/", {
+const getToken = async (user, pass, ip) => {
+  alert("begin set tokn with: " + user + " , " + ip);
+  await axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(ip + "api/auth/jwt/create/", {
     "username": user,
     "password": pass
-  }).then(response => localStorage.setItem(storageKey, response.data.access));
+  }).then(response => {
+    localStorage.setItem(storageKey.token, response.data.access);
+    alert("Token was successfully set. Reload window");
+  }).catch(e => {
+    alert("Error setting the token", e);
+  });
 };
 /*
 export const getGraph = async () => {
@@ -206,6 +219,8 @@ const getTargetGraph = async () => {
     headers: {
       "Authorization": myJWT
     }
+  }).catch(e => {
+    alert(e);
   });
   let jsonRes = await toJson(res);
   jsonRes.pk = id;
@@ -473,10 +488,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AuthForm", function() { return AuthForm; });
 /* harmony import */ var _network_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../network/api */ "./app/network/api.js");
 
-function AuthForm() {
-  const user = prompt('User name', "user");
-  const pass = prompt('Password', "");
-  Object(_network_api__WEBPACK_IMPORTED_MODULE_0__["getToken"])(user, pass);
+function AuthForm(err) {
+  alert(err);
+  let username = localStorage.getItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].user);
+  let host_ip = localStorage.getItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].url);
+  host_ip = prompt('server url', host_ip);
+  let user = prompt('User name', username);
+  let pass = prompt('Password', "");
+  localStorage.setItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].user, user);
+  localStorage.setItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].url, host_ip);
+  Object(_network_api__WEBPACK_IMPORTED_MODULE_0__["getToken"])(user, pass, host_ip); //window.location.reload();
 }
 
 /***/ }),
@@ -737,16 +758,16 @@ function ElementProperties(props) {
     canvas,
     overlays
   } = props;
+  canvas = modeler.get('canvas');
+  rootElement = canvas.getRootElement();
+  overlays = modeler.get('overlays');
+  Object(_Overlays_parseGraphNodes__WEBPACK_IMPORTED_MODULE_3__["renderOverlays"])(rootElement.children, overlays); // apply textarea change to graph object
 
   if (element.labelTarget) {
     element = element.labelTarget;
   }
 
-  content = element.businessObject.name;
-  canvas = modeler.get('canvas');
-  rootElement = canvas.getRootElement();
-  overlays = modeler.get('overlays');
-  Object(_Overlays_parseGraphNodes__WEBPACK_IMPORTED_MODULE_3__["renderOverlays"])(rootElement.children, overlays); // apply textarea change to graph object
+  content = String(element.businessObject.name);
 
   function updateField(name) {
     const modeling = modeler.get('modeling');
@@ -1006,8 +1027,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tagGenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tagGenerator */ "./app/properties-panel/fields/Overlays/tagGenerator.js");
 
 function renderOverlays(children, overlays) {
-  overlays.clear();
-
+  //overlays.clear();
   for (var i in children) {
     let node = children[i];
     let nodeID = node.id;
@@ -3752,6 +3772,216 @@ module.exports = {
   trim: trim,
   stripBOM: stripBOM
 };
+
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-js-color-picker/colors/ColorContextPadProvider.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/bpmn-js-color-picker/colors/ColorContextPadProvider.js ***!
+  \*****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ColorContextPadProvider; });
+const colorImageSvg = '<svg viewBox="0 0 2048 2048" xmlns="http://www.w3.org/2000/svg">' +
+  '<path d="m1660 108-395 397-108 107-196-56-205-57-3 4-165 164 394 394 393 393 165-164v-1l3-3-57-204-51-181 113-113 395-396zM471 786l-366 366 393 393 394 395 366-367-393-394Z" />' +
+'</svg>';
+
+const colorImageUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(colorImageSvg);
+
+
+function ColorContextPadProvider(contextPad, popupMenu, canvas, translate) {
+
+  this._contextPad = contextPad;
+  this._popupMenu = popupMenu;
+  this._canvas = canvas;
+  this._translate = translate;
+
+  contextPad.registerProvider(this);
+}
+
+
+ColorContextPadProvider.$inject = [
+  'contextPad',
+  'popupMenu',
+  'canvas',
+  'translate'
+];
+
+
+ColorContextPadProvider.prototype.getContextPadEntries = function(element) {
+  var self = this;
+
+  var actions = {
+    'set-color': {
+      group: 'edit',
+      className: 'bpmn-icon-color',
+      title: self._translate('Set Color'),
+      imageUrl: colorImageUrl,
+      action: {
+        click: function(event, element) {
+
+          // get start popup draw start position
+          var position = {
+            ...getStartPosition(self._canvas, self._contextPad, element),
+            cursor: {
+              x: event.x,
+              y: event.y
+            }
+          };
+
+          // open new color-picker popup
+          self._popupMenu.open(element, 'color-picker', position);
+        }
+      }
+    }
+  };
+
+  return actions;
+};
+
+
+// helpers //////////////////////
+
+function getStartPosition(canvas, contextPad, element) {
+
+  var Y_OFFSET = 5;
+
+  var diagramContainer = canvas.getContainer(),
+      pad = contextPad.getPad(element).html;
+
+  var diagramRect = diagramContainer.getBoundingClientRect(),
+      padRect = pad.getBoundingClientRect();
+
+  var top = padRect.top - diagramRect.top;
+  var left = padRect.left - diagramRect.left;
+
+  var pos = {
+    x: left,
+    y: top + padRect.height + Y_OFFSET
+  };
+
+  return pos;
+}
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-js-color-picker/colors/ColorPopupProvider.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/bpmn-js-color-picker/colors/ColorPopupProvider.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ColorPopupProvider; });
+function ColorPopupProvider(popupMenu, modeling, translate) {
+  this._popupMenu = popupMenu;
+  this._modeling = modeling;
+  this._translate = translate;
+
+  this._popupMenu.registerProvider('color-picker', this);
+}
+
+
+ColorPopupProvider.$inject = [
+  'popupMenu',
+  'modeling',
+  'translate'
+];
+
+
+ColorPopupProvider.prototype.getEntries = function(element) {
+  var self = this;
+
+  var colors = [{
+    label: 'Default',
+    fill: undefined,
+    stroke: undefined
+  }, {
+    label: 'Blue',
+    fill: '#BBDEFB',
+    stroke: '#1E88E5'
+  }, {
+    label: 'Orange',
+    fill: '#FFE0B2',
+    stroke: '#FB8C00'
+  }, {
+    label: 'Green',
+    fill: '#C8E6C9',
+    stroke: '#43A047'
+  }, {
+    label: 'Red',
+    fill: '#FFCDD2',
+    stroke: '#E53935'
+  }, {
+    label: 'Purple',
+    fill: '#E1BEE7',
+    stroke: '#8E24AA'
+  }];
+
+  var entries = colors.map(function(color) {
+    return {
+      title: self._translate(color.label),
+      id: color.label.toLowerCase() + '-color',
+      className: 'color-icon-' + color.label.toLowerCase(),
+      action: createAction(self._modeling, element, color)
+    };
+  });
+
+  return entries;
+};
+
+
+function createAction(modeling, element, color) {
+  return function() {
+    modeling.setColor(element, color);
+  };
+}
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-js-color-picker/colors/index.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/bpmn-js-color-picker/colors/index.js ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ColorContextPadProvider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ColorContextPadProvider */ "./node_modules/bpmn-js-color-picker/colors/ColorContextPadProvider.js");
+/* harmony import */ var _ColorPopupProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ColorPopupProvider */ "./node_modules/bpmn-js-color-picker/colors/ColorPopupProvider.js");
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  __init__: [
+    'colorContextPadProvider',
+    'colorPopupProvider'
+  ],
+  colorContextPadProvider: [ 'type', _ColorContextPadProvider__WEBPACK_IMPORTED_MODULE_0__["default"] ],
+  colorPopupProvider: [ 'type', _ColorPopupProvider__WEBPACK_IMPORTED_MODULE_1__["default"] ]
+});
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-js-color-picker/index.js":
+/*!****************************************************!*\
+  !*** ./node_modules/bpmn-js-color-picker/index.js ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./colors */ "./node_modules/bpmn-js-color-picker/colors/index.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _colors__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
 
 
 /***/ }),
