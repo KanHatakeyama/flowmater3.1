@@ -1,10 +1,18 @@
-import { getToken } from "../network/api"
+import { getToken, storageKey } from "../network/api"
 
-export function AuthForm() {
-    const user = prompt('User name', "user")
-    const pass = prompt('Password', "")
+export function AuthForm(err) {
 
-    getToken(user, pass)
+    alert(err)
 
-    window.location.reload();
+    let username = localStorage.getItem(storageKey.user);
+    let host_ip = localStorage.getItem(storageKey.url);
+
+    host_ip = prompt('server url', host_ip)
+    let user = prompt('User name', username)
+    let pass = prompt('Password', "")
+    localStorage.setItem(storageKey.user, user)
+    localStorage.setItem(storageKey.url, host_ip)
+    getToken(user, pass, host_ip)
+
+    //window.location.reload();
 }

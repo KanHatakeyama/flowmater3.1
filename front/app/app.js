@@ -35,7 +35,7 @@ getTargetGraph().then((original_record) => {
   const diagramXML = original_record.graph
   modeler.importXML(diagramXML);
 }).catch(err => {
-  AuthForm()
+  AuthForm(err)
 }
 )
 

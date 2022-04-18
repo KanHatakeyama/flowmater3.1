@@ -2,12 +2,18 @@
 import axios from 'axios';
 
 //export const host_ip = process.env.REACT_APP_DIP
-export const host_ip = "http://133.9.195.84:49088/"
-export const storageKey = "E08i733GpZvFaqCe1G61kPcKJud2Z6"
+export const storageKey = {
+    user: "JY6kb8N99co5Y5jjRlWJif7X59gMP3",
+    token: "6aH3o2M8G7b9Is6iPaQbz9dRYsAL55",
+    url: "wJ2eAz9iW4Z1Wag54p1EJDu7m4rK5N"
+}
+
+export const host_ip = localStorage.getItem(storageKey.url);
 
 //Store JWT in localstorage
 //CAUTION: This is not a great idea for seuciry
-export const myJWT = "JWT " + localStorage.getItem(storageKey);
+export const myJWT = "JWT " + localStorage.getItem(storageKey.token);
+
 
 export const toJson = async (res) => {
     const json = await res.json();
@@ -18,16 +24,20 @@ export const toJson = async (res) => {
     }
 }
 
-export const getToken = async (user, pass) => {
-    await axios.post(host_ip + "api/auth/jwt/create/",
+export const getToken = async (user, pass, ip) => {
+    alert("begin set tokn with: " + user + " , " + ip)
+
+    await axios.post(ip + "api/auth/jwt/create/",
         {
             "username": user,
             "password": pass,
         },
-    )
-        .then(response => (
-            localStorage.setItem(storageKey, response.data.access))
-        )
+    ).then(response => {
+        localStorage.setItem(storageKey.token, response.data.access)
+        alert("Token was successfully set. Reload window")
+    }).catch(e => {
+        alert("Error setting the token", e)
+    })
 
 }
 
@@ -45,6 +55,7 @@ export const getGraph = async () => {
 
 export const getTargetGraph = async () => {
 
+
     //get graph id from url (e.g., http://...?gid=100)
     const current_url = new URL(window.location.href);
     const params = current_url.searchParams;
@@ -54,7 +65,7 @@ export const getTargetGraph = async () => {
     const res = await fetch(url, {
         method: "GET",
         headers: { "Authorization": myJWT },
-    })
+    }).catch(e => { alert(e) })
 
 
     let jsonRes = await toJson(res)
