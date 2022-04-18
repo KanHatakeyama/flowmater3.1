@@ -2,6 +2,9 @@ import json
 import bpmn_python.bpmn_diagram_rep as diagram
 import io
 from .ExpGraph import ExpGraph
+from .integrator.cut_and_connect import load_another_graph
+
+MAX_NEST_GRAPH = 4
 
 
 class ExpManager:
@@ -30,4 +33,25 @@ class ExpManager:
             exp = ExpGraph(bpmn_graph.diagram_graph)
             data["exp"] = exp
 
-            self.exp_dict[record["id"]] = data
+            self.exp_dict[int(record["id"])] = data
+
+        self._load_son_graphs()
+
+    def _load_son_graphs(self):
+        # load son graphs according to "load ****" command
+        for pk in list(self.exp_dict):
+            exp = self.exp_dict[pk]["exp"]
+
+            for nest_count in range(MAX_NEST_GRAPH+1):
+                # load
+                load_commands = list(exp.load_commands)
+                if load_commands == 0:
+                    break
+
+                for i in range(len(load_commands)):
+                    load_another_graph(i, pk, exp, self)
+                exp.update_info()
+
+            if len(load_commands) > 0:
+                raise ValueError(
+                    "Too many nesting of graphs! over ", MAX_NEST_GRAPH)

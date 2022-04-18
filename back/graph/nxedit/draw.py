@@ -8,3 +8,5 @@ def save_graph_html(fc_g, save_path="flowchart.html"):
 
     for i, j in list(fc_g.edges):
         pyvis_g.add_edge(i, j)
+
+    pyvis_g.save_graph(save_path)
