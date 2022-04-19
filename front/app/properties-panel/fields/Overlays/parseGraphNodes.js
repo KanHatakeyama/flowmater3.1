@@ -1,6 +1,7 @@
 import { parseLine } from "./tagGenerator"
 
 export function renderOverlays(children, overlays) {
+    //console.log(overlays)
     //overlays.clear();
     for (var i in children) {
         let node = children[i]
@@ -30,7 +31,8 @@ function parseText(nodeID, content, overlays) {
                 bottom: 0,
                 left: 0
             },
-            html: String(tag)
+            html: String(tag),
+            type: "manual"
         });
     }
 

@@ -7,7 +7,7 @@ export const parseLine = (item) => {
         //get pk
         try {
             const pk = (item.split(" ")[1]).split("_")[0]
-            return '<NOBR><a id="load-graph" className="item" href="/?gid=' + String(pk) + 'target="_blank">' + item + '</a>' + "</NOBR><br>"
+            return '<NOBR><a id="load-graph" className="item" href="/?gid=' + String(pk) + '" target="_blank">' + item + '</a>' + "</NOBR><br>"
         } catch (e) { }
     }
 
@@ -17,7 +17,7 @@ export const parseLine = (item) => {
 
         let tag = '<NOBR><img src=' + host_ip + 'uploaded/' + String(title)
         tag += ' alt=""></img><a id="load-graph" className="item" href='
-        tag += host_ip + 'uploaded/' + String(title) + '  target="_blank">' + item + '</a>'
+        tag += host_ip + 'uploaded/' + String(title) + ' target="_blank">' + item + '</a>'
         return tag + "</NOBR><br>"
 
     }

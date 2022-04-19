@@ -22,11 +22,6 @@ export function ElementProperties(props) {
         overlays,
     } = props;
 
-    canvas = modeler.get('canvas');
-    rootElement = canvas.getRootElement();
-    overlays = modeler.get('overlays');
-    renderOverlays(rootElement.children, overlays)   // apply textarea change to graph object
-
     if (element.labelTarget) {
         element = element.labelTarget;
     }
@@ -40,6 +35,8 @@ export function ElementProperties(props) {
         modeling.updateLabel(element, name);
         content = name
         currentTextField.content = name
+
+
     }
 
 
@@ -141,6 +138,11 @@ export function ElementProperties(props) {
             clearInterval(intervalId)
         };
     }, []);
+
+    canvas = modeler.get('canvas');
+    rootElement = canvas.getRootElement();
+    overlays = modeler.get('overlays');
+    renderOverlays(rootElement.children, overlays)   // apply textarea change to graph object
 
 
     // main rendering
