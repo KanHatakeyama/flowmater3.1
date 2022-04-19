@@ -1,9 +1,10 @@
 from ..basic_utils import random_name, search_target_word
 import networkx as nx
 from ..basic_utils import random_name
+import numpy as np
 
 
-def search_start_end_nodes(g: nx.DiGraph, node_array, content_array):
+def search_start_end_nodes(g: nx.DiGraph, node_array: np.array, content_array: np.array):
     """
     search start and end nodes in a graph
     """
@@ -19,14 +20,14 @@ def search_start_end_nodes(g: nx.DiGraph, node_array, content_array):
         if len(tip_node) != 1:
             raise ValueError("you should clarify the end node")
 
-        end_node = "end_"+random_name(15)
+        end_node = "end_"+random_name()
         g.add_node(end_node, node_name='end')
         g.add_edge(tip_node[0], end_node)
 
     return start_node, end_node
 
 
-def search_tips(content_array):
+def search_tips(content_array: np.array):
     """
     manually search "start" and "end" nodes
     """

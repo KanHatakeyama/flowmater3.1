@@ -1,7 +1,8 @@
 import networkx as nx
 import numpy as np
-from .basic_utils import get_node_contents, get_node_ids, search_target_word_re, random_name
-from .graph_checker.analyze_tips import search_start_end_nodes
+from ..basic_utils import get_node_contents, get_node_ids, search_target_word_re, random_name
+from ..graph_checker.analyze_tips import search_start_end_nodes
+from ..integrator.string_parser import parse_command
 import copy
 
 
@@ -71,15 +72,11 @@ class ExpGraph:
                     continue
 
                 content_list.remove(content)
-                title, vals = content.split("=")
-                vals = vals.replace("%", " %")
-                vals = vals.replace("r.t.", "25 oC")
 
-                if vals.find(" ") >= 0:
-                    prop, unit = vals.split(" ")
-                else:
-                    prop = vals
-                    unit = None
+                # parse line
+                title, prop, unit = parse_command(content)
+
+                # add new nodes
                 title_node = random_name()+"_title"
                 prop_node = random_name()+"_prop"
                 unit_node = random_name()+"_unit"
@@ -90,7 +87,7 @@ class ExpGraph:
                 g.add_node(prop_node, node_name=prop)
                 g.add_edge(prop_node, title_node)
 
-                if unit is not None:
+                if unit != "":
                     g.add_node(unit_node, node_name=unit)
                     g.add_edge(unit_node, prop_node)
 

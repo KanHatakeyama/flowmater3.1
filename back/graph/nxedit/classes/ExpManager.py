@@ -2,8 +2,8 @@ import json
 import bpmn_python.bpmn_diagram_rep as diagram
 import io
 from .ExpGraph import ExpGraph
-from .integrator.cut_and_connect import load_another_graph
-from .basic_utils import search_target_word_re
+from ..integrator.cut_and_connect import load_another_graph
+from ..basic_utils import search_target_word_re
 
 MAX_NEST_GRAPH = 4
 
@@ -34,7 +34,7 @@ class ExpManager:
             exp = ExpGraph(bpmn_graph.diagram_graph)
             data["exp"] = exp
 
-            self.exp_dict[int(record["id"])] = data
+            self.exp_dict[str(record["id"])] = data
 
         # load son graphs
         self._load_son_graphs()
@@ -46,7 +46,7 @@ class ExpManager:
         for pk in list(self.exp_dict):
             exp = self.exp_dict[pk]["exp"]
 
-            for nest_count in range(MAX_NEST_GRAPH+1):
+            for _ in range(MAX_NEST_GRAPH+1):
                 # load
                 load_commands = list(exp.load_commands)
                 if load_commands == 0:

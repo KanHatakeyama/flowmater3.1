@@ -2,28 +2,29 @@ import numpy as np
 import re
 import random
 import string
+import networkx as nx
 
 
-def random_name(n=15):
+def random_name(n: int = 15):
     randlst = [random.choice(string.ascii_letters + string.digits)
                for i in range(n)]
     return ''.join(randlst)
 
 
-def get_node_ids(g):
+def get_node_ids(g: nx.DiGraph):
     return list(g.nodes)
 
 
-def get_node_contents(g):
+def get_node_contents(g: nx.DiGraph):
     return [g.nodes[name]["node_name"] for name in get_node_ids(g)]
 
 
-def search_target_word(content_array, search_word):
+def search_target_word(content_array: np.array, search_word: str):
     found_nums = np.where(content_array == search_word)[0]
     return found_nums
 
 
-def search_target_word_re(content_array, search_word, prompt_mode=False):
+def search_target_word_re(content_array: np.array, search_word: str, prompt_mode=False):
     id_list = []
     for num, content in enumerate(content_array):
         for lines in content.split("\n"):

@@ -1,16 +1,16 @@
 import copy
 import networkx as nx
-from ..ExpGraph import ExpGraph
+from ..classes.ExpGraph import ExpGraph
 #from ..ExpManager import ExpManager
 
 
 # def load_another_graph(command_id: int, pk: int, exp: ExpGraph,  manager: ExpManager):
-def load_another_graph(command_id: int, pk: int, exp: ExpGraph,  manager):
+def load_another_graph(command_id: int, pk: str, exp: ExpGraph,  manager):
 
     load_command = exp.load_commands[command_id]
 
     # load command must be in the first line
-    load_pk = int(load_command[5:].split("_")[0])
+    load_pk = str(load_command[5:].split("_")[0])
 
     if load_pk == pk:
         raise ValueError("self-referencing the graph! pk: ", pk)
