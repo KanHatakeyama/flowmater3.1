@@ -59,7 +59,7 @@ class ExpGraph:
 
     def attribute_val_nodes(self):
 
-        # search for numeric nodes (e.g., volume: 10 mL)
+        # search for property nodes (e.g., volume=10 mL)
         while True:
             node_num = search_target_word_re(self.content_array, ".*=", True)
             if type(node_num) is not int:

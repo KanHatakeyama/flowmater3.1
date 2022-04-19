@@ -3,7 +3,8 @@ import bpmn_python.bpmn_diagram_rep as diagram
 import io
 from .ExpGraph import ExpGraph
 from ..integrator.cut_and_connect import load_another_graph
-from ..basic_utils import search_target_word_re
+from ..integrator.duplicator import check_commas
+import copy
 
 MAX_NEST_GRAPH = 4
 
@@ -36,11 +37,11 @@ class ExpManager:
 
             self.exp_dict[str(record["id"])] = data
 
-        # load son graphs
         self._load_son_graphs()
         self._delete_memo_nodes()
         self._delete_file_nodes()
         self._attibute_val_nodes()
+        self._duplicate_graphs_with_comma()
 
     def _load_son_graphs(self):
         # load son graphs according to "load ****" command
@@ -76,3 +77,27 @@ class ExpManager:
         for pk in list(self.exp_dict):
             exp = self.exp_dict[pk]["exp"]
             exp.attribute_val_nodes()
+
+    def _duplicate_graphs_with_comma(self):
+
+        for pk in list(self.exp_dict):
+            record = self.exp_dict[pk]
+            exp = record["exp"]
+
+            n_comma, comma_dict = check_commas(exp)
+
+            if n_comma == 0:
+                return
+
+            # duplicate records
+            for i in range(n_comma+1):
+                dup_record = copy.deepcopy(record)
+                for node_id in comma_dict:
+                    dup_record["exp"].g.nodes[node_id]["node_name"] = comma_dict[node_id][i]
+
+                dup_record["exp"].update_info()
+                dup_record["title"] += f"_{i}"
+                self.exp_dict[pk+f"_{i}"] = dup_record
+
+            # delete original one
+            self.exp_dict.pop(pk)
