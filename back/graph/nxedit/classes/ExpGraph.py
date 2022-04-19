@@ -37,6 +37,26 @@ class ExpGraph:
         self.load_commands = [self.content_array[n]
                               for n in self.load_node_nums]
 
+    def delete_memo_nodes(self):
+        self.delete_nodes_regex(target=".*\[Memo\]")
+
+    def delete_file_nodes(self):
+        self.delete_nodes_regex(target="file .*")
+
+    def delete_nodes_regex(self, target: str):
+
+        del_flag = False
+        # search for target nodes, which should be deleted for ML
+        memo_node_nums = search_target_word_re(
+            self.content_array, target)
+
+        for target_num in memo_node_nums:
+            self.g.remove_node(self.node_array[target_num])
+            del_flag = True
+
+        if del_flag:
+            self.update_info()
+
     def attribute_val_nodes(self):
 
         # search for numeric nodes (e.g., volume: 10 mL)

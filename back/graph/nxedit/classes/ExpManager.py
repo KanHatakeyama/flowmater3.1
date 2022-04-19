@@ -70,18 +70,7 @@ class ExpManager:
     def _delete_nodes_regex(self, target: str):
         for pk in list(self.exp_dict):
             exp = self.exp_dict[pk]["exp"]
-
-            del_flag = False
-            # search for target nodes, which should be deleted for ML
-            memo_node_nums = search_target_word_re(
-                exp.content_array, ".*\[Memo\]")
-
-            for target_num in memo_node_nums:
-                exp.g.remove_node(exp.node_array[target_num])
-                del_flag = True
-
-            if del_flag:
-                exp.update_info()
+            exp.delete_nodes_regex(target)
 
     def _attibute_val_nodes(self):
         for pk in list(self.exp_dict):

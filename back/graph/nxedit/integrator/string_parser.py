@@ -18,8 +18,8 @@ def parse_command(content: str):
 
     # normal numbers
     if re.match("[0-9\-]", vals):
-        unit = re.sub("[0-9, \-]* ", "", vals)
-        prop = re.sub(" *[^0-9, \-]*", "", vals)
+        unit = re.sub("[0-9, \-\.]* ", "", vals)
+        prop = re.sub(" *[^0-9, \-\.]*", "", vals)
     else:
         # str vals
         unit = ""
