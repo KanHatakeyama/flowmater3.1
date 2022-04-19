@@ -1,6 +1,6 @@
 from ..basic_utils import random_name, search_target_word
 import networkx as nx
-from ..basic_utils random_name
+from ..basic_utils import random_name
 
 
 def search_start_end_nodes(g: nx.DiGraph, node_array, content_array):

@@ -40,7 +40,7 @@ class ExpGraph:
 
         # search for numeric nodes (e.g., volume: 10 mL)
         while True:
-            node_num = search_target_word_re(self.content_array, ".*:", True)
+            node_num = search_target_word_re(self.content_array, ".*=", True)
             if type(node_num) is not int:
                 break
             node_id = self.node_array[node_num]
@@ -49,19 +49,29 @@ class ExpGraph:
             target_node = node_id
 
             content_list = g.nodes[node_id]["node_name"].split("\n")
+
+            for exception_word in ["SMILES", "file"]:
+                for content in list(content_list):
+                    if content.startswith(exception_word):
+                        content_list.remove(content)
+
             non_colon_content_list = [
-                i for i in content_list if i.find(":") < 0]
+                i for i in content_list if i.find("=") < 0]
 
             if len(non_colon_content_list) == 0:
                 target_node = list(g.successors(node_id))[0]
 
             # add nodes and edges to express numeric variables
             for content in list(content_list):
-                if content.find(":") < 0:
+                continue_flag = False
+                if content.find("=") < 0:
+                    continue_flag = True
+
+                if continue_flag:
                     continue
+
                 content_list.remove(content)
-                title, vals = content.split(":")
-                vals = vals[1:]
+                title, vals = content.split("=")
                 vals = vals.replace("%", " %")
                 vals = vals.replace("r.t.", "25 oC")
 

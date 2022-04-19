@@ -1,10 +1,11 @@
 import copy
 import networkx as nx
 from ..ExpGraph import ExpGraph
-from .. ExpManager import ExpManager
+#from ..ExpManager import ExpManager
 
 
-def load_another_graph(command_id: int, pk: int, exp: ExpGraph,  manager: ExpManager):
+# def load_another_graph(command_id: int, pk: int, exp: ExpGraph,  manager: ExpManager):
+def load_another_graph(command_id: int, pk: int, exp: ExpGraph,  manager):
 
     load_command = exp.load_commands[command_id]
 
