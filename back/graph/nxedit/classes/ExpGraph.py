@@ -37,6 +37,18 @@ class ExpGraph:
         self.load_commands = [self.content_array[n]
                               for n in self.load_node_nums]
 
+    def relabel(self):
+        """
+        relabel node ids
+        """
+        original_node_ids = self.node_array
+        modif_dict = {i: i+"_"+random_name() for i in original_node_ids}
+        self.g = nx.relabel_nodes(self.g, modif_dict)
+
+        self._update_contents()
+        self._initial_check()
+        self.update_info()
+
     def delete_memo_nodes(self):
         self.delete_nodes_regex(target=".*\[Memo\]")
 

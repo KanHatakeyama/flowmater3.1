@@ -50,13 +50,15 @@ class ExpManager:
 
             for _ in range(MAX_NEST_GRAPH+1):
                 # load
-                load_commands = list(exp.load_commands)
-                if load_commands == 0:
-                    break
+                while True:
+                    load_commands = list(exp.load_commands)
+                    if len(load_commands) == 0:
+                        break
 
-                for i in range(len(load_commands)):
-                    load_another_graph(i, pk, exp, self)
-                exp.update_info()
+                    # for i in range(len(load_commands)):
+                    #    load_another_graph(i, pk, exp, self)
+                    load_another_graph(0, pk, exp, self)
+                    exp.update_info()
 
             if len(load_commands) > 0:
                 raise ValueError(

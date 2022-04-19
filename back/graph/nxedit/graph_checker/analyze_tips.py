@@ -23,6 +23,8 @@ def search_start_end_nodes(g: nx.DiGraph, node_array: np.array, content_array: n
         end_node = "end_"+random_name()
         g.add_node(end_node, node_name='end')
         g.add_edge(tip_node[0], end_node)
+    else:
+        end_node = node_array[end_num]
 
     return start_node, end_node
 

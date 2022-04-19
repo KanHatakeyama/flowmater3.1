@@ -19,7 +19,10 @@ def load_another_graph(command_id: int, pk: str, exp: ExpGraph,  manager):
     additional_commands = load_command.split("\n")[1:]
 
     # load son experiment
-    son_exp = manager.exp_dict[load_pk]["exp"]
+    son_exp = copy.deepcopy(manager.exp_dict[load_pk]["exp"])
+
+    # son node names must be relabelled to avoid node confusion (i.e., load the same son graph in a parent graph)
+    son_exp.relabel()
 
     # get sun graph to be connected (w/o "start" and "end" nodes)
     son_g, son_start_node, son_end_node = cut_son_graphs(son_exp)
