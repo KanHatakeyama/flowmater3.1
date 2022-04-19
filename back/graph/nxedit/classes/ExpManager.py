@@ -78,6 +78,11 @@ class ExpManager:
             exp = self.exp_dict[pk]["exp"]
             exp.attribute_val_nodes()
 
+    def _clean_nodes(self):
+        for pk in list(self.exp_dict):
+            exp = self.exp_dict[pk]["exp"]
+            exp.clean_node_info()
+
     def _duplicate_graphs_with_comma(self):
 
         for pk in list(self.exp_dict):

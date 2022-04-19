@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 from ..basic_utils import get_node_contents, get_node_ids, search_target_word_re, random_name
 from ..graph_checker.analyze_tips import search_start_end_nodes
-from ..integrator.string_parser import parse_command
+from ..integrator.string_parser import parse_command, clean_line
 import copy
 
 
@@ -55,6 +55,21 @@ class ExpGraph:
             del_flag = True
 
         if del_flag:
+            self.update_info()
+
+    def clean_node_info(self):
+        g = self.g
+
+        is_changed = False
+        for node_id in g.nodes:
+            content = g.nodes[node_id]["node_name"]
+
+            clean_content = clean_line(content)
+            if content != clean_content:
+                g.nodes[node_id]["node_name"] = clean_content
+                is_changed = True
+
+        if is_changed:
             self.update_info()
 
     def attribute_val_nodes(self):
@@ -111,6 +126,7 @@ class ExpGraph:
                     g.add_node(unit_node, node_name=unit)
                     g.add_edge(unit_node, prop_node)
 
+            content_list = [i for i in content_list if i not in [""]]
             if len(content_list) == 0:
                 g.remove_node(node_id)
             else:

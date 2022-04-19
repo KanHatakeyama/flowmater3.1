@@ -31,3 +31,10 @@ def parse_command(content: str):
         prop = vals
 
     return title, prop, unit
+
+
+def clean_line(content):
+    # remove extra spaces at start and end
+    rep_content = re.sub("^ *", "", content)
+    rep_content = re.sub(" *$", "", rep_content)
+    return rep_content
