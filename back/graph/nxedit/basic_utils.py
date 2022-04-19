@@ -24,14 +24,20 @@ def search_target_word(content_array: np.array, search_word: str):
     return found_nums
 
 
-def search_target_word_re(content_array: np.array, search_word: str, prompt_mode=False):
+def search_target_word_re(content_array: np.array, search_word: str,
+                          prompt_mode=False):
     id_list = []
     for num, content in enumerate(content_array):
-        for lines in content.split("\n"):
-            res = re.match(search_word, lines)
+        for line in content.split("\n"):
+
+            res = re.match(search_word, line)
+
             if res is not None:
+
+                # return only one
                 if prompt_mode:
                     return num
+
                 id_list.append(num)
                 break
 

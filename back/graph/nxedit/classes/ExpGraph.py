@@ -88,20 +88,18 @@ class ExpGraph:
 
         # search for property nodes (e.g., volume=10 mL)
         while True:
-            node_num = search_target_word_re(self.content_array, ".*=", True)
+            node_num = search_target_word_re(
+                self.content_array, ".*=", prompt_mode=True)
+
             if type(node_num) is not int:
                 break
+
             node_id = self.node_array[node_num]
             g = self.g
 
             target_node = node_id
 
             content_list = g.nodes[node_id]["node_name"].split("\n")
-
-            for exception_word in ["SMILES", "file"]:
-                for content in list(content_list):
-                    if content.startswith(exception_word):
-                        content_list.remove(content)
 
             non_colon_content_list = [
                 i for i in content_list if i.find("=") < 0]
