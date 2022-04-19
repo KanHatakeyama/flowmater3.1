@@ -38,7 +38,8 @@ class ExpManager:
 
         # load son graphs
         self._load_son_graphs()
-        self._delete_memos()
+        self._delete_memo_nodes()
+        self._delete_file_nodes()
         self._attibute_val_nodes()
 
     def _load_son_graphs(self):
@@ -60,15 +61,27 @@ class ExpManager:
                 raise ValueError(
                     "Too many nesting of graphs! over ", MAX_NEST_GRAPH)
 
-    def _delete_memos(self):
+    def _delete_memo_nodes(self):
+        self._delete_nodes_regex(target=".*\[Memo\]")
+
+    def _delete_file_nodes(self):
+        self._delete_nodes_regex(target="file .*")
+
+    def _delete_nodes_regex(self, target: str):
         for pk in list(self.exp_dict):
             exp = self.exp_dict[pk]["exp"]
-            # search for  [Memo] nodes, which should be deleted for ML
+
+            del_flag = False
+            # search for target nodes, which should be deleted for ML
             memo_node_nums = search_target_word_re(
                 exp.content_array, ".*\[Memo\]")
 
             for target_num in memo_node_nums:
                 exp.g.remove_node(exp.node_array[target_num])
+                del_flag = True
+
+            if del_flag:
+                exp.update_info()
 
     def _attibute_val_nodes(self):
         for pk in list(self.exp_dict):
