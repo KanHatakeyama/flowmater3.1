@@ -8,6 +8,7 @@ from rest_framework import generics
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView
 from rest_framework import permissions
+
 MAX_RETURN_GRAPHS = 30
 
 # return recently updated graph lists
@@ -78,10 +79,6 @@ def file_upload(request):
         return HttpResponse(f"file {obj.pk}_{obj.filename()}")
 
     return JsonResponse({'post': 'false'})
-
-
-class UploadHome(TemplateView):
-    template_name = 'upload_form/upload.html'
 
 
 class Reactview(TemplateView):

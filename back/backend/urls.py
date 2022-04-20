@@ -17,17 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import redirect
-from urllib.parse import urlencode
+from . import views
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-
-
-def edit_view(request):
-    parameters = request.GET.get('gid')
-    return redirect(f'graph/edit?gid={parameters}')
 
 
 urlpatterns = [
@@ -38,7 +33,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/', include('djoser.urls')),  # add
     path('api/auth/', include('djoser.urls.jwt')),  # add
-    path('', edit_view),
+    path('', views.edit_view),
 
 ]
 if settings.DEBUG:

@@ -153,9 +153,12 @@ CORS_ORIGIN_WHITELIST = (
 CORS_ORIGIN_ALLOW_ALL = True
 
 
-# react URL
+#  REACT_settings
 # for client rendering (download js from server)
-REACT_URL = ""
+REACT_URL = "/graph/edit"
+
+# server URL
+SERVER_URL = "http://192.168.11.7:49088/"
 
 # for server rendering (set custom url for development with nodejs)
 REACT_URL = "http://192.168.11.7:18849"
