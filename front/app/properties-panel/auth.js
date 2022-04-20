@@ -2,8 +2,9 @@ import { getToken, storageKey } from "../network/api"
 
 export function AuthForm(err) {
 
-    alert(err)
-
+    //alert(err)
+    alert("token or url seem invalid. reaccess this page from admin page")
+    /*
     let username = localStorage.getItem(storageKey.user);
     let host_ip = localStorage.getItem(storageKey.url);
 
@@ -15,4 +16,5 @@ export function AuthForm(err) {
     getToken(user, pass, host_ip)
 
     //window.location.reload();
+    */
 }

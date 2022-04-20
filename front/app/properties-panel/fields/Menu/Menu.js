@@ -8,7 +8,7 @@ const listURLs = (data) => {
     return (
       data.map((v) => (
         <li>
-          <a id="home" className="menu-item" href={"/?gid=" + String(v.pk)} style={styles.linkButton}>  {String(v.pk)} {String(v.title)} </a>
+          <a id="home" className="menu-item" href={"/?gid=" + String(v.pk) + "&server=" + host_ip + "&token=" + myJWT.replace("JWT ", "")} style={styles.linkButton}>  {String(v.pk)} {String(v.title)} </a>
         </li>
       )))
   } catch (e) {

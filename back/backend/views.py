@@ -8,4 +8,4 @@ def edit_view(request):
 
     # redirect to edit page for react
     gid = request.GET.get('gid')
-    return redirect(f'{settings.REACT_URL}?gid={gid}?server={settings.SERVER_URL}?token={token}')
+    return redirect(f'{settings.REACT_URL}?gid={gid}&server={settings.SERVER_URL}&token={token}')
