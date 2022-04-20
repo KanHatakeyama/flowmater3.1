@@ -1,0 +1,359 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d0" for="node" attr.name="label" attr.type="string"/>
+<graph edgedefault="directed"><node id="Task_18okrx5">
+  <data key="d0">start</data>
+</node>
+<node id="Task_0rkqglj">
+  <data key="d0">Flask</data>
+</node>
+<node id="Task_1kmw8q2">
+  <data key="d0">Add</data>
+</node>
+<node id="Task_1pf13pt">
+  <data key="d0">Add</data>
+</node>
+<node id="Task_1q83zid">
+  <data key="d0">N2 flow</data>
+</node>
+<node id="Task_13ntvj9">
+  <data key="d0">Stirr</data>
+</node>
+<node id="Task_1iysbb1">
+  <data key="d0">Add</data>
+</node>
+<node id="Task_106ukwo">
+  <data key="d0">Stirr</data>
+</node>
+<node id="Task_0oj52dv">
+  <data key="d0">Stirr</data>
+</node>
+<node id="Task_0ox863e">
+  <data key="d0">Extract</data>
+</node>
+<node id="Task_0dp1qzx">
+  <data key="d0">Mix</data>
+</node>
+<node id="Task_0v7bmfc">
+  <data key="d0">Organic layer</data>
+</node>
+<node id="Task_0l155vr">
+  <data key="d0">Vacuum drying</data>
+</node>
+<node id="Task_1c5vrwx">
+  <data key="d0">Recrystallization</data>
+</node>
+<node id="Task_0t01x2o">
+  <data key="d0">Mix</data>
+</node>
+<node id="Task_0gzjb2b">
+  <data key="d0">product
+Compound</data>
+</node>
+<node id="Task_1kydvbg">
+  <data key="d0">white solid</data>
+</node>
+<node id="Task_11exz1p">
+  <data key="d0">Experiment condition</data>
+</node>
+<node id="end_P9xu8DllLMg1IdK">
+  <data key="d0">end</data>
+</node>
+<node id="Task_1un2egm_FBelmh5mBKxD5wO">
+  <data key="d0">Compound</data>
+</node>
+<node id="Task_0hejyhd_MpKzy7ipin0CUbc">
+  <data key="d0">Made by: TCI</data>
+</node>
+<node id="Task_0wnhhyw_tmWsny4uXzVqHOl">
+  <data key="d0">Compound</data>
+</node>
+<node id="Task_193ohpy_hbUastJ84xoW6J1">
+  <data key="d0">Compound</data>
+</node>
+<node id="Task_0wnhhyw_wCYadQCDKxKxBW5">
+  <data key="d0">Compound</data>
+</node>
+<node id="Task_094copi_qbzUZWBTMn7W7Ky">
+  <data key="d0">Compound</data>
+</node>
+<node id="Task_11s4crw_bDjdOpg9QpRExdJ">
+  <data key="d0">Compound</data>
+</node>
+<node id="Task_13s4y3z_aoZ6JSjGJlgCawK">
+  <data key="d0">Compound</data>
+</node>
+<node id="Task_1hvmx5b_owA0AKFljoibXXa">
+  <data key="d0">Compound</data>
+</node>
+<node id="tpufuGB9kYDkAk0_title">
+  <data key="d0">volume</data>
+</node>
+<node id="KdcrwWkG2SpKUpB_prop">
+  <data key="d0">13</data>
+</node>
+<node id="Fyo6L9kFRsjnCxZ_unit">
+  <data key="d0">mL</data>
+</node>
+<node id="kPFQ4RL1aUVH24F_title">
+  <data key="d0">mol</data>
+</node>
+<node id="9tQ32D42bj2UpFu_prop">
+  <data key="d0">75</data>
+</node>
+<node id="yeQXbMqwbLu6BEM_unit">
+  <data key="d0">mmol</data>
+</node>
+<node id="t9Dj2imgX1GMv75_title">
+  <data key="d0">volume</data>
+</node>
+<node id="AG8BjqT3JEsfkPX_prop">
+  <data key="d0">100</data>
+</node>
+<node id="jYfilDNkjGvOq43_unit">
+  <data key="d0">mL</data>
+</node>
+<node id="If2laOgg8G01VqP_title">
+  <data key="d0">temperature</data>
+</node>
+<node id="4D1uTbjhm9D7LW3_prop">
+  <data key="d0">-78</data>
+</node>
+<node id="651bADluTXs0NiH_unit">
+  <data key="d0">oC</data>
+</node>
+<node id="VTOBOkCLdflwAZ1_title">
+  <data key="d0">duration</data>
+</node>
+<node id="43mFBkKIoafufXl_prop">
+  <data key="d0">15</data>
+</node>
+<node id="IHpIj9jFhwSFmW2_unit">
+  <data key="d0">min</data>
+</node>
+<node id="t3pnLLGu1SAbRqn_title">
+  <data key="d0">temperature</data>
+</node>
+<node id="8ULyJ1nuhedRegK_prop">
+  <data key="d0">-78</data>
+</node>
+<node id="aziO12pbFuVsOw3_unit">
+  <data key="d0">oC</data>
+</node>
+<node id="9rNelE7sBfHSZXT_title">
+  <data key="d0">duration</data>
+</node>
+<node id="HgY4hryMnjQnRjQ_prop">
+  <data key="d0">20</data>
+</node>
+<node id="K0B9ApNGMR1rUeH_unit">
+  <data key="d0">min</data>
+</node>
+<node id="7gVDbMxCVIuQDYm_title">
+  <data key="d0">temperature</data>
+</node>
+<node id="VYhfYWt8jL7yiKw_prop">
+  <data key="d0">25</data>
+</node>
+<node id="ZUTM9W3sUjyBhnl_unit">
+  <data key="d0">oC</data>
+</node>
+<node id="L1uyH4SzJNb8F2q_title">
+  <data key="d0">duration</data>
+</node>
+<node id="Igl5yp5SKOM3vLQ_prop">
+  <data key="d0">60</data>
+</node>
+<node id="FybSKnsLNy2gUmm_unit">
+  <data key="d0">min</data>
+</node>
+<node id="fbn21HLfLXa8KOg_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="lYecocoIsKf2VfB_prop">
+  <data key="d0">O=C(C=C)NC1CC(C)(C)NC(C)(C)C1</data>
+</node>
+<node id="a0oeK18nfM2Yt9n_title">
+  <data key="d0">weight</data>
+</node>
+<node id="lhCibVmiHf086Ns_prop">
+  <data key="d0">5.65</data>
+</node>
+<node id="5bHPk4sADibF7Sp_unit">
+  <data key="d0">g</data>
+</node>
+<node id="Ym8cbn5MU79STaV_title">
+  <data key="d0">yield</data>
+</node>
+<node id="ytjeZJOZ85I4jAq_prop">
+  <data key="d0">60</data>
+</node>
+<node id="v8W2e6eEmulZB76_unit">
+  <data key="d0">%</data>
+</node>
+<node id="rTwweYuTfD76Dcb_title">
+  <data key="d0">Experimenter</data>
+</node>
+<node id="tEyPbiAjnncKU8p_prop">
+  <data key="d0">Yuto Igarashi</data>
+</node>
+<node id="0zcfsHgZxtljTwD_title">
+  <data key="d0">Date</data>
+</node>
+<node id="m2mTeFPkxvhdmBq_prop">
+  <data key="d0">2022/2/8</data>
+</node>
+<node id="NrtdUtggdRYyD8b_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="dtdeGRrua7VamTK_prop">
+  <data key="d0">NC1CC(C)(C)NC(C)(C)C1</data>
+</node>
+<node id="A5UYKw3vs5C55gA_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="90DEeCx4J7x7RX5_prop">
+  <data key="d0">ClCCl</data>
+</node>
+<node id="aDNV5AuAG9h16FJ_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="LUnXK4f8IRiVz4R_prop">
+  <data key="d0">C=CC(Cl)=O</data>
+</node>
+<node id="I93FQ4zp66xvxI6_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="0AdUU3cCKsSdaxI_prop">
+  <data key="d0">ClCCl</data>
+</node>
+<node id="ZT7uAxTL6MQgXA9_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="tEGJi3fcJPQQFzU_prop">
+  <data key="d0">[Na+].[Na+].[O-]C([O-])=O</data>
+</node>
+<node id="9AQxWm5KkgRWsHT_title">
+  <data key="d0">weight</data>
+</node>
+<node id="VWOTyxoyywg02sZ_prop">
+  <data key="d0">22</data>
+</node>
+<node id="1qrrJz6JouUc4fW_unit">
+  <data key="d0">g</data>
+</node>
+<node id="fnyjfr60poyMi3e_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="SRr4Cx6dUAiXoRb_prop">
+  <data key="d0">CCCCCC</data>
+</node>
+<node id="bvesfRRGzY4XInc_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="O5Vieau4JjJ2Ad4_prop">
+  <data key="d0">OCC</data>
+</node>
+<node id="FO6lox0URmvakAs_title">
+  <data key="d0">SMILES</data>
+</node>
+<node id="jPvSVDsvKXQeS8Q_prop">
+  <data key="d0">O[H]</data>
+</node>
+<node id="fWV3wv24CaopqJO_title">
+  <data key="d0">volume</data>
+</node>
+<node id="6jEarCgMNNoZHqy_prop">
+  <data key="d0">100</data>
+</node>
+<node id="PD6gNuyYoIUrsgF_unit">
+  <data key="d0">mL</data>
+</node>
+<edge source="Task_18okrx5" target="Task_11exz1p"/>
+<edge source="Task_0rkqglj" target="Task_1kmw8q2"/>
+<edge source="Task_1kmw8q2" target="Task_1pf13pt"/>
+<edge source="Task_1pf13pt" target="Task_1q83zid"/>
+<edge source="Task_1q83zid" target="Task_13ntvj9"/>
+<edge source="Task_13ntvj9" target="Task_1iysbb1"/>
+<edge source="Task_1iysbb1" target="Task_106ukwo"/>
+<edge source="Task_106ukwo" target="Task_0oj52dv"/>
+<edge source="Task_0oj52dv" target="Task_0ox863e"/>
+<edge source="Task_0ox863e" target="Task_0v7bmfc"/>
+<edge source="Task_0dp1qzx" target="Task_0ox863e"/>
+<edge source="Task_0v7bmfc" target="Task_0l155vr"/>
+<edge source="Task_0l155vr" target="Task_1c5vrwx"/>
+<edge source="Task_1c5vrwx" target="Task_0gzjb2b"/>
+<edge source="Task_0t01x2o" target="Task_1c5vrwx"/>
+<edge source="Task_0gzjb2b" target="end_P9xu8DllLMg1IdK"/>
+<edge source="Task_1kydvbg" target="Task_0gzjb2b"/>
+<edge source="Task_11exz1p" target="Task_0rkqglj"/>
+<edge source="Task_1un2egm_FBelmh5mBKxD5wO" target="Task_1kmw8q2"/>
+<edge source="Task_0hejyhd_MpKzy7ipin0CUbc" target="Task_1un2egm_FBelmh5mBKxD5wO"/>
+<edge source="Task_0wnhhyw_tmWsny4uXzVqHOl" target="Task_1pf13pt"/>
+<edge source="Task_193ohpy_hbUastJ84xoW6J1" target="Task_1iysbb1"/>
+<edge source="Task_0wnhhyw_wCYadQCDKxKxBW5" target="Task_0dp1qzx"/>
+<edge source="Task_094copi_qbzUZWBTMn7W7Ky" target="Task_0dp1qzx"/>
+<edge source="Task_11s4crw_bDjdOpg9QpRExdJ" target="Task_0t01x2o"/>
+<edge source="Task_13s4y3z_aoZ6JSjGJlgCawK" target="Task_0t01x2o"/>
+<edge source="Task_1hvmx5b_owA0AKFljoibXXa" target="Task_0dp1qzx"/>
+<edge source="tpufuGB9kYDkAk0_title" target="Task_1un2egm_FBelmh5mBKxD5wO"/>
+<edge source="KdcrwWkG2SpKUpB_prop" target="tpufuGB9kYDkAk0_title"/>
+<edge source="Fyo6L9kFRsjnCxZ_unit" target="KdcrwWkG2SpKUpB_prop"/>
+<edge source="kPFQ4RL1aUVH24F_title" target="Task_1un2egm_FBelmh5mBKxD5wO"/>
+<edge source="9tQ32D42bj2UpFu_prop" target="kPFQ4RL1aUVH24F_title"/>
+<edge source="yeQXbMqwbLu6BEM_unit" target="9tQ32D42bj2UpFu_prop"/>
+<edge source="t9Dj2imgX1GMv75_title" target="Task_0wnhhyw_tmWsny4uXzVqHOl"/>
+<edge source="AG8BjqT3JEsfkPX_prop" target="t9Dj2imgX1GMv75_title"/>
+<edge source="jYfilDNkjGvOq43_unit" target="AG8BjqT3JEsfkPX_prop"/>
+<edge source="If2laOgg8G01VqP_title" target="Task_13ntvj9"/>
+<edge source="4D1uTbjhm9D7LW3_prop" target="If2laOgg8G01VqP_title"/>
+<edge source="651bADluTXs0NiH_unit" target="4D1uTbjhm9D7LW3_prop"/>
+<edge source="VTOBOkCLdflwAZ1_title" target="Task_13ntvj9"/>
+<edge source="43mFBkKIoafufXl_prop" target="VTOBOkCLdflwAZ1_title"/>
+<edge source="IHpIj9jFhwSFmW2_unit" target="43mFBkKIoafufXl_prop"/>
+<edge source="t3pnLLGu1SAbRqn_title" target="Task_106ukwo"/>
+<edge source="8ULyJ1nuhedRegK_prop" target="t3pnLLGu1SAbRqn_title"/>
+<edge source="aziO12pbFuVsOw3_unit" target="8ULyJ1nuhedRegK_prop"/>
+<edge source="9rNelE7sBfHSZXT_title" target="Task_106ukwo"/>
+<edge source="HgY4hryMnjQnRjQ_prop" target="9rNelE7sBfHSZXT_title"/>
+<edge source="K0B9ApNGMR1rUeH_unit" target="HgY4hryMnjQnRjQ_prop"/>
+<edge source="7gVDbMxCVIuQDYm_title" target="Task_0oj52dv"/>
+<edge source="VYhfYWt8jL7yiKw_prop" target="7gVDbMxCVIuQDYm_title"/>
+<edge source="ZUTM9W3sUjyBhnl_unit" target="VYhfYWt8jL7yiKw_prop"/>
+<edge source="L1uyH4SzJNb8F2q_title" target="Task_0oj52dv"/>
+<edge source="Igl5yp5SKOM3vLQ_prop" target="L1uyH4SzJNb8F2q_title"/>
+<edge source="FybSKnsLNy2gUmm_unit" target="Igl5yp5SKOM3vLQ_prop"/>
+<edge source="fbn21HLfLXa8KOg_title" target="Task_0gzjb2b"/>
+<edge source="lYecocoIsKf2VfB_prop" target="fbn21HLfLXa8KOg_title"/>
+<edge source="a0oeK18nfM2Yt9n_title" target="Task_1kydvbg"/>
+<edge source="lhCibVmiHf086Ns_prop" target="a0oeK18nfM2Yt9n_title"/>
+<edge source="5bHPk4sADibF7Sp_unit" target="lhCibVmiHf086Ns_prop"/>
+<edge source="Ym8cbn5MU79STaV_title" target="Task_1kydvbg"/>
+<edge source="ytjeZJOZ85I4jAq_prop" target="Ym8cbn5MU79STaV_title"/>
+<edge source="v8W2e6eEmulZB76_unit" target="ytjeZJOZ85I4jAq_prop"/>
+<edge source="rTwweYuTfD76Dcb_title" target="Task_11exz1p"/>
+<edge source="tEyPbiAjnncKU8p_prop" target="rTwweYuTfD76Dcb_title"/>
+<edge source="0zcfsHgZxtljTwD_title" target="Task_11exz1p"/>
+<edge source="m2mTeFPkxvhdmBq_prop" target="0zcfsHgZxtljTwD_title"/>
+<edge source="NrtdUtggdRYyD8b_title" target="Task_1un2egm_FBelmh5mBKxD5wO"/>
+<edge source="dtdeGRrua7VamTK_prop" target="NrtdUtggdRYyD8b_title"/>
+<edge source="A5UYKw3vs5C55gA_title" target="Task_0wnhhyw_tmWsny4uXzVqHOl"/>
+<edge source="90DEeCx4J7x7RX5_prop" target="A5UYKw3vs5C55gA_title"/>
+<edge source="aDNV5AuAG9h16FJ_title" target="Task_193ohpy_hbUastJ84xoW6J1"/>
+<edge source="LUnXK4f8IRiVz4R_prop" target="aDNV5AuAG9h16FJ_title"/>
+<edge source="I93FQ4zp66xvxI6_title" target="Task_0wnhhyw_wCYadQCDKxKxBW5"/>
+<edge source="0AdUU3cCKsSdaxI_prop" target="I93FQ4zp66xvxI6_title"/>
+<edge source="ZT7uAxTL6MQgXA9_title" target="Task_094copi_qbzUZWBTMn7W7Ky"/>
+<edge source="tEGJi3fcJPQQFzU_prop" target="ZT7uAxTL6MQgXA9_title"/>
+<edge source="9AQxWm5KkgRWsHT_title" target="Task_094copi_qbzUZWBTMn7W7Ky"/>
+<edge source="VWOTyxoyywg02sZ_prop" target="9AQxWm5KkgRWsHT_title"/>
+<edge source="1qrrJz6JouUc4fW_unit" target="VWOTyxoyywg02sZ_prop"/>
+<edge source="fnyjfr60poyMi3e_title" target="Task_11s4crw_bDjdOpg9QpRExdJ"/>
+<edge source="SRr4Cx6dUAiXoRb_prop" target="fnyjfr60poyMi3e_title"/>
+<edge source="bvesfRRGzY4XInc_title" target="Task_13s4y3z_aoZ6JSjGJlgCawK"/>
+<edge source="O5Vieau4JjJ2Ad4_prop" target="bvesfRRGzY4XInc_title"/>
+<edge source="FO6lox0URmvakAs_title" target="Task_1hvmx5b_owA0AKFljoibXXa"/>
+<edge source="jPvSVDsvKXQeS8Q_prop" target="FO6lox0URmvakAs_title"/>
+<edge source="fWV3wv24CaopqJO_title" target="Task_1hvmx5b_owA0AKFljoibXXa"/>
+<edge source="6jEarCgMNNoZHqy_prop" target="fWV3wv24CaopqJO_title"/>
+<edge source="PD6gNuyYoIUrsgF_unit" target="6jEarCgMNNoZHqy_prop"/>
+</graph></graphml>
