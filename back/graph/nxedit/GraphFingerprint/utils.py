@@ -1,4 +1,5 @@
 import networkx as nx
+NUM_CHAR = "*NUM"
 
 
 def fill_numbers(fp_g: nx.DiGraph):
@@ -8,7 +9,7 @@ def fill_numbers(fp_g: nx.DiGraph):
         # convert numbers into "number"
         try:
             val = float(val)
-            val = "*NUM*"
+            val = NUM_CHAR
         except:
             pass
 
