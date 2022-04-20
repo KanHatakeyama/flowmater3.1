@@ -1,4 +1,5 @@
 import networkx as nx
+import copy
 NUM_CHAR = "*NUM"
 
 
@@ -36,3 +37,16 @@ def get_fp_key(fp_g: nx.DiGraph, node_id: str):
         fp_key += "-o-["+":".join(out_node_names)+"]"
 
     return fp_key
+
+
+def get_node_id_with_fp_key(g: nx.DiGraph, target_fp_key: str):
+    fp_g = copy.deepcopy(g)
+    fill_numbers(fp_g)
+
+    node_id_list = []
+    for node_id in fp_g.nodes:
+        fp_key = get_fp_key(fp_g, node_id)
+        if fp_key == target_fp_key:
+            node_id_list.append(node_id)
+
+    return node_id_list
