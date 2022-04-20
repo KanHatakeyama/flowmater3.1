@@ -25,10 +25,13 @@ def search_target_word(content_array: np.array, search_word: str):
 
 
 def search_target_word_re(content_array: np.array, search_word: str,
-                          prompt_mode=False):
+                          prompt_mode=False,
+                          exception_lines=[""]):
     id_list = []
     for num, content in enumerate(content_array):
         for line in content.split("\n"):
+            if line in exception_lines:
+                continue
 
             res = re.match(search_word, line)
 

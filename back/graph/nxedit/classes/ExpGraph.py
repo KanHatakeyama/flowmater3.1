@@ -85,11 +85,17 @@ class ExpGraph:
             self.update_info()
 
     def attribute_val_nodes(self):
-
-        # search for property nodes (e.g., volume=10 mL)
+        #exception_lines = []
+        # search for property nodes or smiles nodes (e.g., volume=10 mL)
         while True:
             node_num = search_target_word_re(
                 self.content_array, ".*=", prompt_mode=True)
+            # self.content_array, ".*=", prompt_mode=True)
+
+            # smiles_node_num = search_target_word_re(
+            #    self.content_array, "^SMILES ", prompt_mode=True)
+
+            # if type(smiles_node_num)
 
             if type(node_num) is not int:
                 break
@@ -100,16 +106,27 @@ class ExpGraph:
             target_node = node_id
 
             content_list = g.nodes[node_id]["node_name"].split("\n")
+            content_list = [i for i in content_list if i not in [""]]
 
             non_colon_content_list = [
+                #    i for i in content_list if (i.find("=") < 0 and not i.startswith("SMILES "))]
                 i for i in content_list if i.find("=") < 0]
+
+            # smiles can be a single node
+            # if len(content_list) == 1:
+            #    if content_list[0].startswith("SMILES "):
+            #        non_colon_content_list = content_list
+            #        exception_lines.append(content_list[0])
 
             if len(non_colon_content_list) == 0:
                 target_node = list(g.successors(node_id))[0]
 
+            # print("c", content_list, "non",
+            #      non_colon_content_list, "target", target_node)
             # add nodes and edges to express numeric variables
             for content in list(content_list):
                 continue_flag = False
+                # if content.find("=") < 0 and not content.startswith("SMILES "):
                 if content.find("=") < 0:
                     continue_flag = True
 
@@ -136,7 +153,6 @@ class ExpGraph:
                     g.add_node(unit_node, node_name=unit)
                     g.add_edge(unit_node, prop_node)
 
-            content_list = [i for i in content_list if i not in [""]]
             if len(content_list) == 0:
                 g.remove_node(node_id)
             else:
