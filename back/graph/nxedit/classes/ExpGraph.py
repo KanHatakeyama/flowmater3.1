@@ -2,6 +2,7 @@ import networkx as nx
 import numpy as np
 from ..basic_utils import get_node_contents, get_node_ids, search_target_word_re, random_name
 from ..graph_checker.analyze_tips import search_start_end_nodes
+from .. graph_checker.initializer import claify_compounds
 from ..integrator.string_parser import parse_command, clean_line
 import copy
 
@@ -9,6 +10,7 @@ import copy
 class ExpGraph:
     def __init__(self, g: nx.DiGraph):
         self.g = copy.deepcopy(g)
+        claify_compounds(self.g)
         self._update_contents()
         self._initial_check()
         self.update_info()
