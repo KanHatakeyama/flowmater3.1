@@ -4,6 +4,7 @@ import io
 from .ExpGraph import ExpGraph
 from ..integrator.cut_and_connect import load_another_graph
 from ..integrator.duplicator import check_commas
+from ..graph_checker.protect_nodes import protect_node_characters
 import copy
 
 MAX_NEST_GRAPH = 4
@@ -37,11 +38,21 @@ class ExpManager:
 
             self.exp_dict[str(record["id"])] = data
 
+        # replace "=" and "," of non-property lines with random characters
+        self._protect_words(protect_mode=True)
+
         self._load_son_graphs()
         self._delete_memo_nodes()
         self._delete_file_nodes()
         self._attibute_val_nodes()
         self._duplicate_graphs_with_comma()
+
+        self._protect_words(protect_mode=False)
+
+    def _protect_words(self, protect_mode=True):
+        for pk in list(self.exp_dict):
+            g = self.exp_dict[pk]["exp"].g
+            protect_node_characters(g, protect_mode=protect_mode)
 
     def _load_son_graphs(self):
         # load son graphs according to "load ****" command
