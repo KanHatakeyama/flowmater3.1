@@ -5,10 +5,10 @@ import string
 import networkx as nx
 
 
-def random_name(n: int = 15):
+def random_name(n: int = 15, prefix: str = "TASK_"):
     randlst = [random.choice(string.ascii_letters + string.digits)
                for i in range(n)]
-    return ''.join(randlst)
+    return prefix+''.join(randlst)
 
 
 def get_node_ids(g: nx.DiGraph):
