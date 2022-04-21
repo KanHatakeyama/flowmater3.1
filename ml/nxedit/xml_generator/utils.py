@@ -14,30 +14,37 @@ def _pretty_print(current, parent=None, index=-1, depth=0):
             current.tail = '\n' + ('\t' * (depth - 1))
 
 
-def save_root_as_xml(root, file_path):
+def format_xml(root):
     _pretty_print(root)
 
     tree = ElementTree(root)
+    return tree
+
+
+def save_root_as_xml(root, file_path):
+    tree = format_xml(root)
 
     with open(file_path, "wb") as file:
         tree.write(file, encoding='utf-8', xml_declaration=True)
 
 
 def calc_tree_pos(g,
-                  SCALE=5*10**-2,
+                  X_SCALE=5*10**-2,
+                  Y_SCALE=1.5*5*10**-2,
                   width=100,
                   height=80,
                   y_ratio=1.5,
+                  args='-Grankdir="LR" -Gnodesep=1 -Nshape="box" -Granksep=2 -Gsplines="ortho" ',
                   ):
 
     # plt.figure(figsize=(10,15))
     original_pos = graphviz_layout(
-        g, prog='dot', root=0, args='-Grankdir="LR" -Gnodesep=1 -Nshape="box" -Granksep=2 -Gsplines="ortho" ')
+        g, prog='dot', root=0, args=args)
 
     # modify overlaps (nor perfect)
     modif_pos = {}
     for k, v in original_pos.items():
-        modif_pos[k] = (((v[0]*SCALE)), ((v[1]*SCALE*1.5)))
+        modif_pos[k] = (((v[0]*X_SCALE)), ((v[1]*Y_SCALE)))
 
     def get_pos(modif_pos, node_id):
         x = modif_pos[node_id][0]
@@ -55,7 +62,10 @@ def calc_tree_pos(g,
             if x+width > tx and x < tx+width:
                 if y+height > ty and y < ty+height:
                     modif_pos[target_node_id] = (tx, ty-height*y_ratio)
+    return modif_pos
 
+
+def pos_to_str_pos(modif_pos):
     pos = {}
     for k, v in modif_pos.items():
         pos[k] = (str(int(v[0])), str(int(v[1])))

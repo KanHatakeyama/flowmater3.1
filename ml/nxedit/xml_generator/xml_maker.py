@@ -1,9 +1,9 @@
 
-from .utils import save_root_as_xml
+from .utils import format_xml, save_root_as_xml
 from xml.etree.ElementTree import Element, SubElement, ElementTree
 
 
-def graph_to_xml(g, pos, save_path):
+def graph_to_xml(g, pos, save_path, width=100, height=80):
 
     # header
     root = prepare_header()
@@ -94,9 +94,11 @@ def graph_to_xml(g, pos, save_path):
         shape.append(bounds)
         bounds.set("x", pos[node_id][0])
         bounds.set("y", pos[node_id][1])
-        bounds.set("height", "80")
-        bounds.set("width", "100")
+        bounds.set("height", str(height))
+        bounds.set("width", str(width))
 
+    if save_path is None:
+        return format_xml(root)
     save_root_as_xml(root, save_path)
 
 
