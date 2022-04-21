@@ -1,4 +1,5 @@
 import { host_ip } from "../../../network/api"
+import { myJWT } from "../../../network/api"
 export const parseLine = (item) => {
 
     // load graph
@@ -7,7 +8,7 @@ export const parseLine = (item) => {
         //get pk
         try {
             const pk = (item.split(" ")[1]).split("_")[0]
-            return '<NOBR><a id="load-graph" className="item" href="/?gid=' + String(pk) + '" target="_blank">' + item + '</a>' + "</NOBR><br>"
+            return '<NOBR><a id="load-graph" className="item" href="/?gid=' + String(pk) + "&server=" + host_ip + "&token=" + myJWT.replace("JWT ", "") + '" target="_blank">' + item + '</a>' + "</NOBR><br>"
         } catch (e) { }
     }
 
