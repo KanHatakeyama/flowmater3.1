@@ -39,6 +39,7 @@ class Graph(models.Model):
         max_length=2000, default="new", blank=True, null=True)
     p_tags = models.ManyToManyField("Tag", blank=True)
     graph = models.TextField(null=True, blank=True, default=default_graph)
+    memo = models.TextField(null=True, blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
