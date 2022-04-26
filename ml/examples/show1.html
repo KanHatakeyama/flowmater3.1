@@ -1,0 +1,204 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 500px;
+            height: 500px;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+        #loadingBar {
+            position:absolute;
+            top:0px;
+            left:0px;
+            width: 500px;
+            height: 500px;
+            background-color:rgba(200,200,200,0.8);
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -ms-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+            opacity:1;
+        }
+
+        #bar {
+            position:absolute;
+            top:0px;
+            left:0px;
+            width:20px;
+            height:20px;
+            margin:auto auto auto auto;
+            border-radius:11px;
+            border:2px solid rgba(30,30,30,0.05);
+            background: rgb(0, 173, 246); /* Old browsers */
+            box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+        }
+
+        #border {
+            position:absolute;
+            top:10px;
+            left:10px;
+            width:500px;
+            height:23px;
+            margin:auto auto auto auto;
+            box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+            border-radius:10px;
+        }
+
+        #text {
+            position:absolute;
+            top:8px;
+            left:530px;
+            width:30px;
+            height:50px;
+            margin:auto auto auto auto;
+            font-size:22px;
+            color: #000000;
+        }
+
+        div.outerBorder {
+            position:relative;
+            top:400px;
+            width:600px;
+            height:44px;
+            margin:auto auto auto auto;
+            border:8px solid rgba(0,0,0,0.1);
+            background: rgb(252,252,252); /* Old browsers */
+            background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+            background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+            border-radius:72px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+<div id="loadingBar">
+    <div class="outerBorder">
+        <div id="text">0%</div>
+        <div id="border">
+            <div id="bar"></div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"color": null, "id": "TASK_1", "label": "Dry", "shape": "dot"}, {"color": null, "id": "TASK_2", "label": "Transport to glove box", "shape": "dot"}, {"color": null, "id": "TASK_3", "label": "Cool", "shape": "dot"}, {"color": null, "id": "TASK_4", "label": "Add electrolyte", "shape": "dot"}, {"color": null, "id": "TASK_5", "label": "Fill and press", "shape": "dot"}, {"color": null, "id": "TASK_6", "label": "Seal", "shape": "dot"}, {"color": null, "id": "TASK_7", "label": "Leave", "shape": "dot"}, {"color": null, "id": "TASK_9", "label": "Seal", "shape": "dot"}, {"color": null, "id": "TASK_10", "label": "Carry out from glove box", "shape": "dot"}, {"color": null, "id": "TASK_11", "label": "Break vacuum pack", "shape": "dot"}, {"color": null, "id": "TASK_12", "label": "Add donor\nCompound", "shape": "dot"}, {"color": null, "id": "TASK_13", "label": "Add acceptor\nCompound", "shape": "dot"}, {"color": null, "id": "TASK_14", "label": "Mix", "shape": "dot"}, {"color": null, "id": "TASK_15", "label": "Ball mill", "shape": "dot"}, {"color": null, "id": "TASK_16", "label": "Heat", "shape": "dot"}, {"color": null, "id": "TASK_18", "label": "Petri dish", "shape": "dot"}, {"color": null, "id": "TASK_19", "label": "Cool", "shape": "dot"}, {"color": null, "id": "TASK_20", "label": "Weigh", "shape": "dot"}, {"color": null, "id": "TASK_21", "label": "CT complex", "shape": "dot"}, {"color": null, "id": "TASK_22", "label": "Set environment", "shape": "dot"}, {"color": null, "id": "TASK_25", "label": "Ball mill", "shape": "dot"}, {"color": null, "id": "TASK_26", "label": "Heat", "shape": "dot"}, {"color": null, "id": "TASK_28", "label": "Petri dish", "shape": "dot"}, {"color": null, "id": "TASK_29", "label": "Cool", "shape": "dot"}, {"color": null, "id": "TASK_30", "label": "Weigh", "shape": "dot"}, {"color": null, "id": "TASK_31", "label": "Mix", "shape": "dot"}, {"color": null, "id": "TASK_32", "label": "Add salt\nCompound", "shape": "dot"}, {"color": null, "id": "TASK_33", "label": "Ball mill", "shape": "dot"}, {"color": null, "id": "TASK_34", "label": "Ball mill", "shape": "dot"}, {"color": null, "id": "TASK_37", "label": "Set environment", "shape": "dot"}, {"color": null, "id": "TASK_38", "label": "Select cell", "shape": "dot"}, {"color": null, "id": "TASK_39", "label": "Disassemble cell", "shape": "dot"}, {"color": null, "id": "TASK_40", "label": "Measure thickness of electrolyte", "shape": "dot"}, {"color": null, "id": "TASK_41", "label": "Measure EIS", "shape": "dot"}, {"color": null, "id": "TASK_43", "label": "start", "shape": "dot"}, {"color": null, "id": "end_TASK_Zmb4sw8c1GLv1wQ", "label": "end", "shape": "dot"}, {"color": null, "id": "TASK_8SM4dK4ukXek8hM_title", "label": "temperature", "shape": "dot"}, {"color": null, "id": "TASK_ODfAP5JtmSqE4Gk_prop", "label": "100", "shape": "dot"}, {"color": null, "id": "TASK_kQYyo73moUhoZsA_unit", "label": "oC", "shape": "dot"}, {"color": null, "id": "TASK_1sJMDxGRWP3EqLl_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_Jog4GDecpEClLfo_prop", "label": "1", "shape": "dot"}, {"color": null, "id": "TASK_iS90fhU5pUgj6D3_unit", "label": "hour", "shape": "dot"}, {"color": null, "id": "TASK_s7ebZ9UNs0NjHUY_title", "label": "parts", "shape": "dot"}, {"color": null, "id": "TASK_1qwQrtpiMBekUFk_prop", "label": " insulator tube", "shape": "dot"}, {"color": null, "id": "TASK_6mjrciYhfx0lbcC_title", "label": "tempareture", "shape": "dot"}, {"color": null, "id": "TASK_7VQTY0oEUg4NFlY_prop", "label": "rt", "shape": "dot"}, {"color": null, "id": "TASK_5QAX2W7EBAsKjvc_title", "label": "power", "shape": "dot"}, {"color": null, "id": "TASK_ZvTnOqQp6F2nMC3_prop", "label": "25", "shape": "dot"}, {"color": null, "id": "TASK_0TbjdmRDoCmtUPy_unit", "label": "Nm", "shape": "dot"}, {"color": null, "id": "TASK_SyMabjyhNApQ60w_title", "label": "protocol", "shape": "dot"}, {"color": null, "id": "TASK_4bWHArFKfJ2pEzp_prop", "label": "wrap tightening part with PTFE tape three times ", "shape": "dot"}, {"color": null, "id": "TASK_Uthe4H7dRyQbOBu_title", "label": "temperature", "shape": "dot"}, {"color": null, "id": "TASK_wJOmTPlXeY7ZvLv_prop", "label": "rt", "shape": "dot"}, {"color": null, "id": "TASK_xREZYpTqz8h1C7Z_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_h0RPp1c3s8hF2CK_prop", "label": "20", "shape": "dot"}, {"color": null, "id": "TASK_VeCvlTcsO1tVRvD_unit", "label": "hours", "shape": "dot"}, {"color": null, "id": "TASK_kPcPPzASZl8s2Fd_title", "label": "protocol", "shape": "dot"}, {"color": null, "id": "TASK_nAO5FSBmJuf32HN_prop", "label": "vacuum pack using KitchenBoss G210", "shape": "dot"}, {"color": null, "id": "TASK_NNXq4W4AAKGzOZT_title", "label": "weight", "shape": "dot"}, {"color": null, "id": "TASK_LJ5JT1nVdN8ZlUc_prop", "label": "196.1", "shape": "dot"}, {"color": null, "id": "TASK_weYJ2tosK3DTPVO_unit", "label": "mg", "shape": "dot"}, {"color": null, "id": "TASK_bkl9kMFhVMVdAwz_title", "label": "compound name", "shape": "dot"}, {"color": null, "id": "TASK_mhdRAX0jZdfBGP0_prop", "label": "PMPS", "shape": "dot"}, {"color": null, "id": "TASK_eGWfDZEJxmsJxBo_title", "label": "SMILES", "shape": "dot"}, {"color": null, "id": "TASK_Kt4I7r5Nxln1jgL_prop", "label": "CC1=C(S[*])C(C)=CC([*])=C1", "shape": "dot"}, {"color": null, "id": "TASK_8GLYsZf43cwH6Hf_title", "label": "MW", "shape": "dot"}, {"color": null, "id": "TASK_Q2MpfgwGlqOlX2J_prop", "label": "136.03", "shape": "dot"}, {"color": null, "id": "TASK_kS4UYrmldCaOnSo_title", "label": "Mw", "shape": "dot"}, {"color": null, "id": "TASK_gRRko0bSPdspFaP_prop", "label": "7000", "shape": "dot"}, {"color": null, "id": "TASK_UR2YSPT5si2W8U8_title", "label": "Mn", "shape": "dot"}, {"color": null, "id": "TASK_1qoShPfleDtlpBF_prop", "label": "18000", "shape": "dot"}, {"color": null, "id": "TASK_OphxdZNMTuqyeCs_title", "label": "weight", "shape": "dot"}, {"color": null, "id": "TASK_T91nnmvMLCKMjW5_prop", "label": "89.6", "shape": "dot"}, {"color": null, "id": "TASK_mFPnhsosDg0Y5bn_unit", "label": "mg", "shape": "dot"}, {"color": null, "id": "TASK_pVngbUPmqKHVDwc_title", "label": "compound name", "shape": "dot"}, {"color": null, "id": "TASK_jSKWmhLX9bMa28C_prop", "label": "Chloranil", "shape": "dot"}, {"color": null, "id": "TASK_kQfgR562magUHcj_title", "label": "MW", "shape": "dot"}, {"color": null, "id": "TASK_FsK05M9jDTvByxP_prop", "label": "245.86", "shape": "dot"}, {"color": null, "id": "TASK_zGaqGCph2VLMVXN_title", "label": "SMILES", "shape": "dot"}, {"color": null, "id": "TASK_cGFWYFbQQOAyiZT_prop", "label": "O=C(C(Cl)=C1Cl)C(Cl)=C(Cl)C1=O", "shape": "dot"}, {"color": null, "id": "TASK_tacUYvSL0yowbGG_title", "label": "production data", "shape": "dot"}, {"color": null, "id": "TASK_XrBmU7DNitePCYT_prop", "label": "Aldrich: BCCB8938", "shape": "dot"}, {"color": null, "id": "TASK_3qy8WB5MZBdfEbQ_title", "label": "frequency", "shape": "dot"}, {"color": null, "id": "TASK_8CFdKAQ7fGkMxSx_prop", "label": "50", "shape": "dot"}, {"color": null, "id": "TASK_L3Rrwe7S5u6BtAa_unit", "label": "Hz", "shape": "dot"}, {"color": null, "id": "TASK_8CouCFmMq4TekrE_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_5x3ikYq7m8mhrlI_prop", "label": "5", "shape": "dot"}, {"color": null, "id": "TASK_ZE8MJS19VxcfOe7_unit", "label": "min", "shape": "dot"}, {"color": null, "id": "TASK_DFwSHAyEcObJHu0_title", "label": "temperature", "shape": "dot"}, {"color": null, "id": "TASK_XNaacBup6GINpq1_prop", "label": "250", "shape": "dot"}, {"color": null, "id": "TASK_9QxLVCC3rnW4sNA_unit", "label": "oC", "shape": "dot"}, {"color": null, "id": "TASK_0k5YCT3oAmjftaC_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_hchKnHYdCNI8GOd_prop", "label": "30", "shape": "dot"}, {"color": null, "id": "TASK_6L2qpZwPmLZlMmq_unit", "label": "min", "shape": "dot"}, {"color": null, "id": "TASK_dGfW7IAYWTnNAvt_title", "label": "temperature", "shape": "dot"}, {"color": null, "id": "TASK_bF0IW2KTBgyz5og_prop", "label": "25", "shape": "dot"}, {"color": null, "id": "TASK_3IgSkgYMH4gdX4X_unit", "label": "oC", "shape": "dot"}, {"color": null, "id": "TASK_9IbopUVTBLxDlMv_title", "label": "weight", "shape": "dot"}, {"color": null, "id": "TASK_VrovBlQk6th0V6I_prop", "label": "236.2", "shape": "dot"}, {"color": null, "id": "TASK_VxecT1P7musA1R2_unit", "label": "mg", "shape": "dot"}, {"color": null, "id": "TASK_qgcmhoAZ0dF8WXa_title", "label": "weight", "shape": "dot"}, {"color": null, "id": "TASK_LEkT4brzYjjhxyE_prop", "label": "233.8", "shape": "dot"}, {"color": null, "id": "TASK_OYHZPezP4x1uVbw_unit", "label": "mg", "shape": "dot"}, {"color": null, "id": "TASK_UQFY3P9e2Jc2f6o_title", "label": "person", "shape": "dot"}, {"color": null, "id": "TASK_TciEnCVprkg5O5q_prop", "label": "Hiroki Adachi", "shape": "dot"}, {"color": null, "id": "TASK_AA9imPXJHwuHXEW_title", "label": "O2", "shape": "dot"}, {"color": null, "id": "TASK_qtpg1fz2Vz0htV8_prop", "label": "10.80", "shape": "dot"}, {"color": null, "id": "TASK_2jgGsUSeA5Q9aha_unit", "label": "ppm", "shape": "dot"}, {"color": null, "id": "TASK_fp6mQUNPxh3IXPi_title", "label": "Dew", "shape": "dot"}, {"color": null, "id": "TASK_DJZH1JWgWamsx2X_prop", "label": "-75.2", "shape": "dot"}, {"color": null, "id": "TASK_w01dUQv6VwH9205_unit", "label": "oC", "shape": "dot"}, {"color": null, "id": "TASK_xHTLKcMcEfcehlo_title", "label": "Date", "shape": "dot"}, {"color": null, "id": "TASK_OIXnaiUoMJIQsa1_prop", "label": "2021/7/23", "shape": "dot"}, {"color": null, "id": "TASK_HVyvmPtnBKSMjF5_title", "label": "Env", "shape": "dot"}, {"color": null, "id": "TASK_gX5LjPUzXuY5d2F_prop", "label": "glove box", "shape": "dot"}, {"color": null, "id": "TASK_WWJQJWSKtHvc3rf_title", "label": "frequency", "shape": "dot"}, {"color": null, "id": "TASK_PdduLModXu4jVyO_prop", "label": "50", "shape": "dot"}, {"color": null, "id": "TASK_G5bjtajnSDkvATs_unit", "label": "Hz", "shape": "dot"}, {"color": null, "id": "TASK_sWnqI7YKObSOx3F_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_4tct3bbICCk9ZlT_prop", "label": "5", "shape": "dot"}, {"color": null, "id": "TASK_ZTbvMg2pLSk9sHG_unit", "label": "min", "shape": "dot"}, {"color": null, "id": "TASK_bYX9Q1lzq9m50KH_title", "label": "temperature", "shape": "dot"}, {"color": null, "id": "TASK_4FFpT7dCX51fKmh_prop", "label": "250", "shape": "dot"}, {"color": null, "id": "TASK_xxnfIn4g105Jhr7_unit", "label": "oC", "shape": "dot"}, {"color": null, "id": "TASK_aaC4joRd6RFFhOI_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_6LxAW7Uw8DPKuw6_prop", "label": "30", "shape": "dot"}, {"color": null, "id": "TASK_olzoq41lUWH7UBR_unit", "label": "min", "shape": "dot"}, {"color": null, "id": "TASK_YGSknAdqiJzWr2D_title", "label": "temperature", "shape": "dot"}, {"color": null, "id": "TASK_HnhVjTYwfQt2Vpg_prop", "label": "25", "shape": "dot"}, {"color": null, "id": "TASK_WGBq2ohHlNkuSnw_unit", "label": "oC", "shape": "dot"}, {"color": null, "id": "TASK_xQmPj9DxWL4W1yu_title", "label": "weight", "shape": "dot"}, {"color": null, "id": "TASK_KhB7fFZvLPFBX6Q_prop", "label": "478.5", "shape": "dot"}, {"color": null, "id": "TASK_KxQEmaNAQ2qS8KT_unit", "label": "mg", "shape": "dot"}, {"color": null, "id": "TASK_gE1xfoyMOotNWJf_title", "label": "weight", "shape": "dot"}, {"color": null, "id": "TASK_ARmLPJ09wydwpqZ_prop", "label": "308.1", "shape": "dot"}, {"color": null, "id": "TASK_uF4Vp5xdEBlwJUk_unit", "label": "mg", "shape": "dot"}, {"color": null, "id": "TASK_0evVfdIOtwzFf6p_title", "label": "compound name", "shape": "dot"}, {"color": null, "id": "TASK_H8yixxN8yZxYLSu_prop", "label": "LiTFSI", "shape": "dot"}, {"color": null, "id": "TASK_y1yBa75WNfYoN7N_title", "label": "MW", "shape": "dot"}, {"color": null, "id": "TASK_nCInzik6PubG45s_prop", "label": "287.08", "shape": "dot"}, {"color": null, "id": "TASK_HY6anYIo9f3GIFN_title", "label": "SMILES", "shape": "dot"}, {"color": null, "id": "TASK_oqagnDdBNVQcd9R_prop", "label": "O=S([N-]S(=O)(C(F)(F)F)=O)(C(F)(F)F)=O.[Li+]", "shape": "dot"}, {"color": null, "id": "TASK_ZmWgh25rN4u89D1_title", "label": "production data", "shape": "dot"}, {"color": null, "id": "TASK_jaMHm4zn4LwoDXL_prop", "label": "Kanto: 111Y2184", "shape": "dot"}, {"color": null, "id": "TASK_PH3RMzpXRhRKRpZ_title", "label": "frequency", "shape": "dot"}, {"color": null, "id": "TASK_tEX18uNlvCZFb6l_prop", "label": "50", "shape": "dot"}, {"color": null, "id": "TASK_Ktg1aN0kYR8J5j7_unit", "label": "Hz", "shape": "dot"}, {"color": null, "id": "TASK_calMxltBoNSh6iN_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_ZGXS5DDZGRb5APn_prop", "label": "5", "shape": "dot"}, {"color": null, "id": "TASK_RdWfs1LvwAy0lxm_unit", "label": "min", "shape": "dot"}, {"color": null, "id": "TASK_Y4rDgpaKhWWzyiM_title", "label": "frequency", "shape": "dot"}, {"color": null, "id": "TASK_f5WZBr17jmAYfcl_prop", "label": "50", "shape": "dot"}, {"color": null, "id": "TASK_Xorrvk2GAali5QY_unit", "label": "Hz", "shape": "dot"}, {"color": null, "id": "TASK_XL7bShST9aQX4jS_title", "label": "time", "shape": "dot"}, {"color": null, "id": "TASK_ihpmRQC19MSNM74_prop", "label": "5", "shape": "dot"}, {"color": null, "id": "TASK_xYKDpXM6x0F5CBJ_unit", "label": "min", "shape": "dot"}, {"color": null, "id": "TASK_pDFwLfahMbfg6Z0_title", "label": "person", "shape": "dot"}, {"color": null, "id": "TASK_cSnh9F8Preh3enn_prop", "label": "Hiroki Adachi", "shape": "dot"}, {"color": null, "id": "TASK_nULznc32vNYdrpA_title", "label": "O2", "shape": "dot"}, {"color": null, "id": "TASK_OrYkFREPgsuHY9c_prop", "label": "3.84", "shape": "dot"}, {"color": null, "id": "TASK_y0gksP6lYqFIGDE_unit", "label": "ppm", "shape": "dot"}, {"color": null, "id": "TASK_AcSkqyJERBPxM6U_title", "label": "Dew", "shape": "dot"}, {"color": null, "id": "TASK_FxuJzahALwAbVuY_prop", "label": "-70.4", "shape": "dot"}, {"color": null, "id": "TASK_CHXR057qWLh93I8_unit", "label": "oC", "shape": "dot"}, {"color": null, "id": "TASK_y7ff6qcZfSZoTt3_title", "label": "Date", "shape": "dot"}, {"color": null, "id": "TASK_olYuaRltYC1PS7H_prop", "label": "2021/8/15", "shape": "dot"}, {"color": null, "id": "TASK_XOzN5mgM1YjY9uE_title", "label": "Env", "shape": "dot"}, {"color": null, "id": "TASK_aSTDL0qZBBUC9J4_prop", "label": "glove box", "shape": "dot"}, {"color": null, "id": "TASK_ikyEghKJ3rjemAi_title", "label": "cell_id", "shape": "dot"}, {"color": null, "id": "TASK_vzCdnQYOzYpT8Ix_prop", "label": "10", "shape": "dot"}, {"color": null, "id": "TASK_g2c79pD43pIWL6g_title", "label": "thickness", "shape": "dot"}, {"color": null, "id": "TASK_1LEjl9RNCXTfGrk_prop", "label": "166", "shape": "dot"}, {"color": null, "id": "TASK_4tqrGlc6zxG5rhh_unit", "label": "um", "shape": "dot"}, {"color": null, "id": "TASK_hoPjsM7JFLR52ei_title", "label": "ionic conductivity", "shape": "dot"}, {"color": "#dd4b39", "id": "TASK_umyda4C8Hvuqa2R_prop", "label": "0.000007280000000", "shape": "dot"}, {"color": null, "id": "TASK_QHXQ8q5EKh6MYrk_unit", "label": "S/cm", "shape": "dot"}, {"color": null, "id": "TASK_yIQm5MUv6778fYP_title", "label": "equipment", "shape": "dot"}, {"color": null, "id": "TASK_EnxEKJuJeJetlQu_prop", "label": "ZAHNER CIMPS system", "shape": "dot"}, {"color": null, "id": "TASK_fY1ZBIjM7ZHcFki_title", "label": "DC voltage", "shape": "dot"}, {"color": null, "id": "TASK_WeYLDRny68LreU4_prop", "label": "open circuit", "shape": "dot"}]);
+        edges = new vis.DataSet([{"arrows": "to", "from": "TASK_1", "to": "TASK_2"}, {"arrows": "to", "from": "TASK_2", "to": "TASK_3"}, {"arrows": "to", "from": "TASK_3", "to": "TASK_4"}, {"arrows": "to", "from": "TASK_4", "to": "TASK_5"}, {"arrows": "to", "from": "TASK_5", "to": "TASK_6"}, {"arrows": "to", "from": "TASK_6", "to": "TASK_10"}, {"arrows": "to", "from": "TASK_7", "to": "TASK_11"}, {"arrows": "to", "from": "TASK_9", "to": "TASK_7"}, {"arrows": "to", "from": "TASK_10", "to": "TASK_9"}, {"arrows": "to", "from": "TASK_11", "to": "TASK_41"}, {"arrows": "to", "from": "TASK_12", "to": "TASK_14"}, {"arrows": "to", "from": "TASK_13", "to": "TASK_14"}, {"arrows": "to", "from": "TASK_14", "to": "TASK_15"}, {"arrows": "to", "from": "TASK_15", "to": "TASK_18"}, {"arrows": "to", "from": "TASK_16", "to": "TASK_19"}, {"arrows": "to", "from": "TASK_18", "to": "TASK_16"}, {"arrows": "to", "from": "TASK_19", "to": "TASK_20"}, {"arrows": "to", "from": "TASK_20", "to": "TASK_21"}, {"arrows": "to", "from": "TASK_21", "to": "TASK_25"}, {"arrows": "to", "from": "TASK_22", "to": "TASK_14"}, {"arrows": "to", "from": "TASK_25", "to": "TASK_31"}, {"arrows": "to", "from": "TASK_26", "to": "TASK_29"}, {"arrows": "to", "from": "TASK_28", "to": "TASK_26"}, {"arrows": "to", "from": "TASK_29", "to": "TASK_34"}, {"arrows": "to", "from": "TASK_30", "to": "TASK_38"}, {"arrows": "to", "from": "TASK_31", "to": "TASK_33"}, {"arrows": "to", "from": "TASK_32", "to": "TASK_31"}, {"arrows": "to", "from": "TASK_33", "to": "TASK_28"}, {"arrows": "to", "from": "TASK_34", "to": "TASK_30"}, {"arrows": "to", "from": "TASK_37", "to": "TASK_22"}, {"arrows": "to", "from": "TASK_38", "to": "TASK_1"}, {"arrows": "to", "from": "TASK_39", "to": "TASK_40"}, {"arrows": "to", "from": "TASK_40", "to": "end_TASK_Zmb4sw8c1GLv1wQ"}, {"arrows": "to", "from": "TASK_41", "to": "TASK_39"}, {"arrows": "to", "from": "TASK_43", "to": "TASK_37"}, {"arrows": "to", "from": "TASK_8SM4dK4ukXek8hM_title", "to": "TASK_1"}, {"arrows": "to", "from": "TASK_ODfAP5JtmSqE4Gk_prop", "to": "TASK_8SM4dK4ukXek8hM_title"}, {"arrows": "to", "from": "TASK_kQYyo73moUhoZsA_unit", "to": "TASK_ODfAP5JtmSqE4Gk_prop"}, {"arrows": "to", "from": "TASK_1sJMDxGRWP3EqLl_title", "to": "TASK_1"}, {"arrows": "to", "from": "TASK_Jog4GDecpEClLfo_prop", "to": "TASK_1sJMDxGRWP3EqLl_title"}, {"arrows": "to", "from": "TASK_iS90fhU5pUgj6D3_unit", "to": "TASK_Jog4GDecpEClLfo_prop"}, {"arrows": "to", "from": "TASK_s7ebZ9UNs0NjHUY_title", "to": "TASK_1"}, {"arrows": "to", "from": "TASK_1qwQrtpiMBekUFk_prop", "to": "TASK_s7ebZ9UNs0NjHUY_title"}, {"arrows": "to", "from": "TASK_6mjrciYhfx0lbcC_title", "to": "TASK_3"}, {"arrows": "to", "from": "TASK_7VQTY0oEUg4NFlY_prop", "to": "TASK_6mjrciYhfx0lbcC_title"}, {"arrows": "to", "from": "TASK_5QAX2W7EBAsKjvc_title", "to": "TASK_5"}, {"arrows": "to", "from": "TASK_ZvTnOqQp6F2nMC3_prop", "to": "TASK_5QAX2W7EBAsKjvc_title"}, {"arrows": "to", "from": "TASK_0TbjdmRDoCmtUPy_unit", "to": "TASK_ZvTnOqQp6F2nMC3_prop"}, {"arrows": "to", "from": "TASK_SyMabjyhNApQ60w_title", "to": "TASK_6"}, {"arrows": "to", "from": "TASK_4bWHArFKfJ2pEzp_prop", "to": "TASK_SyMabjyhNApQ60w_title"}, {"arrows": "to", "from": "TASK_Uthe4H7dRyQbOBu_title", "to": "TASK_7"}, {"arrows": "to", "from": "TASK_wJOmTPlXeY7ZvLv_prop", "to": "TASK_Uthe4H7dRyQbOBu_title"}, {"arrows": "to", "from": "TASK_xREZYpTqz8h1C7Z_title", "to": "TASK_7"}, {"arrows": "to", "from": "TASK_h0RPp1c3s8hF2CK_prop", "to": "TASK_xREZYpTqz8h1C7Z_title"}, {"arrows": "to", "from": "TASK_VeCvlTcsO1tVRvD_unit", "to": "TASK_h0RPp1c3s8hF2CK_prop"}, {"arrows": "to", "from": "TASK_kPcPPzASZl8s2Fd_title", "to": "TASK_9"}, {"arrows": "to", "from": "TASK_nAO5FSBmJuf32HN_prop", "to": "TASK_kPcPPzASZl8s2Fd_title"}, {"arrows": "to", "from": "TASK_NNXq4W4AAKGzOZT_title", "to": "TASK_12"}, {"arrows": "to", "from": "TASK_LJ5JT1nVdN8ZlUc_prop", "to": "TASK_NNXq4W4AAKGzOZT_title"}, {"arrows": "to", "from": "TASK_weYJ2tosK3DTPVO_unit", "to": "TASK_LJ5JT1nVdN8ZlUc_prop"}, {"arrows": "to", "from": "TASK_bkl9kMFhVMVdAwz_title", "to": "TASK_12"}, {"arrows": "to", "from": "TASK_mhdRAX0jZdfBGP0_prop", "to": "TASK_bkl9kMFhVMVdAwz_title"}, {"arrows": "to", "from": "TASK_eGWfDZEJxmsJxBo_title", "to": "TASK_12"}, {"arrows": "to", "from": "TASK_Kt4I7r5Nxln1jgL_prop", "to": "TASK_eGWfDZEJxmsJxBo_title"}, {"arrows": "to", "from": "TASK_8GLYsZf43cwH6Hf_title", "to": "TASK_12"}, {"arrows": "to", "from": "TASK_Q2MpfgwGlqOlX2J_prop", "to": "TASK_8GLYsZf43cwH6Hf_title"}, {"arrows": "to", "from": "TASK_kS4UYrmldCaOnSo_title", "to": "TASK_12"}, {"arrows": "to", "from": "TASK_gRRko0bSPdspFaP_prop", "to": "TASK_kS4UYrmldCaOnSo_title"}, {"arrows": "to", "from": "TASK_UR2YSPT5si2W8U8_title", "to": "TASK_12"}, {"arrows": "to", "from": "TASK_1qoShPfleDtlpBF_prop", "to": "TASK_UR2YSPT5si2W8U8_title"}, {"arrows": "to", "from": "TASK_OphxdZNMTuqyeCs_title", "to": "TASK_13"}, {"arrows": "to", "from": "TASK_T91nnmvMLCKMjW5_prop", "to": "TASK_OphxdZNMTuqyeCs_title"}, {"arrows": "to", "from": "TASK_mFPnhsosDg0Y5bn_unit", "to": "TASK_T91nnmvMLCKMjW5_prop"}, {"arrows": "to", "from": "TASK_pVngbUPmqKHVDwc_title", "to": "TASK_13"}, {"arrows": "to", "from": "TASK_jSKWmhLX9bMa28C_prop", "to": "TASK_pVngbUPmqKHVDwc_title"}, {"arrows": "to", "from": "TASK_kQfgR562magUHcj_title", "to": "TASK_13"}, {"arrows": "to", "from": "TASK_FsK05M9jDTvByxP_prop", "to": "TASK_kQfgR562magUHcj_title"}, {"arrows": "to", "from": "TASK_zGaqGCph2VLMVXN_title", "to": "TASK_13"}, {"arrows": "to", "from": "TASK_cGFWYFbQQOAyiZT_prop", "to": "TASK_zGaqGCph2VLMVXN_title"}, {"arrows": "to", "from": "TASK_tacUYvSL0yowbGG_title", "to": "TASK_13"}, {"arrows": "to", "from": "TASK_XrBmU7DNitePCYT_prop", "to": "TASK_tacUYvSL0yowbGG_title"}, {"arrows": "to", "from": "TASK_3qy8WB5MZBdfEbQ_title", "to": "TASK_15"}, {"arrows": "to", "from": "TASK_8CFdKAQ7fGkMxSx_prop", "to": "TASK_3qy8WB5MZBdfEbQ_title"}, {"arrows": "to", "from": "TASK_L3Rrwe7S5u6BtAa_unit", "to": "TASK_8CFdKAQ7fGkMxSx_prop"}, {"arrows": "to", "from": "TASK_8CouCFmMq4TekrE_title", "to": "TASK_15"}, {"arrows": "to", "from": "TASK_5x3ikYq7m8mhrlI_prop", "to": "TASK_8CouCFmMq4TekrE_title"}, {"arrows": "to", "from": "TASK_ZE8MJS19VxcfOe7_unit", "to": "TASK_5x3ikYq7m8mhrlI_prop"}, {"arrows": "to", "from": "TASK_DFwSHAyEcObJHu0_title", "to": "TASK_16"}, {"arrows": "to", "from": "TASK_XNaacBup6GINpq1_prop", "to": "TASK_DFwSHAyEcObJHu0_title"}, {"arrows": "to", "from": "TASK_9QxLVCC3rnW4sNA_unit", "to": "TASK_XNaacBup6GINpq1_prop"}, {"arrows": "to", "from": "TASK_0k5YCT3oAmjftaC_title", "to": "TASK_16"}, {"arrows": "to", "from": "TASK_hchKnHYdCNI8GOd_prop", "to": "TASK_0k5YCT3oAmjftaC_title"}, {"arrows": "to", "from": "TASK_6L2qpZwPmLZlMmq_unit", "to": "TASK_hchKnHYdCNI8GOd_prop"}, {"arrows": "to", "from": "TASK_dGfW7IAYWTnNAvt_title", "to": "TASK_19"}, {"arrows": "to", "from": "TASK_bF0IW2KTBgyz5og_prop", "to": "TASK_dGfW7IAYWTnNAvt_title"}, {"arrows": "to", "from": "TASK_3IgSkgYMH4gdX4X_unit", "to": "TASK_bF0IW2KTBgyz5og_prop"}, {"arrows": "to", "from": "TASK_9IbopUVTBLxDlMv_title", "to": "TASK_20"}, {"arrows": "to", "from": "TASK_VrovBlQk6th0V6I_prop", "to": "TASK_9IbopUVTBLxDlMv_title"}, {"arrows": "to", "from": "TASK_VxecT1P7musA1R2_unit", "to": "TASK_VrovBlQk6th0V6I_prop"}, {"arrows": "to", "from": "TASK_qgcmhoAZ0dF8WXa_title", "to": "TASK_21"}, {"arrows": "to", "from": "TASK_LEkT4brzYjjhxyE_prop", "to": "TASK_qgcmhoAZ0dF8WXa_title"}, {"arrows": "to", "from": "TASK_OYHZPezP4x1uVbw_unit", "to": "TASK_LEkT4brzYjjhxyE_prop"}, {"arrows": "to", "from": "TASK_UQFY3P9e2Jc2f6o_title", "to": "TASK_22"}, {"arrows": "to", "from": "TASK_TciEnCVprkg5O5q_prop", "to": "TASK_UQFY3P9e2Jc2f6o_title"}, {"arrows": "to", "from": "TASK_AA9imPXJHwuHXEW_title", "to": "TASK_22"}, {"arrows": "to", "from": "TASK_qtpg1fz2Vz0htV8_prop", "to": "TASK_AA9imPXJHwuHXEW_title"}, {"arrows": "to", "from": "TASK_2jgGsUSeA5Q9aha_unit", "to": "TASK_qtpg1fz2Vz0htV8_prop"}, {"arrows": "to", "from": "TASK_fp6mQUNPxh3IXPi_title", "to": "TASK_22"}, {"arrows": "to", "from": "TASK_DJZH1JWgWamsx2X_prop", "to": "TASK_fp6mQUNPxh3IXPi_title"}, {"arrows": "to", "from": "TASK_w01dUQv6VwH9205_unit", "to": "TASK_DJZH1JWgWamsx2X_prop"}, {"arrows": "to", "from": "TASK_xHTLKcMcEfcehlo_title", "to": "TASK_22"}, {"arrows": "to", "from": "TASK_OIXnaiUoMJIQsa1_prop", "to": "TASK_xHTLKcMcEfcehlo_title"}, {"arrows": "to", "from": "TASK_HVyvmPtnBKSMjF5_title", "to": "TASK_22"}, {"arrows": "to", "from": "TASK_gX5LjPUzXuY5d2F_prop", "to": "TASK_HVyvmPtnBKSMjF5_title"}, {"arrows": "to", "from": "TASK_WWJQJWSKtHvc3rf_title", "to": "TASK_25"}, {"arrows": "to", "from": "TASK_PdduLModXu4jVyO_prop", "to": "TASK_WWJQJWSKtHvc3rf_title"}, {"arrows": "to", "from": "TASK_G5bjtajnSDkvATs_unit", "to": "TASK_PdduLModXu4jVyO_prop"}, {"arrows": "to", "from": "TASK_sWnqI7YKObSOx3F_title", "to": "TASK_25"}, {"arrows": "to", "from": "TASK_4tct3bbICCk9ZlT_prop", "to": "TASK_sWnqI7YKObSOx3F_title"}, {"arrows": "to", "from": "TASK_ZTbvMg2pLSk9sHG_unit", "to": "TASK_4tct3bbICCk9ZlT_prop"}, {"arrows": "to", "from": "TASK_bYX9Q1lzq9m50KH_title", "to": "TASK_26"}, {"arrows": "to", "from": "TASK_4FFpT7dCX51fKmh_prop", "to": "TASK_bYX9Q1lzq9m50KH_title"}, {"arrows": "to", "from": "TASK_xxnfIn4g105Jhr7_unit", "to": "TASK_4FFpT7dCX51fKmh_prop"}, {"arrows": "to", "from": "TASK_aaC4joRd6RFFhOI_title", "to": "TASK_26"}, {"arrows": "to", "from": "TASK_6LxAW7Uw8DPKuw6_prop", "to": "TASK_aaC4joRd6RFFhOI_title"}, {"arrows": "to", "from": "TASK_olzoq41lUWH7UBR_unit", "to": "TASK_6LxAW7Uw8DPKuw6_prop"}, {"arrows": "to", "from": "TASK_YGSknAdqiJzWr2D_title", "to": "TASK_29"}, {"arrows": "to", "from": "TASK_HnhVjTYwfQt2Vpg_prop", "to": "TASK_YGSknAdqiJzWr2D_title"}, {"arrows": "to", "from": "TASK_WGBq2ohHlNkuSnw_unit", "to": "TASK_HnhVjTYwfQt2Vpg_prop"}, {"arrows": "to", "from": "TASK_xQmPj9DxWL4W1yu_title", "to": "TASK_30"}, {"arrows": "to", "from": "TASK_KhB7fFZvLPFBX6Q_prop", "to": "TASK_xQmPj9DxWL4W1yu_title"}, {"arrows": "to", "from": "TASK_KxQEmaNAQ2qS8KT_unit", "to": "TASK_KhB7fFZvLPFBX6Q_prop"}, {"arrows": "to", "from": "TASK_gE1xfoyMOotNWJf_title", "to": "TASK_32"}, {"arrows": "to", "from": "TASK_ARmLPJ09wydwpqZ_prop", "to": "TASK_gE1xfoyMOotNWJf_title"}, {"arrows": "to", "from": "TASK_uF4Vp5xdEBlwJUk_unit", "to": "TASK_ARmLPJ09wydwpqZ_prop"}, {"arrows": "to", "from": "TASK_0evVfdIOtwzFf6p_title", "to": "TASK_32"}, {"arrows": "to", "from": "TASK_H8yixxN8yZxYLSu_prop", "to": "TASK_0evVfdIOtwzFf6p_title"}, {"arrows": "to", "from": "TASK_y1yBa75WNfYoN7N_title", "to": "TASK_32"}, {"arrows": "to", "from": "TASK_nCInzik6PubG45s_prop", "to": "TASK_y1yBa75WNfYoN7N_title"}, {"arrows": "to", "from": "TASK_HY6anYIo9f3GIFN_title", "to": "TASK_32"}, {"arrows": "to", "from": "TASK_oqagnDdBNVQcd9R_prop", "to": "TASK_HY6anYIo9f3GIFN_title"}, {"arrows": "to", "from": "TASK_ZmWgh25rN4u89D1_title", "to": "TASK_32"}, {"arrows": "to", "from": "TASK_jaMHm4zn4LwoDXL_prop", "to": "TASK_ZmWgh25rN4u89D1_title"}, {"arrows": "to", "from": "TASK_PH3RMzpXRhRKRpZ_title", "to": "TASK_33"}, {"arrows": "to", "from": "TASK_tEX18uNlvCZFb6l_prop", "to": "TASK_PH3RMzpXRhRKRpZ_title"}, {"arrows": "to", "from": "TASK_Ktg1aN0kYR8J5j7_unit", "to": "TASK_tEX18uNlvCZFb6l_prop"}, {"arrows": "to", "from": "TASK_calMxltBoNSh6iN_title", "to": "TASK_33"}, {"arrows": "to", "from": "TASK_ZGXS5DDZGRb5APn_prop", "to": "TASK_calMxltBoNSh6iN_title"}, {"arrows": "to", "from": "TASK_RdWfs1LvwAy0lxm_unit", "to": "TASK_ZGXS5DDZGRb5APn_prop"}, {"arrows": "to", "from": "TASK_Y4rDgpaKhWWzyiM_title", "to": "TASK_34"}, {"arrows": "to", "from": "TASK_f5WZBr17jmAYfcl_prop", "to": "TASK_Y4rDgpaKhWWzyiM_title"}, {"arrows": "to", "from": "TASK_Xorrvk2GAali5QY_unit", "to": "TASK_f5WZBr17jmAYfcl_prop"}, {"arrows": "to", "from": "TASK_XL7bShST9aQX4jS_title", "to": "TASK_34"}, {"arrows": "to", "from": "TASK_ihpmRQC19MSNM74_prop", "to": "TASK_XL7bShST9aQX4jS_title"}, {"arrows": "to", "from": "TASK_xYKDpXM6x0F5CBJ_unit", "to": "TASK_ihpmRQC19MSNM74_prop"}, {"arrows": "to", "from": "TASK_pDFwLfahMbfg6Z0_title", "to": "TASK_37"}, {"arrows": "to", "from": "TASK_cSnh9F8Preh3enn_prop", "to": "TASK_pDFwLfahMbfg6Z0_title"}, {"arrows": "to", "from": "TASK_nULznc32vNYdrpA_title", "to": "TASK_37"}, {"arrows": "to", "from": "TASK_OrYkFREPgsuHY9c_prop", "to": "TASK_nULznc32vNYdrpA_title"}, {"arrows": "to", "from": "TASK_y0gksP6lYqFIGDE_unit", "to": "TASK_OrYkFREPgsuHY9c_prop"}, {"arrows": "to", "from": "TASK_AcSkqyJERBPxM6U_title", "to": "TASK_37"}, {"arrows": "to", "from": "TASK_FxuJzahALwAbVuY_prop", "to": "TASK_AcSkqyJERBPxM6U_title"}, {"arrows": "to", "from": "TASK_CHXR057qWLh93I8_unit", "to": "TASK_FxuJzahALwAbVuY_prop"}, {"arrows": "to", "from": "TASK_y7ff6qcZfSZoTt3_title", "to": "TASK_37"}, {"arrows": "to", "from": "TASK_olYuaRltYC1PS7H_prop", "to": "TASK_y7ff6qcZfSZoTt3_title"}, {"arrows": "to", "from": "TASK_XOzN5mgM1YjY9uE_title", "to": "TASK_37"}, {"arrows": "to", "from": "TASK_aSTDL0qZBBUC9J4_prop", "to": "TASK_XOzN5mgM1YjY9uE_title"}, {"arrows": "to", "from": "TASK_ikyEghKJ3rjemAi_title", "to": "TASK_38"}, {"arrows": "to", "from": "TASK_vzCdnQYOzYpT8Ix_prop", "to": "TASK_ikyEghKJ3rjemAi_title"}, {"arrows": "to", "from": "TASK_g2c79pD43pIWL6g_title", "to": "TASK_40"}, {"arrows": "to", "from": "TASK_1LEjl9RNCXTfGrk_prop", "to": "TASK_g2c79pD43pIWL6g_title"}, {"arrows": "to", "from": "TASK_4tqrGlc6zxG5rhh_unit", "to": "TASK_1LEjl9RNCXTfGrk_prop"}, {"arrows": "to", "from": "TASK_hoPjsM7JFLR52ei_title", "to": "TASK_41"}, {"arrows": "to", "from": "TASK_umyda4C8Hvuqa2R_prop", "to": "TASK_hoPjsM7JFLR52ei_title"}, {"arrows": "to", "from": "TASK_QHXQ8q5EKh6MYrk_unit", "to": "TASK_umyda4C8Hvuqa2R_prop"}, {"arrows": "to", "from": "TASK_yIQm5MUv6778fYP_title", "to": "TASK_41"}, {"arrows": "to", "from": "TASK_EnxEKJuJeJetlQu_prop", "to": "TASK_yIQm5MUv6778fYP_title"}, {"arrows": "to", "from": "TASK_fY1ZBIjM7ZHcFki_title", "to": "TASK_41"}, {"arrows": "to", "from": "TASK_WeYLDRny68LreU4_prop", "to": "TASK_fY1ZBIjM7ZHcFki_title"}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+        network.on("stabilizationProgress", function(params) {
+      		document.getElementById('loadingBar').removeAttribute("style");
+	        var maxWidth = 496;
+	        var minWidth = 20;
+	        var widthFactor = params.iterations/params.total;
+	        var width = Math.max(minWidth,maxWidth * widthFactor);
+
+	        document.getElementById('bar').style.width = width + 'px';
+	        document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+	    });
+	    network.once("stabilizationIterationsDone", function() {
+	        document.getElementById('text').innerHTML = '100%';
+	        document.getElementById('bar').style.width = '496px';
+	        document.getElementById('loadingBar').style.opacity = 0;
+	        // really clean the dom element
+	        setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+	    });
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
