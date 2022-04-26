@@ -150,10 +150,11 @@ dmypy.json
 
 #media
 uploaded/
-
+local_settings.py
 
 #others
 
 ml/temp/
 ml/data_importers/temp
 ml/data_importers/
+back/graph/debug/

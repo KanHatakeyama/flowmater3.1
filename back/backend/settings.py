@@ -21,8 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0lipoj_-!e1sc5bt@z%in=8+va3ub=ch9^!821j446o*qr32f8'
-
+SECRET_KEY = 'django-insecure-@qjd*vhmv%1qd1yrg03^j((@#n8nn@=y21^t0gri0r$d)%i=j('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -157,14 +156,15 @@ CORS_ORIGIN_ALLOW_ALL = True
 # for client rendering (download js from server)
 REACT_URL = "/graph/edit"
 
-# server URL
-SERVER_URL = "http://192.168.11.7:49088/"
 
-# for server rendering (set custom url for development with nodejs)
-REACT_URL = "http://192.168.11.7:18849"
+SERVER_URL = "http://192.168.11.2:87654/"
 
 
 # this should be false for file upload form
 # TODO: fix this for higher safety
 CSRF_COOKIE_SECURE = False
 #CSRF_TRUSTED_ORIGINS = [REACT_URL]
+try:
+    from .local_settings import *
+except ImportError:
+    pass
