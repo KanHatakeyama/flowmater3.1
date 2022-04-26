@@ -1,5 +1,5 @@
 # FlowMater 3.1
-- Flowchart of Materials
+- Flowchart of Materials (alpha version)
 - Create and analyze flowcharts related to material projects
 ![_](manual/media/react.gif)
 
