@@ -30,7 +30,7 @@
       - ```docker run -p 8000:8000 -it fm3```
 # Issues
 - TODO
-  - Make manual
+  - Make user manual
   - Searching graphs, etc.
 - Security
   - Do not run the server in pulic. Some security issues
