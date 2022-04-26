@@ -14,13 +14,14 @@ RUN pip3 install django-import-export==2.7.1
 RUN pip3 install djangorestframework==3.13.1
 RUN pip3 install djangorestframework-jwt==1.11.0
 RUN pip3 install django-cleanup==6.0.0
+RUN pip3 install djoser==2.1.0
+RUN pip3 install django-cors-headers==3.11.0
 
+RUN pip3 install joblib==1.1.0
 
 RUN mkdir /code
 WORKDIR /code
 ADD . /code
-#RUN cd back
 
-CMD cd back && python manage.py runserver 0.0.0.0:49088
 
-#CMD gunicorn --bind 0.0.0.0:$PORT config.wsgi
+#CMD python manage.py runserver 0.0.0.0:8000

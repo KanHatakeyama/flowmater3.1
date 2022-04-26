@@ -13,6 +13,18 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
+
+# -----------------------------------------
+# Main custom settings for this project
+
+# set your server URL
+SERVER_URL = "http://192.168.11.7:8000/"
+
+# in the case of debelopment by node.js, change url
+REACT_URL = "/graph/edit"
+
+# -----------------------------------------
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -152,19 +164,15 @@ CORS_ORIGIN_WHITELIST = (
 CORS_ORIGIN_ALLOW_ALL = True
 
 
-#  REACT_settings
-# for client rendering (download js from server)
-REACT_URL = "/graph/edit"
-
-
-SERVER_URL = "http://192.168.11.2:87654/"
-
-
 # this should be false for file upload form
 # TODO: fix this for higher safety
 CSRF_COOKIE_SECURE = False
 #CSRF_TRUSTED_ORIGINS = [REACT_URL]
+
+PRIVATE_MODE = True
+
 try:
-    from .local_settings import *
-except ImportError:
+    if PRIVATE_MODE:
+        from .local_settings import *
+except:
     pass
