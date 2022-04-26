@@ -14,7 +14,7 @@ class GraphAdmin(ImportExportModelAdmin):
                     'created_at', 'updated_at',
                     )
     save_as = True
-
+    search_fields = ['title', ]
     readonly_fields = ("edit", "p_tags",)
     ordering = ["-updated_at", "pk"]
 

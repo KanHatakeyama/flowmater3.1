@@ -150,12 +150,11 @@ module.exports = JSON.parse("{\"name\":\"custom\",\"uri\":\"http://custom/ns\",\
 /*!****************************!*\
   !*** ./app/network/api.js ***!
   \****************************/
-/*! exports provided: storageKey, host_ip, myJWT, toJson, getToken, getTargetGraph, newGraph, updateGraph */
+/*! exports provided: host_ip, myJWT, toJson, getToken, getTargetGraph, newGraph, updateGraph */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "storageKey", function() { return storageKey; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "host_ip", function() { return host_ip; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "myJWT", function() { return myJWT; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toJson", function() { return toJson; });
@@ -165,17 +164,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateGraph", function() { return updateGraph; });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
- //export const host_ip = process.env.REACT_APP_DIP
 
-const storageKey = {
-  user: "JY6kb8N99co5Y5jjRlWJif7X59gMP3",
-  token: "6aH3o2M8G7b9Is6iPaQbz9dRYsAL55",
-  url: "wJ2eAz9iW4Z1Wag54p1EJDu7m4rK5N"
-};
-const host_ip = localStorage.getItem(storageKey.url); //Store JWT in localstorage
+const current_url = new URL(window.location.href);
+const url_params = current_url.searchParams; //export const host_ip = process.env.REACT_APP_DIP
+
+/*
+export const storageKey = {
+    user: "JY6kb8N99co5Y5jjRlWJif7X59gMP3",
+    token: "6aH3o2M8G7b9Is6iPaQbz9dRYsAL55",
+    url: "wJ2eAz9iW4Z1Wag54p1EJDu7m4rK5N"
+}
+*/
+//export const host_ip = localStorage.getItem(storageKey.url);
+
+const host_ip = url_params.get('server'); //Store JWT in localstorage
 //CAUTION: This is not a great idea for seuciry
+//export const myJWT = "JWT " + localStorage.getItem(storageKey.token);
 
-const myJWT = "JWT " + localStorage.getItem(storageKey.token);
+const myJWT = "JWT " + url_params.get('token');
 const toJson = async res => {
   const json = await res.json();
 
@@ -210,9 +216,8 @@ export const getGraph = async () => {
 
 const getTargetGraph = async () => {
   //get graph id from url (e.g., http://...?gid=100)
-  const current_url = new URL(window.location.href);
-  const params = current_url.searchParams;
-  const id = params.get('gid');
+  const id = url_params.get('gid');
+  console.log(id, host_ip, myJWT);
   const url = host_ip + `graph/` + String(id);
   const res = await fetch(url, {
     method: "GET",
@@ -489,15 +494,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _network_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../network/api */ "./app/network/api.js");
 
 function AuthForm(err) {
-  alert(err);
-  let username = localStorage.getItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].user);
-  let host_ip = localStorage.getItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].url);
-  host_ip = prompt('server url', host_ip);
-  let user = prompt('User name', username);
-  let pass = prompt('Password', "");
-  localStorage.setItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].user, user);
-  localStorage.setItem(_network_api__WEBPACK_IMPORTED_MODULE_0__["storageKey"].url, host_ip);
-  Object(_network_api__WEBPACK_IMPORTED_MODULE_0__["getToken"])(user, pass, host_ip); //window.location.reload();
+  //alert(err)
+  alert("token or url seem invalid. reaccess this page from admin page");
+  /*
+  let username = localStorage.getItem(storageKey.user);
+  let host_ip = localStorage.getItem(storageKey.url);
+   host_ip = prompt('server url', host_ip)
+  let user = prompt('User name', username)
+  let pass = prompt('Password', "")
+  localStorage.setItem(storageKey.user, user)
+  localStorage.setItem(storageKey.url, host_ip)
+  getToken(user, pass, host_ip)
+   //window.location.reload();
+  */
 }
 
 /***/ }),
@@ -758,10 +767,6 @@ function ElementProperties(props) {
     canvas,
     overlays
   } = props;
-  canvas = modeler.get('canvas');
-  rootElement = canvas.getRootElement();
-  overlays = modeler.get('overlays');
-  Object(_Overlays_parseGraphNodes__WEBPACK_IMPORTED_MODULE_3__["renderOverlays"])(rootElement.children, overlays); // apply textarea change to graph object
 
   if (element.labelTarget) {
     element = element.labelTarget;
@@ -863,7 +868,12 @@ function ElementProperties(props) {
     return () => {
       clearInterval(intervalId);
     };
-  }, []); // main rendering
+  }, []);
+  canvas = modeler.get('canvas');
+  rootElement = canvas.getRootElement();
+  overlays = modeler.get('overlays');
+  Object(_Overlays_parseGraphNodes__WEBPACK_IMPORTED_MODULE_3__["renderOverlays"])(rootElement.children, overlays); // apply textarea change to graph object
+  // main rendering
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "element-properties",
@@ -907,7 +917,7 @@ const listURLs = data => {
     return data.map(v => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
       id: "home",
       className: "menu-item",
-      href: "/?gid=" + String(v.pk),
+      href: "/?gid=" + String(v.pk) + "&server=" + _network_api__WEBPACK_IMPORTED_MODULE_3__["host_ip"] + "&token=" + _network_api__WEBPACK_IMPORTED_MODULE_3__["myJWT"].replace("JWT ", ""),
       style: _MenuStyle__WEBPACK_IMPORTED_MODULE_2__["styles"].linkButton
     }, "  ", String(v.pk), " ", String(v.title), " ")));
   } catch (e) {}
@@ -1027,6 +1037,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tagGenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tagGenerator */ "./app/properties-panel/fields/Overlays/tagGenerator.js");
 
 function renderOverlays(children, overlays) {
+  //console.log(overlays)
   //overlays.clear();
   for (var i in children) {
     let node = children[i];
@@ -1052,7 +1063,8 @@ function parseText(nodeID, content, overlays) {
         bottom: 0,
         left: 0
       },
-      html: String(tag)
+      html: String(tag),
+      type: "manual"
     });
   }
 }
@@ -1070,8 +1082,6 @@ function parseText(nodeID, content, overlays) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseLine", function() { return parseLine; });
 /* harmony import */ var _network_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../network/api */ "./app/network/api.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 
 
 const parseLine = item => {
@@ -1080,26 +1090,36 @@ const parseLine = item => {
     //get pk
     try {
       const pk = item.split(" ")[1].split("_")[0];
-      return '<a id="load-graph" className="item" href="/?gid=' + String(pk) + '"style={{ color: "#FF570D" }} target="_blank">' + item + '</a>';
+      return '<NOBR><a id="load-graph" className="item" href="/?gid=' + String(pk) + "&server=" + _network_api__WEBPACK_IMPORTED_MODULE_0__["host_ip"] + "&token=" + _network_api__WEBPACK_IMPORTED_MODULE_0__["myJWT"].replace("JWT ", "") + '" target="_blank">' + item + '</a>' + "</NOBR><br>";
     } catch (e) {}
   }
 
   if (item.indexOf("file") === 0) {
-    //get pk
-    //const title = (item.split(" ")[1]).split("_").slice(1)
     const title = item.slice(item.indexOf("_")).slice(1);
-    let tag = '<img src=' + _network_api__WEBPACK_IMPORTED_MODULE_0__["host_ip"] + 'uploaded/' + String(title);
+    let tag = '<NOBR><img src=' + _network_api__WEBPACK_IMPORTED_MODULE_0__["host_ip"] + 'uploaded/' + String(title);
     tag += ' alt=""></img><a id="load-graph" className="item" href=';
-    tag += _network_api__WEBPACK_IMPORTED_MODULE_0__["host_ip"] + 'uploaded/' + String(title) + ' style={{ color: "#696969" }}target="_blank">' + item + '</a>';
-    return tag;
+    tag += _network_api__WEBPACK_IMPORTED_MODULE_0__["host_ip"] + 'uploaded/' + String(title) + ' target="_blank">' + item + '</a>';
+    return tag + "</NOBR><br>";
   } //smiles: show chemical strucrures
 
 
   if (item.indexOf("SMILES") === 0) {
-    //get pk
     const smiles = item.slice(7);
     let tag = '<img src=' + _network_api__WEBPACK_IMPORTED_MODULE_0__["host_ip"] + 'molecules/smiles/' + smiles + ' width="150 px " />';
-    return tag;
+    return tag + "<br>";
+  }
+
+  if (item.search("=") > 0) {
+    let tag = "<NOBR>";
+    const title = item.replace(/ *=.*/, "") + " ";
+    tag += '<font color="green" size=0.5% >' + title + "</font>";
+    const vals = item.replace(/.*= */, "");
+    tag += '<font color="gray" size=0.5%>' + vals + "</font>"; //let unit = vals.replace(/[0-9, \-]* /, "")
+    //let prop = vals.replace(/ *[^0-9, \-]*/, "")
+    //tag += '<font color="gray" size=0.5%>' + prop + "</font>"
+    //tag += '<font color="black" size=0.5%>' + unit + "</font>"
+
+    return tag + "</NOBR><br>";
   }
 
   return "";
