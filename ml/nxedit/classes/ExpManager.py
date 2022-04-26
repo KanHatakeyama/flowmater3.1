@@ -29,11 +29,22 @@ class ExpManager:
 
             # parse bpmn data
             bpmn_graph = diagram.BpmnDiagramGraph()
-            bpmn_graph.load_diagram_from_xml_file(io.StringIO(record["graph"]))
+            try:
+                bpmn_graph.load_diagram_from_xml_file(
+                    io.StringIO(record["graph"]))
+            except:
+                print("error parsing bpmn ", record["title"])
+                continue
             data["bpmn"] = bpmn_graph
 
             # initialize nx graph object
-            exp = ExpGraph(bpmn_graph.diagram_graph)
+            try:
+                exp = ExpGraph(bpmn_graph.diagram_graph)
+            except Exception as e:
+                print("error", e, record["title"])
+                #print("error", e, record)
+                continue
+                #raise ValueError("error parsing ", record)
             data["exp"] = exp
 
             self.exp_dict[str(record["id"])] = data
@@ -68,12 +79,18 @@ class ExpManager:
 
                     # for i in range(len(load_commands)):
                     #    load_another_graph(i, pk, exp, self)
-                    load_another_graph(0, pk, exp, self)
+                    try:
+                        load_another_graph(0, pk, exp, self)
+                    except:
+                        print("caution! error, parsing", pk, exp)
+                        break
                     exp.update_info()
 
             if len(load_commands) > 0:
-                raise ValueError(
-                    "Too many nesting of graphs! over ", MAX_NEST_GRAPH)
+                print("caution! too many nesting over ", MAX_NEST_GRAPH, pk)
+                break
+                # raise ValueError(
+                #    "Too many nesting of graphs! over ", MAX_NEST_GRAPH)
 
     def _delete_memo_nodes(self):
         self._delete_nodes_regex(target=".*\[Memo\]")

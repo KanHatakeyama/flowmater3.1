@@ -49,4 +49,4 @@ class MedieFileAdmin(admin.ModelAdmin):
 
 admin.site.register(Graph, GraphAdmin)
 admin.site.register(MediaFile, MedieFileAdmin)
-# admin.site.register(Tag)
+admin.site.register(Tag)
