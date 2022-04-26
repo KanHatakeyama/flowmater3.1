@@ -20,6 +20,10 @@ def parse_command(content: str):
     if re.match("[0-9\-]", vals):
         unit = re.sub("[0-9, \-\.]* ", "", vals)
         prop = re.sub(" *[^0-9, \-\.]*", "", vals)
+
+        # no unit vals
+        if unit == prop:
+            unit = ""
     else:
         # str vals
         unit = ""
