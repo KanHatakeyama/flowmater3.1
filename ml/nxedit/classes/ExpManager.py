@@ -83,7 +83,7 @@ class ExpManager:
                         load_another_graph(0, pk, exp, self)
                     except Exception as e:
                         print("caution! error, parsing",
-                              pk, exp, "error position: ", e)
+                              pk, exp, "error position: ", e, load_commands)
                         break
                     exp.update_info()
 

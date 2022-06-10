@@ -10,6 +10,7 @@ def load_another_graph(command_id: int, pk: str, exp: ExpGraph,  manager):
     load_command = exp.load_commands[command_id]
 
     # load command must be in the first line
+    load_command = sort_command(load_command)
     load_pk = str(load_command[5:].split("_")[0])
 
     if load_pk == pk:
@@ -67,3 +68,22 @@ def cut_son_graphs(son_exp: ExpGraph):
     son_g.remove_node(son_exp.start_node)
 
     return son_g, son_start_node, son_end_node
+
+
+def sort_command(command_str):
+    """
+    sort command so that "load ****" comes in the first line
+    """
+    command_list = command_str.split("\n")
+
+    sorted_command_list = []
+    for command in command_list:
+        if command.find("load ") == 0:
+            sorted_command_list.append(command)
+            command_list.remove(command)
+            break
+
+    for command in command_list:
+        sorted_command_list.append(command)
+
+    return "\n".join(sorted_command_list)
