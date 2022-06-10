@@ -19,7 +19,10 @@
 
 # 2. Launch server
 1. Run docker
-    - ```docker run -p 8000:8000 -it fm3```
+    - ```docker run -it --name fm3 -v $(pwd):/code -p 8000:8000 fm3```
+    - INFO: For the second and subsequent running of the container, enter the following command
+    - ```docker start -ia fm3```
+
 1. Run following commands to run server
     - ```conda activate chem```
     - ```cd back```
