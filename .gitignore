@@ -157,4 +157,5 @@ local_settings.py
 ml/temp/
 ml/data_importers/temp
 ml/data_importers/
+ml/private/
 back/graph/debug/
