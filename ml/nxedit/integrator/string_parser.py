@@ -17,27 +17,24 @@ def parse_command(content: str):
     vals = vals.replace("r.t.", "25 oC")
 
     # normal numbers
-    """
     if re.match("[0-9\-]", vals):
+        """
         unit = re.sub("[0-9, \-\.]* ", "", vals)
         prop = re.sub(" *[^0-9, \-\.]*", "", vals)
 
         # no unit vals
         if unit == prop:
             unit = ""
-    else:
-        # str vals
-        unit = ""
-        prop = vals
-    """
-    if re.match("[0-9\-]", vals):
-        #unit = re.sub("[0-9, \-\.]* ", "", vals)
-        #prop = re.sub(" *[^0-9, \-\.]*", "", vals)
+        """
         unit = re.sub(
             "[+-]?(?:\d+\.?\d*|\.\d+)(?:(?:[eE][+-]?\d+)|(?:\*10\^[+-]?\d+))?", "", vals)
         prop = vals.replace(unit, "").replace(" ", "")
         unit = re.sub("^\ ?", "", unit)
 
+    else:
+        # str vals
+        unit = ""
+        prop = vals
     # special cases
     if title in ["Date", "date"]:
         unit = ""
