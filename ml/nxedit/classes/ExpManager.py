@@ -3,7 +3,7 @@ import bpmn_python.bpmn_diagram_rep as diagram
 import io
 from .ExpGraph import ExpGraph
 from ..integrator.cut_and_connect import load_another_graph
-from ..integrator.duplicator import check_commas
+from ..integrator.duplicator import check_splits
 from ..graph_checker.protect_nodes import protect_node_characters
 import copy
 
@@ -120,7 +120,7 @@ class ExpManager:
             record = self.exp_dict[pk]
             exp = record["exp"]
 
-            n_comma, comma_dict = check_commas(exp)
+            n_comma, comma_dict = check_splits(exp)
 
             if n_comma == 0:
                 return

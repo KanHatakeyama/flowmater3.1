@@ -1,8 +1,10 @@
 from ..basic_utils import search_target_word_re
 from ..classes.ExpGraph import ExpGraph
 
+# *USE semicolon ; instead of comma!
 
-def check_commas(exp: ExpGraph):
+
+def check_splits(exp: ExpGraph):
     """
     search for comma split nodes, indicating multiple experiments (e.g., 10,20,30)
 
@@ -20,20 +22,20 @@ def check_commas(exp: ExpGraph):
         e.g., {'zDxBlSOaemBcEb6_prop': ['10', '20', '60'], 'CWOtmNOzi7KtOwe_prop': ['90', '60', '70']}    
     """
 
-    comma_nodes_nums = search_target_word_re(exp.content_array, ".*,")
+    comma_nodes_nums = search_target_word_re(exp.content_array, ".*;")
 
     n_comma_list = []
     comma_dict = {}
     for node_num in comma_nodes_nums:
         content = exp.content_array[node_num]
-        n_comma = content.count(",")
+        n_comma = content.count(";")
         n_comma_list.append(n_comma)
-        comma_dict[exp.node_array[node_num]] = content.split(",")
+        comma_dict[exp.node_array[node_num]] = content.split(";")
 
     # if number of commas are different in a graph, raise error
     if len(list(set(n_comma_list))) != 1 and len(n_comma_list) != 0:
         raise ValueError(
-            "number of commas (,) in nodes must be the same in a graph!", comma_dict)
+            "number of semicolong (;) in nodes must be the same in a graph!", comma_dict)
 
     if len(n_comma_list) == 0:
         n_comma = 0
