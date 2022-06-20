@@ -35,7 +35,7 @@ def check_splits(exp: ExpGraph):
     # if number of commas are different in a graph, raise error
     if len(list(set(n_comma_list))) != 1 and len(n_comma_list) != 0:
         raise ValueError(
-            "number of semicolong (;) in nodes must be the same in a graph!", comma_dict)
+            "number of semicolons (;) in nodes must be the same in a graph!", comma_dict)
 
     if len(n_comma_list) == 0:
         n_comma = 0

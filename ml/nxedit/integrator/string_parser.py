@@ -40,6 +40,20 @@ def parse_command(content: str):
         unit = ""
         prop = vals
 
+    # if split with semicolons
+    """
+    e.g., unit,prop
+    FROM: ('S/cm; S/cm', '7.93e-5S/cm;1.68e-4S/cm')
+    TO: ('S/cm;S/cm', '7.93e-5;1.68e-4')
+
+    """
+    if prop.find(";"):
+        unit = unit.replace(" ", "")
+        prop = prop.replace(" ", "")
+
+        actual_unit = unit.split(";")[0]
+        prop = prop.replace(actual_unit, "")
+
     return title, prop, unit
 
 
