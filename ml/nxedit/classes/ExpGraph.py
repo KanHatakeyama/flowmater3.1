@@ -4,6 +4,7 @@ from ..basic_utils import get_node_contents, get_node_ids, search_target_word_re
 from ..graph_checker.analyze_tips import search_start_end_nodes
 from .. graph_checker.initializer import claify_compounds
 from ..integrator.string_parser import parse_command, clean_line
+from ..draw import save_graph_html
 import copy
 
 
@@ -22,7 +23,9 @@ class ExpGraph:
     def _initial_check(self):
 
         # check if all nodes are connected
-        if not nx.is_tree(self.g):
+        # if not nx.is_tree(self.g):
+        if not nx.is_weakly_connected(self.g):
+            save_graph_html(self.g, save_path="error.html")
             raise ValueError("all nodes must be connected in a graph")
 
         # check start and end nodes
