@@ -23,12 +23,16 @@ class ExpGraph:
     def _initial_check(self):
 
         # check if all nodes are connected
-        # if not nx.is_tree(self.g):
         if not nx.is_weakly_connected(self.g):
             save_graph_html(self.g, save_path="error.html")
             raise ValueError("all nodes must be connected in a graph")
 
+        if not nx.is_tree(self.g):
+            save_graph_html(self.g, save_path="error.html")
+            raise ValueError("graphs should not have cycles!")
+
         # check start and end nodes
+
         self.start_node, self.end_node = search_start_end_nodes(
             self.g, self.node_array, self.content_array)
 
