@@ -122,8 +122,10 @@ class ExpManager:
 
             n_comma, comma_dict = check_splits(exp)
 
+            #print(pk, n_comma, comma_dict)
             if n_comma == 0:
-                return
+                # return
+                continue
 
             # duplicate records
             for i in range(n_comma+1):

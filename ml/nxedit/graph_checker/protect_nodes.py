@@ -28,9 +28,9 @@ def protect_node_characters(g: nx.DiGraph, protect_mode=True, exception_list=["S
             # protect comma
             if line.find("=") < 0:
                 if protect_mode:
-                    line = line.replace(",", ESCAPE_COMMA)
+                    line = line.replace(";", ESCAPE_COMMA)
                 else:
-                    line = line.replace(ESCAPE_COMMA, ",")
+                    line = line.replace(ESCAPE_COMMA, ";")
 
             modif_lines.append(line)
 
