@@ -11,8 +11,9 @@ MAX_NEST_GRAPH = 4
 
 
 class ExpManager:
-    def __init__(self, dump_path="dump.json"):
+    def __init__(self, dump_path="dump.json", except_ids=[]):
         self.dump_path = dump_path
+        self.except_ids = [str(i) for i in except_ids]
         self._initialize()
 
     def _initialize(self):
@@ -23,6 +24,10 @@ class ExpManager:
         self.exp_dict = {}
 
         for record in record_list:
+            pk = str(record["id"])
+            if pk in self.except_ids:
+                continue
+
             data = {}
             data["title"] = record["title"]
             data["tags"] = record["tags"]
@@ -47,7 +52,7 @@ class ExpManager:
                 #raise ValueError("error parsing ", record)
             data["exp"] = exp
 
-            self.exp_dict[str(record["id"])] = data
+            self.exp_dict[pk] = data
 
         # replace "=" and "," of non-property lines with random characters
         self._protect_words(protect_mode=True)
@@ -88,7 +93,8 @@ class ExpManager:
                     exp.update_info()
 
             if len(load_commands) > 0:
-                print("caution! too many nesting over ", MAX_NEST_GRAPH, pk)
+                print("caution! too many nesting over ",
+                      MAX_NEST_GRAPH, "times, pk: ", pk)
                 break
                 # raise ValueError(
                 #    "Too many nesting of graphs! over ", MAX_NEST_GRAPH)
