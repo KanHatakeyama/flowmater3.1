@@ -120,7 +120,11 @@ class ExpManager:
             record = self.exp_dict[pk]
             exp = record["exp"]
 
-            n_comma, comma_dict = check_splits(exp)
+            try:
+                n_comma, comma_dict = check_splits(exp)
+            except Exception as e:
+                print(f"error during duplicating graphs. pk: {pk}", e)
+                continue
 
             if n_comma == 0:
                 # return
