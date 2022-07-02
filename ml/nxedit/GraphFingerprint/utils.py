@@ -18,15 +18,14 @@ def fill_numbers(fp_g: nx.DiGraph):
 
 
 def get_fp_key(fp_g: nx.DiGraph, node_id: str):
+    """
+    calc fp key according to the "node_name" of the target node and neighboring nodes
+    """
     val = fp_g.nodes[node_id]["node_name"]
 
-    # in_node_names = sorted([node_id_to_name[i]
-    #                        for i in list(fp_g.predecessors(node_id))])
     in_node_names = sorted([fp_g.nodes[i]["node_name"]
                             for i in list(fp_g.predecessors(node_id))])
 
-    # out_node_names = sorted([node_id_to_name[i]
-    #                         for i in list(fp_g.successors(node_id))])
     out_node_names = sorted([fp_g.nodes[i]["node_name"]
                              for i in list(fp_g.successors(node_id))])
 
