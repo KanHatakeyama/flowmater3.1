@@ -102,6 +102,8 @@ var _moddle_custom_json__WEBPACK_IMPORTED_MODULE_2___namespace = /*#__PURE__*/__
 /* harmony import */ var _network_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./network/api */ "./app/network/api.js");
 /* harmony import */ var _properties_panel_auth__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./properties-panel/auth */ "./app/properties-panel/auth.js");
 /* harmony import */ var bpmn_js_color_picker__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! bpmn-js-color-picker */ "./node_modules/bpmn-js-color-picker/index.js");
+/* harmony import */ var bpmn_js_task_resize_lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! bpmn-js-task-resize/lib */ "./node_modules/bpmn-js-task-resize/lib/index.js");
+
 
 
 
@@ -118,7 +120,8 @@ const modeler = new bpmn_js_lib_Modeler__WEBPACK_IMPORTED_MODULE_0__["default"](
   keyboard: {
     bindTo: document.body
   },
-  additionalModules: [bpmn_js_color_picker__WEBPACK_IMPORTED_MODULE_5__["default"]]
+  additionalModules: [bpmn_js_color_picker__WEBPACK_IMPORTED_MODULE_5__["default"], bpmn_js_task_resize_lib__WEBPACK_IMPORTED_MODULE_6__["default"]],
+  taskResizingEnabled: true
 }); // load json data of the record and launch editor
 
 Object(_network_api__WEBPACK_IMPORTED_MODULE_3__["getTargetGraph"])().then(original_record => {
@@ -4006,6 +4009,117 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/bpmn-js-task-resize/lib/ResizeEvent.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/bpmn-js-task-resize/lib/ResizeEvent.js ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ResizeEvent; });
+/* harmony import */ var diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/rules/RuleProvider */ "./node_modules/diagram-js/lib/features/rules/RuleProvider.js");
+/* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
+/* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+
+function ResizeEvent(eventBus, eventResizingEnabled) {
+  diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__["default"].call(this, eventBus);
+  this.eventResizingEnabled = eventResizingEnabled || false;
+}
+
+inherits__WEBPACK_IMPORTED_MODULE_1___default()(ResizeEvent, diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+ResizeEvent.$inject = ['eventBus', 'config.eventResizingEnabled'];
+
+ResizeEvent.prototype.init = function () {
+  var me = this;
+
+  me.addRule('shape.resize', 1500, function (data) {
+    if (me.eventResizingEnabled && data.shape.businessObject &&
+      data.shape.businessObject.$instanceOf('bpmn:Event')) {
+      if (data.newBounds) {
+        data.newBounds.width = Math.max(36, data.newBounds.width);
+        data.newBounds.height = Math.max(36, data.newBounds.height);
+      } return true;
+    }
+  });
+};
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-js-task-resize/lib/ResizeTask.js":
+/*!************************************************************!*\
+  !*** ./node_modules/bpmn-js-task-resize/lib/ResizeTask.js ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ResizeTask; });
+/* harmony import */ var diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/rules/RuleProvider */ "./node_modules/diagram-js/lib/features/rules/RuleProvider.js");
+/* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
+/* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+
+function ResizeTask(eventBus, taskResizingEnabled) {
+  diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__["default"].call(this, eventBus);
+  this.taskResizingEnabled=taskResizingEnabled || false;
+}
+
+inherits__WEBPACK_IMPORTED_MODULE_1___default()(ResizeTask, diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+ResizeTask.$inject = [ 'eventBus', 'config.taskResizingEnabled' ];
+
+ResizeTask.prototype.init = function() {
+  var me=this;
+
+  me.addRule('shape.resize', 1500, function(data) {
+    if (me.taskResizingEnabled && data.shape.businessObject && 
+        (data.shape.businessObject.$instanceOf('bpmn:Task') || 
+         data.shape.businessObject.$instanceOf('bpmn:CallActivity') ||
+         data.shape.businessObject.$instanceOf('bpmn:SubProcess'))) {
+      if (data.newBounds) {
+        data.newBounds.width=Math.max(100,data.newBounds.width);
+        data.newBounds.height=Math.max(80,data.newBounds.height);
+      }
+      return true;
+    }
+  });
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-js-task-resize/lib/index.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/bpmn-js-task-resize/lib/index.js ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ResizeTask__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ResizeTask */ "./node_modules/bpmn-js-task-resize/lib/ResizeTask.js");
+/* harmony import */ var _ResizeEvent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ResizeEvent */ "./node_modules/bpmn-js-task-resize/lib/ResizeEvent.js");
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  __init__: [ 'resizeTask', 'resizeEvent' ],
+  resizeTask: [ 'type', _ResizeTask__WEBPACK_IMPORTED_MODULE_0__["default"] ],
+  resizeEvent: [ 'type', _ResizeEvent__WEBPACK_IMPORTED_MODULE_1__["default"] ]
+});
+
+
+/***/ }),
+
 /***/ "./node_modules/bpmn-js/lib/Modeler.js":
 /*!*********************************************!*\
   !*** ./node_modules/bpmn-js/lib/Modeler.js ***!
@@ -4022,27 +4136,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ids__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(ids__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Viewer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Viewer */ "./node_modules/bpmn-js/lib/Viewer.js");
 /* harmony import */ var _NavigatedViewer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./NavigatedViewer */ "./node_modules/bpmn-js/lib/NavigatedViewer.js");
-/* harmony import */ var diagram_js_lib_navigation_keyboard_move__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/navigation/keyboard-move */ "./node_modules/diagram-js/lib/navigation/keyboard-move/index.js");
-/* harmony import */ var diagram_js_lib_navigation_movecanvas__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/navigation/movecanvas */ "./node_modules/diagram-js/lib/navigation/movecanvas/index.js");
-/* harmony import */ var diagram_js_lib_navigation_touch__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/navigation/touch */ "./node_modules/diagram-js/lib/navigation/touch/index.js");
-/* harmony import */ var diagram_js_lib_navigation_zoomscroll__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! diagram-js/lib/navigation/zoomscroll */ "./node_modules/diagram-js/lib/navigation/zoomscroll/index.js");
-/* harmony import */ var diagram_js_lib_features_align_elements__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/features/align-elements */ "./node_modules/diagram-js/lib/features/align-elements/index.js");
+/* harmony import */ var diagram_js_lib_navigation_keyboard_move__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/navigation/keyboard-move */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/keyboard-move/index.js");
+/* harmony import */ var diagram_js_lib_navigation_movecanvas__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/navigation/movecanvas */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/movecanvas/index.js");
+/* harmony import */ var diagram_js_lib_navigation_touch__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/navigation/touch */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/touch/index.js");
+/* harmony import */ var diagram_js_lib_navigation_zoomscroll__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! diagram-js/lib/navigation/zoomscroll */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/index.js");
+/* harmony import */ var diagram_js_lib_features_align_elements__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/features/align-elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/align-elements/index.js");
 /* harmony import */ var _features_auto_place__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./features/auto-place */ "./node_modules/bpmn-js/lib/features/auto-place/index.js");
 /* harmony import */ var _features_auto_resize__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./features/auto-resize */ "./node_modules/bpmn-js/lib/features/auto-resize/index.js");
-/* harmony import */ var diagram_js_lib_features_auto_scroll__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! diagram-js/lib/features/auto-scroll */ "./node_modules/diagram-js/lib/features/auto-scroll/index.js");
-/* harmony import */ var diagram_js_lib_features_bendpoints__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! diagram-js/lib/features/bendpoints */ "./node_modules/diagram-js/lib/features/bendpoints/index.js");
+/* harmony import */ var diagram_js_lib_features_auto_scroll__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! diagram-js/lib/features/auto-scroll */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-scroll/index.js");
+/* harmony import */ var diagram_js_lib_features_bendpoints__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! diagram-js/lib/features/bendpoints */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/index.js");
 /* harmony import */ var _features_context_pad__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./features/context-pad */ "./node_modules/bpmn-js/lib/features/context-pad/index.js");
 /* harmony import */ var _features_copy_paste__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./features/copy-paste */ "./node_modules/bpmn-js/lib/features/copy-paste/index.js");
 /* harmony import */ var _features_distribute_elements__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./features/distribute-elements */ "./node_modules/bpmn-js/lib/features/distribute-elements/index.js");
 /* harmony import */ var _features_editor_actions__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./features/editor-actions */ "./node_modules/bpmn-js/lib/features/editor-actions/index.js");
 /* harmony import */ var _features_keyboard__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./features/keyboard */ "./node_modules/bpmn-js/lib/features/keyboard/index.js");
-/* harmony import */ var diagram_js_lib_features_keyboard_move_selection__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! diagram-js/lib/features/keyboard-move-selection */ "./node_modules/diagram-js/lib/features/keyboard-move-selection/index.js");
+/* harmony import */ var diagram_js_lib_features_keyboard_move_selection__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! diagram-js/lib/features/keyboard-move-selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard-move-selection/index.js");
 /* harmony import */ var _features_label_editing__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./features/label-editing */ "./node_modules/bpmn-js/lib/features/label-editing/index.js");
 /* harmony import */ var _features_modeling__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./features/modeling */ "./node_modules/bpmn-js/lib/features/modeling/index.js");
-/* harmony import */ var diagram_js_lib_features_move__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! diagram-js/lib/features/move */ "./node_modules/diagram-js/lib/features/move/index.js");
+/* harmony import */ var diagram_js_lib_features_move__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! diagram-js/lib/features/move */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/index.js");
 /* harmony import */ var _features_palette__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./features/palette */ "./node_modules/bpmn-js/lib/features/palette/index.js");
 /* harmony import */ var _features_replace_preview__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./features/replace-preview */ "./node_modules/bpmn-js/lib/features/replace-preview/index.js");
-/* harmony import */ var diagram_js_lib_features_resize__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! diagram-js/lib/features/resize */ "./node_modules/diagram-js/lib/features/resize/index.js");
+/* harmony import */ var diagram_js_lib_features_resize__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! diagram-js/lib/features/resize */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/index.js");
 /* harmony import */ var _features_snapping__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./features/snapping */ "./node_modules/bpmn-js/lib/features/snapping/index.js");
 /* harmony import */ var _features_search__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./features/search */ "./node_modules/bpmn-js/lib/features/search/index.js");
 
@@ -4297,9 +4411,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Viewer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Viewer */ "./node_modules/bpmn-js/lib/Viewer.js");
-/* harmony import */ var diagram_js_lib_navigation_keyboard_move__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/navigation/keyboard-move */ "./node_modules/diagram-js/lib/navigation/keyboard-move/index.js");
-/* harmony import */ var diagram_js_lib_navigation_movecanvas__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/navigation/movecanvas */ "./node_modules/diagram-js/lib/navigation/movecanvas/index.js");
-/* harmony import */ var diagram_js_lib_navigation_zoomscroll__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/navigation/zoomscroll */ "./node_modules/diagram-js/lib/navigation/zoomscroll/index.js");
+/* harmony import */ var diagram_js_lib_navigation_keyboard_move__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/navigation/keyboard-move */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/keyboard-move/index.js");
+/* harmony import */ var diagram_js_lib_navigation_movecanvas__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/navigation/movecanvas */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/movecanvas/index.js");
+/* harmony import */ var diagram_js_lib_navigation_zoomscroll__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/navigation/zoomscroll */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/index.js");
 
 
 
@@ -4344,15 +4458,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var diagram_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js */ "./node_modules/diagram-js/index.js");
+/* harmony import */ var diagram_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js */ "./node_modules/bpmn-js/node_modules/diagram-js/index.js");
 /* harmony import */ var bpmn_moddle__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! bpmn-moddle */ "./node_modules/bpmn-moddle/index.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _import_Importer__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./import/Importer */ "./node_modules/bpmn-js/lib/import/Importer.js");
 /* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./core */ "./node_modules/bpmn-js/lib/core/index.js");
-/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/diagram-js/lib/i18n/translate/index.js");
-/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var diagram_js_lib_features_overlays__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! diagram-js/lib/features/overlays */ "./node_modules/diagram-js/lib/features/overlays/index.js");
+/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/index.js");
+/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var diagram_js_lib_features_overlays__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! diagram-js/lib/features/overlays */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/index.js");
 /* harmony import */ var _util_PoweredByUtil__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./util/PoweredByUtil */ "./node_modules/bpmn-js/lib/util/PoweredByUtil.js");
 /**
  * The code in the <project-logo></project-logo> area
@@ -5073,7 +5187,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDiamondPath", function() { return getDiamondPath; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRectPath", function() { return getRectPath; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/util/RenderUtil */ "./node_modules/diagram-js/lib/util/RenderUtil.js");
+/* harmony import */ var diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/util/RenderUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/RenderUtil.js");
 
 
 
@@ -5227,14 +5341,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_draw_BaseRenderer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/draw/BaseRenderer */ "./node_modules/diagram-js/lib/draw/BaseRenderer.js");
+/* harmony import */ var diagram_js_lib_draw_BaseRenderer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/draw/BaseRenderer */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/BaseRenderer.js");
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/util/RenderUtil */ "./node_modules/diagram-js/lib/util/RenderUtil.js");
+/* harmony import */ var diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/util/RenderUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/RenderUtil.js");
 /* harmony import */ var _BpmnRenderUtil__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./BpmnRenderUtil */ "./node_modules/bpmn-js/lib/draw/BpmnRenderUtil.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! diagram-js/lib/util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var diagram_js_lib_util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! diagram-js/lib/util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 /* harmony import */ var ids__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ids */ "./node_modules/ids/index.js");
 /* harmony import */ var ids__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(ids__WEBPACK_IMPORTED_MODULE_10__);
 
@@ -7620,7 +7734,7 @@ function format(str, obj) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TextRenderer; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_util_Text__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/util/Text */ "./node_modules/diagram-js/lib/util/Text.js");
+/* harmony import */ var diagram_js_lib_util_Text__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/util/Text */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Text.js");
 
 
 
@@ -7917,7 +8031,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getConnectedAtPosition", function() { return getConnectedAtPosition; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deconflictPosition", function() { return deconflictPosition; });
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 
 
@@ -8350,7 +8464,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BpmnAutoResize; });
-/* harmony import */ var diagram_js_lib_features_auto_resize_AutoResize__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/auto-resize/AutoResize */ "./node_modules/diagram-js/lib/features/auto-resize/AutoResize.js");
+/* harmony import */ var diagram_js_lib_features_auto_resize_AutoResize__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/auto-resize/AutoResize */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-resize/AutoResize.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
@@ -8408,7 +8522,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_features_auto_resize_AutoResizeProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/auto-resize/AutoResizeProvider */ "./node_modules/diagram-js/lib/features/auto-resize/AutoResizeProvider.js");
+/* harmony import */ var diagram_js_lib_features_auto_resize_AutoResizeProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/auto-resize/AutoResizeProvider */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-resize/AutoResizeProvider.js");
 
 
 
@@ -8506,7 +8620,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
 /* harmony import */ var _modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../modeling/util/ModelingUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/ModelingUtil.js");
 /* harmony import */ var _modeling_util_LaneUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../modeling/util/LaneUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/LaneUtil.js");
-/* harmony import */ var diagram_js_lib_util_Mouse__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var diagram_js_lib_util_Mouse__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
 
 
 
@@ -8937,11 +9051,11 @@ function isEventType(eventBo, type, definition) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_direct_editing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js-direct-editing */ "./node_modules/diagram-js-direct-editing/index.js");
-/* harmony import */ var diagram_js_lib_features_context_pad__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/context-pad */ "./node_modules/diagram-js/lib/features/context-pad/index.js");
-/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var diagram_js_lib_features_connect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/connect */ "./node_modules/diagram-js/lib/features/connect/index.js");
-/* harmony import */ var diagram_js_lib_features_create__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/features/create */ "./node_modules/diagram-js/lib/features/create/index.js");
+/* harmony import */ var diagram_js_direct_editing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js-direct-editing */ "./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/index.js");
+/* harmony import */ var diagram_js_lib_features_context_pad__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/context-pad */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/context-pad/index.js");
+/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var diagram_js_lib_features_connect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/connect */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/connect/index.js");
+/* harmony import */ var diagram_js_lib_features_create__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/features/create */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/create/index.js");
 /* harmony import */ var _popup_menu__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../popup-menu */ "./node_modules/bpmn-js/lib/features/popup-menu/index.js");
 /* harmony import */ var _ContextPadProvider__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ContextPadProvider */ "./node_modules/bpmn-js/lib/features/context-pad/ContextPadProvider.js");
 
@@ -9140,7 +9254,7 @@ BpmnCopyPaste.$inject = [
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_copy_paste__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/copy-paste */ "./node_modules/diagram-js/lib/features/copy-paste/index.js");
+/* harmony import */ var diagram_js_lib_features_copy_paste__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/copy-paste */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/copy-paste/index.js");
 /* harmony import */ var _BpmnCopyPaste__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnCopyPaste */ "./node_modules/bpmn-js/lib/features/copy-paste/BpmnCopyPaste.js");
 
 
@@ -9212,7 +9326,7 @@ BpmnDistributeElements.$inject = [ 'distributeElements' ];
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_distribute_elements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/distribute-elements */ "./node_modules/diagram-js/lib/features/distribute-elements/index.js");
+/* harmony import */ var diagram_js_lib_features_distribute_elements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/distribute-elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/distribute-elements/index.js");
 /* harmony import */ var _BpmnDistributeElements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnDistributeElements */ "./node_modules/bpmn-js/lib/features/distribute-elements/BpmnDistributeElements.js");
 
 
@@ -9242,10 +9356,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BpmnEditorActions; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_features_editor_actions_EditorActions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/editor-actions/EditorActions */ "./node_modules/diagram-js/lib/features/editor-actions/EditorActions.js");
+/* harmony import */ var diagram_js_lib_features_editor_actions_EditorActions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/editor-actions/EditorActions */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/editor-actions/EditorActions.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 
 
 
@@ -9432,7 +9546,7 @@ BpmnEditorActions.prototype._registerDefaultActions = function(injector) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_editor_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/editor-actions */ "./node_modules/diagram-js/lib/features/editor-actions/index.js");
+/* harmony import */ var diagram_js_lib_features_editor_actions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/editor-actions */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/editor-actions/index.js");
 /* harmony import */ var _BpmnEditorActions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnEditorActions */ "./node_modules/bpmn-js/lib/features/editor-actions/BpmnEditorActions.js");
 
 
@@ -9460,7 +9574,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BpmnKeyboardBindings; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_features_keyboard_KeyboardBindings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/keyboard/KeyboardBindings */ "./node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js");
+/* harmony import */ var diagram_js_lib_features_keyboard_KeyboardBindings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/keyboard/KeyboardBindings */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js");
 
 
 
@@ -9631,7 +9745,7 @@ BpmnKeyboardBindings.prototype.registerBindings = function(keyboard, editorActio
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/keyboard */ "./node_modules/diagram-js/lib/features/keyboard/index.js");
+/* harmony import */ var diagram_js_lib_features_keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/keyboard */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/index.js");
 /* harmony import */ var _BpmnKeyboardBindings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnKeyboardBindings */ "./node_modules/bpmn-js/lib/features/keyboard/BpmnKeyboardBindings.js");
 
 
@@ -9660,7 +9774,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return LabelEditingPreview; });
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var diagram_js_lib_util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 
@@ -10418,9 +10532,9 @@ function isEmptyText(label) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_change_support__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/change-support */ "./node_modules/diagram-js/lib/features/change-support/index.js");
-/* harmony import */ var diagram_js_lib_features_resize__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/resize */ "./node_modules/diagram-js/lib/features/resize/index.js");
-/* harmony import */ var diagram_js_direct_editing__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js-direct-editing */ "./node_modules/diagram-js-direct-editing/index.js");
+/* harmony import */ var diagram_js_lib_features_change_support__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/change-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/change-support/index.js");
+/* harmony import */ var diagram_js_lib_features_resize__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/resize */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/index.js");
+/* harmony import */ var diagram_js_direct_editing__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js-direct-editing */ "./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/index.js");
 /* harmony import */ var _LabelEditingProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./LabelEditingProvider */ "./node_modules/bpmn-js/lib/features/label-editing/LabelEditingProvider.js");
 /* harmony import */ var _LabelEditingPreview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LabelEditingPreview */ "./node_modules/bpmn-js/lib/features/label-editing/LabelEditingPreview.js");
 
@@ -10574,9 +10688,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_layout_BaseLayouter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/layout/BaseLayouter */ "./node_modules/diagram-js/lib/layout/BaseLayouter.js");
-/* harmony import */ var diagram_js_lib_layout_ManhattanLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/ManhattanLayout */ "./node_modules/diagram-js/lib/layout/ManhattanLayout.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_layout_BaseLayouter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/layout/BaseLayouter */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/BaseLayouter.js");
+/* harmony import */ var diagram_js_lib_layout_ManhattanLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/ManhattanLayout */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/ManhattanLayout.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
@@ -10949,10 +11063,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
-/* harmony import */ var diagram_js_lib_model__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/model */ "./node_modules/diagram-js/lib/model/index.js");
+/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var diagram_js_lib_model__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/model */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/model/index.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -11687,7 +11801,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
-/* harmony import */ var diagram_js_lib_core_ElementFactory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/core/ElementFactory */ "./node_modules/diagram-js/lib/core/ElementFactory.js");
+/* harmony import */ var diagram_js_lib_core_ElementFactory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/core/ElementFactory */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/ElementFactory.js");
 /* harmony import */ var _util_LabelUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/LabelUtil */ "./node_modules/bpmn-js/lib/util/LabelUtil.js");
 
 
@@ -11928,7 +12042,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Modeling; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_features_modeling_Modeling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/modeling/Modeling */ "./node_modules/diagram-js/lib/features/modeling/Modeling.js");
+/* harmony import */ var diagram_js_lib_features_modeling_Modeling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/modeling/Modeling */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/Modeling.js");
 /* harmony import */ var _cmd_UpdatePropertiesHandler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cmd/UpdatePropertiesHandler */ "./node_modules/bpmn-js/lib/features/modeling/cmd/UpdatePropertiesHandler.js");
 /* harmony import */ var _cmd_UpdateCanvasRootHandler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./cmd/UpdateCanvasRootHandler */ "./node_modules/bpmn-js/lib/features/modeling/cmd/UpdateCanvasRootHandler.js");
 /* harmony import */ var _cmd_AddLaneHandler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./cmd/AddLaneHandler */ "./node_modules/bpmn-js/lib/features/modeling/cmd/AddLaneHandler.js");
@@ -12146,10 +12260,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AdaptiveLabelPositioningBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
-/* harmony import */ var diagram_js_lib_util_Math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Math */ "./node_modules/diagram-js/lib/util/Math.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_util_Math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Math */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Math.js");
 /* harmony import */ var _util_LabelUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../util/LabelUtil */ "./node_modules/bpmn-js/lib/util/LabelUtil.js");
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -12354,7 +12468,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -12412,7 +12526,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BoundaryEventBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 
@@ -12497,7 +12611,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -12582,7 +12696,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CreateBoundaryEventBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
 
@@ -12654,7 +12768,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CreateDataObjectBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
 
@@ -12709,7 +12823,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CreateParticipantBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
 
@@ -12826,8 +12940,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DataInputAssociationBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
-/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
@@ -12996,7 +13110,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DataStoreBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _util_ModelingUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/ModelingUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/ModelingUtil.js");
 /* harmony import */ var _cmd_UpdateSemanticParentHandler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../cmd/UpdateSemanticParentHandler */ "./node_modules/bpmn-js/lib/features/modeling/cmd/UpdateSemanticParentHandler.js");
@@ -13222,10 +13336,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DeleteLaneBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _util_LaneUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/LaneUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/LaneUtil.js");
-/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 
 
 
@@ -13350,8 +13464,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
-/* harmony import */ var diagram_js_lib_util_LineIntersection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/util/LineIntersection */ "./node_modules/diagram-js/lib/util/LineIntersection.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_util_LineIntersection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/util/LineIntersection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/LineIntersection.js");
 
 
 
@@ -13566,7 +13680,7 @@ function getMid(bounds) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ImportDockingFix; });
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var _util_LineIntersect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util/LineIntersect */ "./node_modules/bpmn-js/lib/features/modeling/behavior/util/LineIntersect.js");
 
 
@@ -13662,7 +13776,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return IsHorizontalFix; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _util_ModelingUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/ModelingUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/ModelingUtil.js");
 
@@ -13722,7 +13836,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _util_LabelUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../util/LabelUtil */ "./node_modules/bpmn-js/lib/util/LabelUtil.js");
 /* harmony import */ var _util_LabelLayoutUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./util/LabelLayoutUtil */ "./node_modules/bpmn-js/lib/features/modeling/behavior/util/LabelLayoutUtil.js");
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -14013,7 +14127,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_LineIntersect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util/LineIntersect */ "./node_modules/bpmn-js/lib/features/modeling/behavior/util/LineIntersect.js");
 
 
@@ -14112,7 +14226,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RemoveParticipantBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
 
@@ -14177,7 +14291,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
 
@@ -14327,7 +14441,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReplaceElementBehaviour; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
@@ -14469,8 +14583,8 @@ ReplaceElementBehaviour.$inject = [
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ResizeLaneBehavior; });
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
-/* harmony import */ var diagram_js_lib_util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
 
 
 
@@ -14545,9 +14659,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ToggleElementCollapseBehaviour; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_features_resize_ResizeUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/resize/ResizeUtil */ "./node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
+/* harmony import */ var diagram_js_lib_features_resize_ResizeUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/resize/ResizeUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
 
 
 
@@ -14702,7 +14816,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -14749,7 +14863,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DeleteSequenceFlowBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
 
@@ -14820,7 +14934,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UpdateFlowNodeRefsBehavior; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 
 
@@ -15245,7 +15359,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getLabelAdjustment", function() { return getLabelAdjustment; });
 /* harmony import */ var _GeometricUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GeometricUtil */ "./node_modules/bpmn-js/lib/features/modeling/behavior/util/GeometricUtil.js");
 /* harmony import */ var _LineAttachmentUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LineAttachmentUtil */ "./node_modules/bpmn-js/lib/features/modeling/behavior/util/LineAttachmentUtil.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 
 
 
@@ -15766,7 +15880,7 @@ function lineIntersect(l1s, l1e, l2s, l2e) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AddLaneHandler; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 /* harmony import */ var _util_LaneUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/LaneUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/LaneUtil.js");
 
 
@@ -15915,9 +16029,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ResizeLaneHandler; });
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _util_LaneUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/LaneUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/LaneUtil.js");
-/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
-/* harmony import */ var diagram_js_lib_features_resize_ResizeUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/features/resize/ResizeUtil */ "./node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
+/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_features_resize_ResizeUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/features/resize/ResizeUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
 
 
 
@@ -16210,7 +16324,7 @@ SplitLaneHandler.prototype.preExecute = function(context) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UpdateCanvasRootHandler; });
-/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
 
 
 
@@ -16304,8 +16418,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UpdateFlowNodeRefsHandler; });
 /* harmony import */ var _util_LaneUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/LaneUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/LaneUtil.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
-/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 
 
 
@@ -16795,19 +16909,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/lib/features/rules/index.js");
 /* harmony import */ var _ordering__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../ordering */ "./node_modules/bpmn-js/lib/features/ordering/index.js");
 /* harmony import */ var _replace__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../replace */ "./node_modules/bpmn-js/lib/features/replace/index.js");
-/* harmony import */ var diagram_js_lib_command__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/command */ "./node_modules/diagram-js/lib/command/index.js");
-/* harmony import */ var diagram_js_lib_features_tooltips__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/features/tooltips */ "./node_modules/diagram-js/lib/features/tooltips/index.js");
-/* harmony import */ var diagram_js_lib_features_label_support__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/features/label-support */ "./node_modules/diagram-js/lib/features/label-support/index.js");
-/* harmony import */ var diagram_js_lib_features_attach_support__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! diagram-js/lib/features/attach-support */ "./node_modules/diagram-js/lib/features/attach-support/index.js");
-/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var diagram_js_lib_features_change_support__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! diagram-js/lib/features/change-support */ "./node_modules/diagram-js/lib/features/change-support/index.js");
-/* harmony import */ var diagram_js_lib_features_space_tool__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! diagram-js/lib/features/space-tool */ "./node_modules/diagram-js/lib/features/space-tool/index.js");
+/* harmony import */ var diagram_js_lib_command__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/command */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/index.js");
+/* harmony import */ var diagram_js_lib_features_tooltips__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/features/tooltips */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tooltips/index.js");
+/* harmony import */ var diagram_js_lib_features_label_support__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/features/label-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/label-support/index.js");
+/* harmony import */ var diagram_js_lib_features_attach_support__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! diagram-js/lib/features/attach-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/attach-support/index.js");
+/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var diagram_js_lib_features_change_support__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! diagram-js/lib/features/change-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/change-support/index.js");
+/* harmony import */ var diagram_js_lib_features_space_tool__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! diagram-js/lib/features/space-tool */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/index.js");
 /* harmony import */ var _BpmnFactory__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./BpmnFactory */ "./node_modules/bpmn-js/lib/features/modeling/BpmnFactory.js");
 /* harmony import */ var _BpmnUpdater__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./BpmnUpdater */ "./node_modules/bpmn-js/lib/features/modeling/BpmnUpdater.js");
 /* harmony import */ var _ElementFactory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./ElementFactory */ "./node_modules/bpmn-js/lib/features/modeling/ElementFactory.js");
 /* harmony import */ var _Modeling__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./Modeling */ "./node_modules/bpmn-js/lib/features/modeling/Modeling.js");
 /* harmony import */ var _BpmnLayouter__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./BpmnLayouter */ "./node_modules/bpmn-js/lib/features/modeling/BpmnLayouter.js");
-/* harmony import */ var diagram_js_lib_layout_CroppingConnectionDocking__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! diagram-js/lib/layout/CroppingConnectionDocking */ "./node_modules/diagram-js/lib/layout/CroppingConnectionDocking.js");
+/* harmony import */ var diagram_js_lib_layout_CroppingConnectionDocking__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! diagram-js/lib/layout/CroppingConnectionDocking */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/CroppingConnectionDocking.js");
 
 
 
@@ -16873,8 +16987,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "computeLanesResize", function() { return computeLanesResize; });
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _ModelingUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModelingUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/ModelingUtil.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
-/* harmony import */ var diagram_js_lib_features_resize_ResizeUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/resize/ResizeUtil */ "./node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_features_resize_ResizeUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/resize/ResizeUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
 
 
 
@@ -17095,7 +17209,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BpmnOrderingProvider; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var diagram_js_lib_features_ordering_OrderingProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/ordering/OrderingProvider */ "./node_modules/diagram-js/lib/features/ordering/OrderingProvider.js");
+/* harmony import */ var diagram_js_lib_features_ordering_OrderingProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/ordering/OrderingProvider */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/ordering/OrderingProvider.js");
 /* harmony import */ var _modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../modeling/util/ModelingUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/ModelingUtil.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 
@@ -17274,7 +17388,7 @@ inherits__WEBPACK_IMPORTED_MODULE_0___default()(BpmnOrderingProvider, diagram_js
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/diagram-js/lib/i18n/translate/index.js");
+/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/index.js");
 /* harmony import */ var _BpmnOrderingProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnOrderingProvider */ "./node_modules/bpmn-js/lib/features/ordering/BpmnOrderingProvider.js");
 
 
@@ -17475,13 +17589,13 @@ PaletteProvider.prototype.getPaletteEntries = function(element) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_palette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/palette */ "./node_modules/diagram-js/lib/features/palette/index.js");
-/* harmony import */ var diagram_js_lib_features_create__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/create */ "./node_modules/diagram-js/lib/features/create/index.js");
-/* harmony import */ var diagram_js_lib_features_space_tool__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/features/space-tool */ "./node_modules/diagram-js/lib/features/space-tool/index.js");
-/* harmony import */ var diagram_js_lib_features_lasso_tool__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/lasso-tool */ "./node_modules/diagram-js/lib/features/lasso-tool/index.js");
-/* harmony import */ var diagram_js_lib_features_hand_tool__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/features/hand-tool */ "./node_modules/diagram-js/lib/features/hand-tool/index.js");
-/* harmony import */ var diagram_js_lib_features_global_connect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/features/global-connect */ "./node_modules/diagram-js/lib/features/global-connect/index.js");
-/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/diagram-js/lib/i18n/translate/index.js");
+/* harmony import */ var diagram_js_lib_features_palette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/palette */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/palette/index.js");
+/* harmony import */ var diagram_js_lib_features_create__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/create */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/create/index.js");
+/* harmony import */ var diagram_js_lib_features_space_tool__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/features/space-tool */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/index.js");
+/* harmony import */ var diagram_js_lib_features_lasso_tool__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/features/lasso-tool */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/lasso-tool/index.js");
+/* harmony import */ var diagram_js_lib_features_hand_tool__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! diagram-js/lib/features/hand-tool */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/hand-tool/index.js");
+/* harmony import */ var diagram_js_lib_features_global_connect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! diagram-js/lib/features/global-connect */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/global-connect/index.js");
+/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/index.js");
 /* harmony import */ var _PaletteProvider__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./PaletteProvider */ "./node_modules/bpmn-js/lib/features/palette/PaletteProvider.js");
 
 
@@ -18020,7 +18134,7 @@ ReplaceMenuProvider.prototype._getAdHocEntry = function(element) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_popup_menu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/popup-menu */ "./node_modules/diagram-js/lib/features/popup-menu/index.js");
+/* harmony import */ var diagram_js_lib_features_popup_menu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/popup-menu */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/popup-menu/index.js");
 /* harmony import */ var _replace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../replace */ "./node_modules/bpmn-js/lib/features/replace/index.js");
 /* harmony import */ var _ReplaceMenuProvider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReplaceMenuProvider */ "./node_modules/bpmn-js/lib/features/popup-menu/ReplaceMenuProvider.js");
 
@@ -18105,7 +18219,7 @@ function isDifferentType(element) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BpmnReplacePreview; });
-/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var diagram_js_lib_command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var css_escape__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! css.escape */ "./node_modules/css.escape/css.escape.js");
@@ -18244,7 +18358,7 @@ inherits__WEBPACK_IMPORTED_MODULE_1___default()(BpmnReplacePreview, diagram_js_l
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_preview_support__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/preview-support */ "./node_modules/diagram-js/lib/features/preview-support/index.js");
+/* harmony import */ var diagram_js_lib_features_preview_support__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/preview-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/index.js");
 /* harmony import */ var _BpmnReplacePreview__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnReplacePreview */ "./node_modules/bpmn-js/lib/features/replace-preview/BpmnReplacePreview.js");
 
 
@@ -19350,8 +19464,8 @@ var PARTICIPANT = [
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var diagram_js_lib_features_replace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/replace */ "./node_modules/diagram-js/lib/features/replace/index.js");
+/* harmony import */ var diagram_js_lib_features_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var diagram_js_lib_features_replace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! diagram-js/lib/features/replace */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/replace/index.js");
 /* harmony import */ var _BpmnReplace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BpmnReplace */ "./node_modules/bpmn-js/lib/features/replace/BpmnReplace.js");
 
 
@@ -19386,7 +19500,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../modeling/util/ModelingUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/ModelingUtil.js");
 /* harmony import */ var _util_LabelUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/LabelUtil */ "./node_modules/bpmn-js/lib/util/LabelUtil.js");
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
-/* harmony import */ var diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/features/rules/RuleProvider */ "./node_modules/diagram-js/lib/features/rules/RuleProvider.js");
+/* harmony import */ var diagram_js_lib_features_rules_RuleProvider__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/features/rules/RuleProvider */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/RuleProvider.js");
 /* harmony import */ var _snapping_BpmnSnappingUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../snapping/BpmnSnappingUtil */ "./node_modules/bpmn-js/lib/features/snapping/BpmnSnappingUtil.js");
 
 
@@ -20278,7 +20392,7 @@ function canCopy(collection, element) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var diagram_js_lib_features_rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
 /* harmony import */ var _BpmnRules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnRules */ "./node_modules/bpmn-js/lib/features/rules/BpmnRules.js");
 
 
@@ -20442,7 +20556,7 @@ function matchAndSplit(text, pattern) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_search_pad__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/search-pad */ "./node_modules/diagram-js/lib/features/search-pad/index.js");
+/* harmony import */ var diagram_js_lib_features_search_pad__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/search-pad */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/search-pad/index.js");
 /* harmony import */ var _BpmnSearchProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnSearchProvider */ "./node_modules/bpmn-js/lib/features/search/BpmnSearchProvider.js");
 
 
@@ -20473,13 +20587,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var diagram_js_lib_util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../modeling/util/ModelingUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/ModelingUtil.js");
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
-/* harmony import */ var diagram_js_lib_features_snapping_Snapping__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/features/snapping/Snapping */ "./node_modules/diagram-js/lib/features/snapping/Snapping.js");
-/* harmony import */ var diagram_js_lib_features_snapping_SnapUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! diagram-js/lib/features/snapping/SnapUtil */ "./node_modules/diagram-js/lib/features/snapping/SnapUtil.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_features_snapping_Snapping__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! diagram-js/lib/features/snapping/Snapping */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/Snapping.js");
+/* harmony import */ var diagram_js_lib_features_snapping_SnapUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! diagram-js/lib/features/snapping/SnapUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapUtil.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var _BpmnSnappingUtil__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./BpmnSnappingUtil */ "./node_modules/bpmn-js/lib/features/snapping/BpmnSnappingUtil.js");
 /* harmony import */ var _modeling_util_LaneUtil__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../modeling/util/LaneUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/LaneUtil.js");
 
@@ -20953,7 +21067,7 @@ function snapToPosition(event, position) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getBoundaryAttachment", function() { return getBoundaryAttachment; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getParticipantSizeConstraints", function() { return getParticipantSizeConstraints; });
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _modeling_util_LaneUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../modeling/util/LaneUtil */ "./node_modules/bpmn-js/lib/features/modeling/util/LaneUtil.js");
 
@@ -21142,7 +21256,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/ModelUtil */ "./node_modules/bpmn-js/lib/util/ModelUtil.js");
 /* harmony import */ var _util_LabelUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/LabelUtil */ "./node_modules/bpmn-js/lib/util/LabelUtil.js");
-/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var diagram_js_lib_layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! diagram-js/lib/layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var _util_DiUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/DiUtil */ "./node_modules/bpmn-js/lib/util/DiUtil.js");
 /* harmony import */ var _Util__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Util */ "./node_modules/bpmn-js/lib/import/Util.js");
 
@@ -22064,7 +22178,7 @@ function elementToString(e) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/diagram-js/lib/i18n/translate/index.js");
+/* harmony import */ var diagram_js_lib_i18n_translate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/i18n/translate */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/index.js");
 /* harmony import */ var _BpmnImporter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BpmnImporter */ "./node_modules/bpmn-js/lib/import/BpmnImporter.js");
 
 
@@ -22732,500 +22846,17 @@ function getProperties(descriptor, keepDefault) {
 
 /***/ }),
 
-/***/ "./node_modules/bpmn-moddle/index.js":
-/*!*******************************************!*\
-  !*** ./node_modules/bpmn-moddle/index.js ***!
-  \*******************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/index.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/index.js ***!
+  \******************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _lib_simple__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/simple */ "./node_modules/bpmn-moddle/lib/simple.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _lib_simple__WEBPACK_IMPORTED_MODULE_0__["default"]; });
-
-
-
-/***/ }),
-
-/***/ "./node_modules/bpmn-moddle/lib/bpmn-moddle.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/bpmn-moddle/lib/bpmn-moddle.js ***!
-  \*****************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BpmnModdle; });
-/* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var moddle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moddle */ "./node_modules/moddle/index.js");
-/* harmony import */ var moddle_xml__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moddle-xml */ "./node_modules/moddle-xml/index.js");
-
-
-
-
-
-
-
-/**
- * A sub class of {@link Moddle} with support for import and export of BPMN 2.0 xml files.
- *
- * @class BpmnModdle
- * @extends Moddle
- *
- * @param {Object|Array} packages to use for instantiating the model
- * @param {Object} [options] additional options to pass over
- */
-function BpmnModdle(packages, options) {
-  moddle__WEBPACK_IMPORTED_MODULE_1__["default"].call(this, packages, options);
-}
-
-BpmnModdle.prototype = Object.create(moddle__WEBPACK_IMPORTED_MODULE_1__["default"].prototype);
-
-
-/**
- * Instantiates a BPMN model tree from a given xml string.
- *
- * @param {String}   xmlStr
- * @param {String}   [typeName='bpmn:Definitions'] name of the root element
- * @param {Object}   [options]  options to pass to the underlying reader
- * @param {Function} done       callback that is invoked with (err, result, parseContext)
- *                              once the import completes
- */
-BpmnModdle.prototype.fromXML = function(xmlStr, typeName, options, done) {
-
-  if (!Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isString"])(typeName)) {
-    done = options;
-    options = typeName;
-    typeName = 'bpmn:Definitions';
-  }
-
-  if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(options)) {
-    done = options;
-    options = {};
-  }
-
-  var reader = new moddle_xml__WEBPACK_IMPORTED_MODULE_2__["Reader"](Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["assign"])({ model: this, lax: true }, options));
-  var rootHandler = reader.handler(typeName);
-
-  reader.fromXML(xmlStr, rootHandler, done);
-};
-
-
-/**
- * Serializes a BPMN 2.0 object tree to XML.
- *
- * @param {String}   element    the root element, typically an instance of `bpmn:Definitions`
- * @param {Object}   [options]  to pass to the underlying writer
- * @param {Function} done       callback invoked with (err, xmlStr) once the import completes
- */
-BpmnModdle.prototype.toXML = function(element, options, done) {
-
-  if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(options)) {
-    done = options;
-    options = {};
-  }
-
-  var writer = new moddle_xml__WEBPACK_IMPORTED_MODULE_2__["Writer"](options);
-
-  var result;
-  var err;
-
-  try {
-    result = writer.toXML(element);
-  } catch (e) {
-    err = e;
-  }
-
-  return done(err, result);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/bpmn-moddle/lib/simple.js":
-/*!************************************************!*\
-  !*** ./node_modules/bpmn-moddle/lib/simple.js ***!
-  \************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _bpmn_moddle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bpmn-moddle */ "./node_modules/bpmn-moddle/lib/bpmn-moddle.js");
-/* harmony import */ var _resources_bpmn_json_bpmn_json__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../resources/bpmn/json/bpmn.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json");
-var _resources_bpmn_json_bpmn_json__WEBPACK_IMPORTED_MODULE_2___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/bpmn.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json", 1);
-/* harmony import */ var _resources_bpmn_json_bpmndi_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../resources/bpmn/json/bpmndi.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json");
-var _resources_bpmn_json_bpmndi_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/bpmndi.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json", 1);
-/* harmony import */ var _resources_bpmn_json_dc_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../resources/bpmn/json/dc.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/dc.json");
-var _resources_bpmn_json_dc_json__WEBPACK_IMPORTED_MODULE_4___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/dc.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/dc.json", 1);
-/* harmony import */ var _resources_bpmn_json_di_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../resources/bpmn/json/di.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/di.json");
-var _resources_bpmn_json_di_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/di.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/di.json", 1);
-/* harmony import */ var _resources_bpmn_io_json_bioc_json__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../resources/bpmn-io/json/bioc.json */ "./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json");
-var _resources_bpmn_io_json_bioc_json__WEBPACK_IMPORTED_MODULE_6___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn-io/json/bioc.json */ "./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json", 1);
-
-
-
-
-
-
-
-
-
-
-var packages = {
-  bpmn: _resources_bpmn_json_bpmn_json__WEBPACK_IMPORTED_MODULE_2__,
-  bpmndi: _resources_bpmn_json_bpmndi_json__WEBPACK_IMPORTED_MODULE_3__,
-  dc: _resources_bpmn_json_dc_json__WEBPACK_IMPORTED_MODULE_4__,
-  di: _resources_bpmn_json_di_json__WEBPACK_IMPORTED_MODULE_5__,
-  bioc: _resources_bpmn_io_json_bioc_json__WEBPACK_IMPORTED_MODULE_6__
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (function(additionalPackages, options) {
-  var pks = Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["assign"])({}, packages, additionalPackages);
-
-  return new _bpmn_moddle__WEBPACK_IMPORTED_MODULE_1__["default"](pks, options);
-});
-
-
-/***/ }),
-
-/***/ "./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json":
-/*!*******************************************************************!*\
-  !*** ./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json ***!
-  \*******************************************************************/
-/*! exports provided: name, uri, prefix, types, enumerations, associations, default */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"name\":\"bpmn.io colors for BPMN\",\"uri\":\"http://bpmn.io/schema/bpmn/biocolor/1.0\",\"prefix\":\"bioc\",\"types\":[{\"name\":\"ColoredShape\",\"extends\":[\"bpmndi:BPMNShape\"],\"properties\":[{\"name\":\"stroke\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"fill\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ColoredEdge\",\"extends\":[\"bpmndi:BPMNEdge\"],\"properties\":[{\"name\":\"stroke\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"fill\",\"isAttr\":true,\"type\":\"String\"}]}],\"enumerations\":[],\"associations\":[]}");
-
-/***/ }),
-
-/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json":
-/*!****************************************************************!*\
-  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json ***!
-  \****************************************************************/
-/*! exports provided: name, uri, associations, types, enumerations, prefix, xml, default */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"name\":\"BPMN20\",\"uri\":\"http://www.omg.org/spec/BPMN/20100524/MODEL\",\"associations\":[],\"types\":[{\"name\":\"Interface\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"operations\",\"type\":\"Operation\",\"isMany\":true},{\"name\":\"implementationRef\",\"type\":\"String\",\"isAttr\":true}]},{\"name\":\"Operation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"inMessageRef\",\"type\":\"Message\",\"isReference\":true},{\"name\":\"outMessageRef\",\"type\":\"Message\",\"isReference\":true},{\"name\":\"errorRef\",\"type\":\"Error\",\"isMany\":true,\"isReference\":true},{\"name\":\"implementationRef\",\"type\":\"String\",\"isAttr\":true}]},{\"name\":\"EndPoint\",\"superClass\":[\"RootElement\"]},{\"name\":\"Auditing\",\"superClass\":[\"BaseElement\"]},{\"name\":\"GlobalTask\",\"superClass\":[\"CallableElement\"],\"properties\":[{\"name\":\"resources\",\"type\":\"ResourceRole\",\"isMany\":true}]},{\"name\":\"Monitoring\",\"superClass\":[\"BaseElement\"]},{\"name\":\"Performer\",\"superClass\":[\"ResourceRole\"]},{\"name\":\"Process\",\"superClass\":[\"FlowElementsContainer\",\"CallableElement\"],\"properties\":[{\"name\":\"processType\",\"type\":\"ProcessType\",\"isAttr\":true},{\"name\":\"isClosed\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"auditing\",\"type\":\"Auditing\"},{\"name\":\"monitoring\",\"type\":\"Monitoring\"},{\"name\":\"properties\",\"type\":\"Property\",\"isMany\":true},{\"name\":\"laneSets\",\"type\":\"LaneSet\",\"isMany\":true,\"replaces\":\"FlowElementsContainer#laneSets\"},{\"name\":\"flowElements\",\"type\":\"FlowElement\",\"isMany\":true,\"replaces\":\"FlowElementsContainer#flowElements\"},{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true},{\"name\":\"resources\",\"type\":\"ResourceRole\",\"isMany\":true},{\"name\":\"correlationSubscriptions\",\"type\":\"CorrelationSubscription\",\"isMany\":true},{\"name\":\"supports\",\"type\":\"Process\",\"isMany\":true,\"isReference\":true},{\"name\":\"definitionalCollaborationRef\",\"type\":\"Collaboration\",\"isAttr\":true,\"isReference\":true},{\"name\":\"isExecutable\",\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"LaneSet\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"lanes\",\"type\":\"Lane\",\"isMany\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Lane\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"partitionElementRef\",\"type\":\"BaseElement\",\"isAttr\":true,\"isReference\":true},{\"name\":\"partitionElement\",\"type\":\"BaseElement\"},{\"name\":\"flowNodeRef\",\"type\":\"FlowNode\",\"isMany\":true,\"isReference\":true},{\"name\":\"childLaneSet\",\"type\":\"LaneSet\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"GlobalManualTask\",\"superClass\":[\"GlobalTask\"]},{\"name\":\"ManualTask\",\"superClass\":[\"Task\"]},{\"name\":\"UserTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"renderings\",\"type\":\"Rendering\",\"isMany\":true},{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Rendering\",\"superClass\":[\"BaseElement\"]},{\"name\":\"HumanPerformer\",\"superClass\":[\"Performer\"]},{\"name\":\"PotentialOwner\",\"superClass\":[\"HumanPerformer\"]},{\"name\":\"GlobalUserTask\",\"superClass\":[\"GlobalTask\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"renderings\",\"type\":\"Rendering\",\"isMany\":true}]},{\"name\":\"Gateway\",\"isAbstract\":true,\"superClass\":[\"FlowNode\"],\"properties\":[{\"name\":\"gatewayDirection\",\"type\":\"GatewayDirection\",\"default\":\"Unspecified\",\"isAttr\":true}]},{\"name\":\"EventBasedGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"instantiate\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"eventGatewayType\",\"type\":\"EventBasedGatewayType\",\"isAttr\":true,\"default\":\"Exclusive\"}]},{\"name\":\"ComplexGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"activationCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ExclusiveGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"InclusiveGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ParallelGateway\",\"superClass\":[\"Gateway\"]},{\"name\":\"RootElement\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"]},{\"name\":\"Relationship\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"type\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"direction\",\"type\":\"RelationshipDirection\",\"isAttr\":true},{\"name\":\"source\",\"isMany\":true,\"isReference\":true,\"type\":\"Element\"},{\"name\":\"target\",\"isMany\":true,\"isReference\":true,\"type\":\"Element\"}]},{\"name\":\"BaseElement\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"isAttr\":true,\"type\":\"String\",\"isId\":true},{\"name\":\"documentation\",\"type\":\"Documentation\",\"isMany\":true},{\"name\":\"extensionDefinitions\",\"type\":\"ExtensionDefinition\",\"isMany\":true,\"isReference\":true},{\"name\":\"extensionElements\",\"type\":\"ExtensionElements\"}]},{\"name\":\"Extension\",\"properties\":[{\"name\":\"mustUnderstand\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"definition\",\"type\":\"ExtensionDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ExtensionDefinition\",\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"extensionAttributeDefinitions\",\"type\":\"ExtensionAttributeDefinition\",\"isMany\":true}]},{\"name\":\"ExtensionAttributeDefinition\",\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"type\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isReference\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"extensionDefinition\",\"type\":\"ExtensionDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ExtensionElements\",\"properties\":[{\"name\":\"valueRef\",\"isAttr\":true,\"isReference\":true,\"type\":\"Element\"},{\"name\":\"values\",\"type\":\"Element\",\"isMany\":true},{\"name\":\"extensionAttributeDefinition\",\"type\":\"ExtensionAttributeDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Documentation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"text\",\"type\":\"String\",\"isBody\":true},{\"name\":\"textFormat\",\"default\":\"text/plain\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Event\",\"isAbstract\":true,\"superClass\":[\"FlowNode\",\"InteractionNode\"],\"properties\":[{\"name\":\"properties\",\"type\":\"Property\",\"isMany\":true}]},{\"name\":\"IntermediateCatchEvent\",\"superClass\":[\"CatchEvent\"]},{\"name\":\"IntermediateThrowEvent\",\"superClass\":[\"ThrowEvent\"]},{\"name\":\"EndEvent\",\"superClass\":[\"ThrowEvent\"]},{\"name\":\"StartEvent\",\"superClass\":[\"CatchEvent\"],\"properties\":[{\"name\":\"isInterrupting\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"ThrowEvent\",\"isAbstract\":true,\"superClass\":[\"Event\"],\"properties\":[{\"name\":\"dataInputs\",\"type\":\"DataInput\",\"isMany\":true},{\"name\":\"dataInputAssociations\",\"type\":\"DataInputAssociation\",\"isMany\":true},{\"name\":\"inputSet\",\"type\":\"InputSet\"},{\"name\":\"eventDefinitions\",\"type\":\"EventDefinition\",\"isMany\":true},{\"name\":\"eventDefinitionRef\",\"type\":\"EventDefinition\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"CatchEvent\",\"isAbstract\":true,\"superClass\":[\"Event\"],\"properties\":[{\"name\":\"parallelMultiple\",\"isAttr\":true,\"type\":\"Boolean\",\"default\":false},{\"name\":\"dataOutputs\",\"type\":\"DataOutput\",\"isMany\":true},{\"name\":\"dataOutputAssociations\",\"type\":\"DataOutputAssociation\",\"isMany\":true},{\"name\":\"outputSet\",\"type\":\"OutputSet\"},{\"name\":\"eventDefinitions\",\"type\":\"EventDefinition\",\"isMany\":true},{\"name\":\"eventDefinitionRef\",\"type\":\"EventDefinition\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"BoundaryEvent\",\"superClass\":[\"CatchEvent\"],\"properties\":[{\"name\":\"cancelActivity\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"attachedToRef\",\"type\":\"Activity\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"EventDefinition\",\"isAbstract\":true,\"superClass\":[\"RootElement\"]},{\"name\":\"CancelEventDefinition\",\"superClass\":[\"EventDefinition\"]},{\"name\":\"ErrorEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"errorRef\",\"type\":\"Error\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"TerminateEventDefinition\",\"superClass\":[\"EventDefinition\"]},{\"name\":\"EscalationEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"escalationRef\",\"type\":\"Escalation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Escalation\",\"properties\":[{\"name\":\"structureRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"escalationCode\",\"isAttr\":true,\"type\":\"String\"}],\"superClass\":[\"RootElement\"]},{\"name\":\"CompensateEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"waitForCompletion\",\"isAttr\":true,\"type\":\"Boolean\",\"default\":true},{\"name\":\"activityRef\",\"type\":\"Activity\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"TimerEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"timeDate\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"timeCycle\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"timeDuration\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"LinkEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"target\",\"type\":\"LinkEventDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"source\",\"type\":\"LinkEventDefinition\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"MessageEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ConditionalEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"condition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"SignalEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"signalRef\",\"type\":\"Signal\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Signal\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"structureRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ImplicitThrowEvent\",\"superClass\":[\"ThrowEvent\"]},{\"name\":\"DataState\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ItemAwareElement\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"itemSubjectRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"dataState\",\"type\":\"DataState\"}]},{\"name\":\"DataAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"assignment\",\"type\":\"Assignment\",\"isMany\":true},{\"name\":\"sourceRef\",\"type\":\"ItemAwareElement\",\"isMany\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"ItemAwareElement\",\"isReference\":true},{\"name\":\"transformation\",\"type\":\"FormalExpression\",\"xml\":{\"serialize\":\"property\"}}]},{\"name\":\"DataInput\",\"superClass\":[\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"inputSetRef\",\"type\":\"InputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"inputSetWithOptional\",\"type\":\"InputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"inputSetWithWhileExecuting\",\"type\":\"InputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"DataOutput\",\"superClass\":[\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"outputSetRef\",\"type\":\"OutputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"outputSetWithOptional\",\"type\":\"OutputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"outputSetWithWhileExecuting\",\"type\":\"OutputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"InputSet\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"dataInputRefs\",\"type\":\"DataInput\",\"isMany\":true,\"isReference\":true},{\"name\":\"optionalInputRefs\",\"type\":\"DataInput\",\"isMany\":true,\"isReference\":true},{\"name\":\"whileExecutingInputRefs\",\"type\":\"DataInput\",\"isMany\":true,\"isReference\":true},{\"name\":\"outputSetRefs\",\"type\":\"OutputSet\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"OutputSet\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"dataOutputRefs\",\"type\":\"DataOutput\",\"isMany\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"inputSetRefs\",\"type\":\"InputSet\",\"isMany\":true,\"isReference\":true},{\"name\":\"optionalOutputRefs\",\"type\":\"DataOutput\",\"isMany\":true,\"isReference\":true},{\"name\":\"whileExecutingOutputRefs\",\"type\":\"DataOutput\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"Property\",\"superClass\":[\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"DataInputAssociation\",\"superClass\":[\"DataAssociation\"]},{\"name\":\"DataOutputAssociation\",\"superClass\":[\"DataAssociation\"]},{\"name\":\"InputOutputSpecification\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"dataInputs\",\"type\":\"DataInput\",\"isMany\":true},{\"name\":\"dataOutputs\",\"type\":\"DataOutput\",\"isMany\":true},{\"name\":\"inputSets\",\"type\":\"InputSet\",\"isMany\":true},{\"name\":\"outputSets\",\"type\":\"OutputSet\",\"isMany\":true}]},{\"name\":\"DataObject\",\"superClass\":[\"FlowElement\",\"ItemAwareElement\"],\"properties\":[{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"InputOutputBinding\",\"properties\":[{\"name\":\"inputDataRef\",\"type\":\"InputSet\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outputDataRef\",\"type\":\"OutputSet\",\"isAttr\":true,\"isReference\":true},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Assignment\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"from\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"to\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"DataStore\",\"superClass\":[\"RootElement\",\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"capacity\",\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"isUnlimited\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"DataStoreReference\",\"superClass\":[\"ItemAwareElement\",\"FlowElement\"],\"properties\":[{\"name\":\"dataStoreRef\",\"type\":\"DataStore\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"DataObjectReference\",\"superClass\":[\"ItemAwareElement\",\"FlowElement\"],\"properties\":[{\"name\":\"dataObjectRef\",\"type\":\"DataObject\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ConversationLink\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"sourceRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ConversationAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"innerConversationNodeRef\",\"type\":\"ConversationNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outerConversationNodeRef\",\"type\":\"ConversationNode\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"CallConversation\",\"superClass\":[\"ConversationNode\"],\"properties\":[{\"name\":\"calledCollaborationRef\",\"type\":\"Collaboration\",\"isAttr\":true,\"isReference\":true},{\"name\":\"participantAssociations\",\"type\":\"ParticipantAssociation\",\"isMany\":true}]},{\"name\":\"Conversation\",\"superClass\":[\"ConversationNode\"]},{\"name\":\"SubConversation\",\"superClass\":[\"ConversationNode\"],\"properties\":[{\"name\":\"conversationNodes\",\"type\":\"ConversationNode\",\"isMany\":true}]},{\"name\":\"ConversationNode\",\"isAbstract\":true,\"superClass\":[\"InteractionNode\",\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true},{\"name\":\"messageFlowRefs\",\"type\":\"MessageFlow\",\"isMany\":true,\"isReference\":true},{\"name\":\"correlationKeys\",\"type\":\"CorrelationKey\",\"isMany\":true}]},{\"name\":\"GlobalConversation\",\"superClass\":[\"Collaboration\"]},{\"name\":\"PartnerEntity\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"PartnerRole\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"CorrelationProperty\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"correlationPropertyRetrievalExpression\",\"type\":\"CorrelationPropertyRetrievalExpression\",\"isMany\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"type\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Error\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"structureRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"errorCode\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"CorrelationKey\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"correlationPropertyRef\",\"type\":\"CorrelationProperty\",\"isMany\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Expression\",\"superClass\":[\"BaseElement\"],\"isAbstract\":false,\"properties\":[{\"name\":\"body\",\"type\":\"String\",\"isBody\":true}]},{\"name\":\"FormalExpression\",\"superClass\":[\"Expression\"],\"properties\":[{\"name\":\"language\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"evaluatesToTypeRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Message\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"itemRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ItemDefinition\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"itemKind\",\"type\":\"ItemKind\",\"isAttr\":true},{\"name\":\"structureRef\",\"type\":\"String\",\"isAttr\":true},{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"import\",\"type\":\"Import\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"FlowElement\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"auditing\",\"type\":\"Auditing\"},{\"name\":\"monitoring\",\"type\":\"Monitoring\"},{\"name\":\"categoryValueRef\",\"type\":\"CategoryValue\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"SequenceFlow\",\"superClass\":[\"FlowElement\"],\"properties\":[{\"name\":\"isImmediate\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"conditionExpression\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"sourceRef\",\"type\":\"FlowNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"FlowNode\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"FlowElementsContainer\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"laneSets\",\"type\":\"LaneSet\",\"isMany\":true},{\"name\":\"flowElements\",\"type\":\"FlowElement\",\"isMany\":true}]},{\"name\":\"CallableElement\",\"isAbstract\":true,\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"ioSpecification\",\"type\":\"InputOutputSpecification\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"supportedInterfaceRef\",\"type\":\"Interface\",\"isMany\":true,\"isReference\":true},{\"name\":\"ioBinding\",\"type\":\"InputOutputBinding\",\"isMany\":true,\"xml\":{\"serialize\":\"property\"}}]},{\"name\":\"FlowNode\",\"isAbstract\":true,\"superClass\":[\"FlowElement\"],\"properties\":[{\"name\":\"incoming\",\"type\":\"SequenceFlow\",\"isMany\":true,\"isReference\":true},{\"name\":\"outgoing\",\"type\":\"SequenceFlow\",\"isMany\":true,\"isReference\":true},{\"name\":\"lanes\",\"type\":\"Lane\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"CorrelationPropertyRetrievalExpression\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"messagePath\",\"type\":\"FormalExpression\"},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"CorrelationPropertyBinding\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"dataPath\",\"type\":\"FormalExpression\"},{\"name\":\"correlationPropertyRef\",\"type\":\"CorrelationProperty\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Resource\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"resourceParameters\",\"type\":\"ResourceParameter\",\"isMany\":true}]},{\"name\":\"ResourceParameter\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isRequired\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"type\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"CorrelationSubscription\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"correlationKeyRef\",\"type\":\"CorrelationKey\",\"isAttr\":true,\"isReference\":true},{\"name\":\"correlationPropertyBinding\",\"type\":\"CorrelationPropertyBinding\",\"isMany\":true}]},{\"name\":\"MessageFlow\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"sourceRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"MessageFlowAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"innerMessageFlowRef\",\"type\":\"MessageFlow\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outerMessageFlowRef\",\"type\":\"MessageFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"InteractionNode\",\"isAbstract\":true,\"properties\":[{\"name\":\"incomingConversationLinks\",\"type\":\"ConversationLink\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"outgoingConversationLinks\",\"type\":\"ConversationLink\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"Participant\",\"superClass\":[\"InteractionNode\",\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"interfaceRef\",\"type\":\"Interface\",\"isMany\":true,\"isReference\":true},{\"name\":\"participantMultiplicity\",\"type\":\"ParticipantMultiplicity\"},{\"name\":\"endPointRefs\",\"type\":\"EndPoint\",\"isMany\":true,\"isReference\":true},{\"name\":\"processRef\",\"type\":\"Process\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ParticipantAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"innerParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outerParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ParticipantMultiplicity\",\"properties\":[{\"name\":\"minimum\",\"default\":0,\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"maximum\",\"default\":1,\"isAttr\":true,\"type\":\"Integer\"}],\"superClass\":[\"BaseElement\"]},{\"name\":\"Collaboration\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isClosed\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"participants\",\"type\":\"Participant\",\"isMany\":true},{\"name\":\"messageFlows\",\"type\":\"MessageFlow\",\"isMany\":true},{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true},{\"name\":\"conversations\",\"type\":\"ConversationNode\",\"isMany\":true},{\"name\":\"conversationAssociations\",\"type\":\"ConversationAssociation\"},{\"name\":\"participantAssociations\",\"type\":\"ParticipantAssociation\",\"isMany\":true},{\"name\":\"messageFlowAssociations\",\"type\":\"MessageFlowAssociation\",\"isMany\":true},{\"name\":\"correlationKeys\",\"type\":\"CorrelationKey\",\"isMany\":true},{\"name\":\"choreographyRef\",\"type\":\"Choreography\",\"isMany\":true,\"isReference\":true},{\"name\":\"conversationLinks\",\"type\":\"ConversationLink\",\"isMany\":true}]},{\"name\":\"ChoreographyActivity\",\"isAbstract\":true,\"superClass\":[\"FlowNode\"],\"properties\":[{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true},{\"name\":\"initiatingParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true},{\"name\":\"correlationKeys\",\"type\":\"CorrelationKey\",\"isMany\":true},{\"name\":\"loopType\",\"type\":\"ChoreographyLoopType\",\"default\":\"None\",\"isAttr\":true}]},{\"name\":\"CallChoreography\",\"superClass\":[\"ChoreographyActivity\"],\"properties\":[{\"name\":\"calledChoreographyRef\",\"type\":\"Choreography\",\"isAttr\":true,\"isReference\":true},{\"name\":\"participantAssociations\",\"type\":\"ParticipantAssociation\",\"isMany\":true}]},{\"name\":\"SubChoreography\",\"superClass\":[\"ChoreographyActivity\",\"FlowElementsContainer\"],\"properties\":[{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true}]},{\"name\":\"ChoreographyTask\",\"superClass\":[\"ChoreographyActivity\"],\"properties\":[{\"name\":\"messageFlowRef\",\"type\":\"MessageFlow\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"Choreography\",\"superClass\":[\"Collaboration\",\"FlowElementsContainer\"]},{\"name\":\"GlobalChoreographyTask\",\"superClass\":[\"Choreography\"],\"properties\":[{\"name\":\"initiatingParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"TextAnnotation\",\"superClass\":[\"Artifact\"],\"properties\":[{\"name\":\"text\",\"type\":\"String\"},{\"name\":\"textFormat\",\"default\":\"text/plain\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Group\",\"superClass\":[\"Artifact\"],\"properties\":[{\"name\":\"categoryValueRef\",\"type\":\"CategoryValue\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Association\",\"superClass\":[\"Artifact\"],\"properties\":[{\"name\":\"associationDirection\",\"type\":\"AssociationDirection\",\"isAttr\":true},{\"name\":\"sourceRef\",\"type\":\"BaseElement\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"BaseElement\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Category\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"categoryValue\",\"type\":\"CategoryValue\",\"isMany\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Artifact\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"]},{\"name\":\"CategoryValue\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"categorizedFlowElements\",\"type\":\"FlowElement\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"value\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Activity\",\"isAbstract\":true,\"superClass\":[\"FlowNode\"],\"properties\":[{\"name\":\"isForCompensation\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true},{\"name\":\"ioSpecification\",\"type\":\"InputOutputSpecification\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"boundaryEventRefs\",\"type\":\"BoundaryEvent\",\"isMany\":true,\"isReference\":true},{\"name\":\"properties\",\"type\":\"Property\",\"isMany\":true},{\"name\":\"dataInputAssociations\",\"type\":\"DataInputAssociation\",\"isMany\":true},{\"name\":\"dataOutputAssociations\",\"type\":\"DataOutputAssociation\",\"isMany\":true},{\"name\":\"startQuantity\",\"default\":1,\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"resources\",\"type\":\"ResourceRole\",\"isMany\":true},{\"name\":\"completionQuantity\",\"default\":1,\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"loopCharacteristics\",\"type\":\"LoopCharacteristics\"}]},{\"name\":\"ServiceTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"SubProcess\",\"superClass\":[\"Activity\",\"FlowElementsContainer\",\"InteractionNode\"],\"properties\":[{\"name\":\"triggeredByEvent\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true}]},{\"name\":\"LoopCharacteristics\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"]},{\"name\":\"MultiInstanceLoopCharacteristics\",\"superClass\":[\"LoopCharacteristics\"],\"properties\":[{\"name\":\"isSequential\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"behavior\",\"type\":\"MultiInstanceBehavior\",\"default\":\"All\",\"isAttr\":true},{\"name\":\"loopCardinality\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"loopDataInputRef\",\"type\":\"ItemAwareElement\",\"isReference\":true},{\"name\":\"loopDataOutputRef\",\"type\":\"ItemAwareElement\",\"isReference\":true},{\"name\":\"inputDataItem\",\"type\":\"DataInput\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"outputDataItem\",\"type\":\"DataOutput\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"complexBehaviorDefinition\",\"type\":\"ComplexBehaviorDefinition\",\"isMany\":true},{\"name\":\"completionCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"oneBehaviorEventRef\",\"type\":\"EventDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"noneBehaviorEventRef\",\"type\":\"EventDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"StandardLoopCharacteristics\",\"superClass\":[\"LoopCharacteristics\"],\"properties\":[{\"name\":\"testBefore\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"loopCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"loopMaximum\",\"type\":\"Integer\",\"isAttr\":true}]},{\"name\":\"CallActivity\",\"superClass\":[\"Activity\"],\"properties\":[{\"name\":\"calledElement\",\"type\":\"String\",\"isAttr\":true}]},{\"name\":\"Task\",\"superClass\":[\"Activity\",\"InteractionNode\"]},{\"name\":\"SendTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ReceiveTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"instantiate\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ScriptTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"scriptFormat\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"script\",\"type\":\"String\"}]},{\"name\":\"BusinessRuleTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"AdHocSubProcess\",\"superClass\":[\"SubProcess\"],\"properties\":[{\"name\":\"completionCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"ordering\",\"type\":\"AdHocOrdering\",\"isAttr\":true},{\"name\":\"cancelRemainingInstances\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"Transaction\",\"superClass\":[\"SubProcess\"],\"properties\":[{\"name\":\"protocol\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"method\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"GlobalScriptTask\",\"superClass\":[\"GlobalTask\"],\"properties\":[{\"name\":\"scriptLanguage\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"script\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"GlobalBusinessRuleTask\",\"superClass\":[\"GlobalTask\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ComplexBehaviorDefinition\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"condition\",\"type\":\"FormalExpression\"},{\"name\":\"event\",\"type\":\"ImplicitThrowEvent\"}]},{\"name\":\"ResourceRole\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"resourceRef\",\"type\":\"Resource\",\"isReference\":true},{\"name\":\"resourceParameterBindings\",\"type\":\"ResourceParameterBinding\",\"isMany\":true},{\"name\":\"resourceAssignmentExpression\",\"type\":\"ResourceAssignmentExpression\"},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ResourceParameterBinding\",\"properties\":[{\"name\":\"expression\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"parameterRef\",\"type\":\"ResourceParameter\",\"isAttr\":true,\"isReference\":true}],\"superClass\":[\"BaseElement\"]},{\"name\":\"ResourceAssignmentExpression\",\"properties\":[{\"name\":\"expression\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}],\"superClass\":[\"BaseElement\"]},{\"name\":\"Import\",\"properties\":[{\"name\":\"importType\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"location\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"namespace\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Definitions\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"targetNamespace\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"expressionLanguage\",\"default\":\"http://www.w3.org/1999/XPath\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"typeLanguage\",\"default\":\"http://www.w3.org/2001/XMLSchema\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"imports\",\"type\":\"Import\",\"isMany\":true},{\"name\":\"extensions\",\"type\":\"Extension\",\"isMany\":true},{\"name\":\"rootElements\",\"type\":\"RootElement\",\"isMany\":true},{\"name\":\"diagrams\",\"isMany\":true,\"type\":\"bpmndi:BPMNDiagram\"},{\"name\":\"exporter\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"relationships\",\"type\":\"Relationship\",\"isMany\":true},{\"name\":\"exporterVersion\",\"isAttr\":true,\"type\":\"String\"}]}],\"enumerations\":[{\"name\":\"ProcessType\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"Public\"},{\"name\":\"Private\"}]},{\"name\":\"GatewayDirection\",\"literalValues\":[{\"name\":\"Unspecified\"},{\"name\":\"Converging\"},{\"name\":\"Diverging\"},{\"name\":\"Mixed\"}]},{\"name\":\"EventBasedGatewayType\",\"literalValues\":[{\"name\":\"Parallel\"},{\"name\":\"Exclusive\"}]},{\"name\":\"RelationshipDirection\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"Forward\"},{\"name\":\"Backward\"},{\"name\":\"Both\"}]},{\"name\":\"ItemKind\",\"literalValues\":[{\"name\":\"Physical\"},{\"name\":\"Information\"}]},{\"name\":\"ChoreographyLoopType\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"Standard\"},{\"name\":\"MultiInstanceSequential\"},{\"name\":\"MultiInstanceParallel\"}]},{\"name\":\"AssociationDirection\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"One\"},{\"name\":\"Both\"}]},{\"name\":\"MultiInstanceBehavior\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"One\"},{\"name\":\"All\"},{\"name\":\"Complex\"}]},{\"name\":\"AdHocOrdering\",\"literalValues\":[{\"name\":\"Parallel\"},{\"name\":\"Sequential\"}]}],\"prefix\":\"bpmn\",\"xml\":{\"tagAlias\":\"lowerCase\",\"typePrefix\":\"t\"}}");
-
-/***/ }),
-
-/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json":
-/*!******************************************************************!*\
-  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json ***!
-  \******************************************************************/
-/*! exports provided: name, uri, types, enumerations, associations, prefix, default */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"name\":\"BPMNDI\",\"uri\":\"http://www.omg.org/spec/BPMN/20100524/DI\",\"types\":[{\"name\":\"BPMNDiagram\",\"properties\":[{\"name\":\"plane\",\"type\":\"BPMNPlane\",\"redefines\":\"di:Diagram#rootElement\"},{\"name\":\"labelStyle\",\"type\":\"BPMNLabelStyle\",\"isMany\":true}],\"superClass\":[\"di:Diagram\"]},{\"name\":\"BPMNPlane\",\"properties\":[{\"name\":\"bpmnElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"bpmn:BaseElement\",\"redefines\":\"di:DiagramElement#modelElement\"}],\"superClass\":[\"di:Plane\"]},{\"name\":\"BPMNShape\",\"properties\":[{\"name\":\"bpmnElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"bpmn:BaseElement\",\"redefines\":\"di:DiagramElement#modelElement\"},{\"name\":\"isHorizontal\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"isExpanded\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"isMarkerVisible\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"label\",\"type\":\"BPMNLabel\"},{\"name\":\"isMessageVisible\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"participantBandKind\",\"type\":\"ParticipantBandKind\",\"isAttr\":true},{\"name\":\"choreographyActivityShape\",\"type\":\"BPMNShape\",\"isAttr\":true,\"isReference\":true}],\"superClass\":[\"di:LabeledShape\"]},{\"name\":\"BPMNEdge\",\"properties\":[{\"name\":\"label\",\"type\":\"BPMNLabel\"},{\"name\":\"bpmnElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"bpmn:BaseElement\",\"redefines\":\"di:DiagramElement#modelElement\"},{\"name\":\"sourceElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"di:DiagramElement\",\"redefines\":\"di:Edge#source\"},{\"name\":\"targetElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"di:DiagramElement\",\"redefines\":\"di:Edge#target\"},{\"name\":\"messageVisibleKind\",\"type\":\"MessageVisibleKind\",\"isAttr\":true,\"default\":\"initiating\"}],\"superClass\":[\"di:LabeledEdge\"]},{\"name\":\"BPMNLabel\",\"properties\":[{\"name\":\"labelStyle\",\"type\":\"BPMNLabelStyle\",\"isAttr\":true,\"isReference\":true,\"redefines\":\"di:DiagramElement#style\"}],\"superClass\":[\"di:Label\"]},{\"name\":\"BPMNLabelStyle\",\"properties\":[{\"name\":\"font\",\"type\":\"dc:Font\"}],\"superClass\":[\"di:Style\"]}],\"enumerations\":[{\"name\":\"ParticipantBandKind\",\"literalValues\":[{\"name\":\"top_initiating\"},{\"name\":\"middle_initiating\"},{\"name\":\"bottom_initiating\"},{\"name\":\"top_non_initiating\"},{\"name\":\"middle_non_initiating\"},{\"name\":\"bottom_non_initiating\"}]},{\"name\":\"MessageVisibleKind\",\"literalValues\":[{\"name\":\"initiating\"},{\"name\":\"non_initiating\"}]}],\"associations\":[],\"prefix\":\"bpmndi\"}");
-
-/***/ }),
-
-/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/dc.json":
-/*!**************************************************************!*\
-  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/dc.json ***!
-  \**************************************************************/
-/*! exports provided: name, uri, types, prefix, associations, default */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"name\":\"DC\",\"uri\":\"http://www.omg.org/spec/DD/20100524/DC\",\"types\":[{\"name\":\"Boolean\"},{\"name\":\"Integer\"},{\"name\":\"Real\"},{\"name\":\"String\"},{\"name\":\"Font\",\"properties\":[{\"name\":\"name\",\"type\":\"String\",\"isAttr\":true},{\"name\":\"size\",\"type\":\"Real\",\"isAttr\":true},{\"name\":\"isBold\",\"type\":\"Boolean\",\"isAttr\":true},{\"name\":\"isItalic\",\"type\":\"Boolean\",\"isAttr\":true},{\"name\":\"isUnderline\",\"type\":\"Boolean\",\"isAttr\":true},{\"name\":\"isStrikeThrough\",\"type\":\"Boolean\",\"isAttr\":true}]},{\"name\":\"Point\",\"properties\":[{\"name\":\"x\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true},{\"name\":\"y\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true}]},{\"name\":\"Bounds\",\"properties\":[{\"name\":\"x\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true},{\"name\":\"y\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true},{\"name\":\"width\",\"type\":\"Real\",\"isAttr\":true},{\"name\":\"height\",\"type\":\"Real\",\"isAttr\":true}]}],\"prefix\":\"dc\",\"associations\":[]}");
-
-/***/ }),
-
-/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/di.json":
-/*!**************************************************************!*\
-  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/di.json ***!
-  \**************************************************************/
-/*! exports provided: name, uri, types, associations, prefix, xml, default */
-/***/ (function(module) {
-
-module.exports = JSON.parse("{\"name\":\"DI\",\"uri\":\"http://www.omg.org/spec/DD/20100524/DI\",\"types\":[{\"name\":\"DiagramElement\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"type\":\"String\",\"isAttr\":true,\"isId\":true},{\"name\":\"extension\",\"type\":\"Extension\"},{\"name\":\"owningDiagram\",\"type\":\"Diagram\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"owningElement\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"modelElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true,\"type\":\"Element\"},{\"name\":\"style\",\"type\":\"Style\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"ownedElement\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"Node\",\"isAbstract\":true,\"superClass\":[\"DiagramElement\"]},{\"name\":\"Edge\",\"isAbstract\":true,\"superClass\":[\"DiagramElement\"],\"properties\":[{\"name\":\"source\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"target\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"waypoint\",\"isUnique\":false,\"isMany\":true,\"type\":\"dc:Point\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"Diagram\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"type\":\"String\",\"isAttr\":true,\"isId\":true},{\"name\":\"rootElement\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"documentation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"resolution\",\"isAttr\":true,\"type\":\"Real\"},{\"name\":\"ownedStyle\",\"type\":\"Style\",\"isReadOnly\":true,\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"Shape\",\"isAbstract\":true,\"superClass\":[\"Node\"],\"properties\":[{\"name\":\"bounds\",\"type\":\"dc:Bounds\"}]},{\"name\":\"Plane\",\"isAbstract\":true,\"superClass\":[\"Node\"],\"properties\":[{\"name\":\"planeElement\",\"type\":\"DiagramElement\",\"subsettedProperty\":\"DiagramElement-ownedElement\",\"isMany\":true}]},{\"name\":\"LabeledEdge\",\"isAbstract\":true,\"superClass\":[\"Edge\"],\"properties\":[{\"name\":\"ownedLabel\",\"type\":\"Label\",\"isReadOnly\":true,\"subsettedProperty\":\"DiagramElement-ownedElement\",\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"LabeledShape\",\"isAbstract\":true,\"superClass\":[\"Shape\"],\"properties\":[{\"name\":\"ownedLabel\",\"type\":\"Label\",\"isReadOnly\":true,\"subsettedProperty\":\"DiagramElement-ownedElement\",\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"Label\",\"isAbstract\":true,\"superClass\":[\"Node\"],\"properties\":[{\"name\":\"bounds\",\"type\":\"dc:Bounds\"}]},{\"name\":\"Style\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"type\":\"String\",\"isAttr\":true,\"isId\":true}]},{\"name\":\"Extension\",\"properties\":[{\"name\":\"values\",\"type\":\"Element\",\"isMany\":true}]}],\"associations\":[],\"prefix\":\"di\",\"xml\":{\"tagAlias\":\"lowerCase\"}}");
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js!./app/properties-panel/PropertiesView.css":
-/*!***************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./app/properties-panel/PropertiesView.css ***!
-  \***************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
-// Module
-exports.push([module.i, ".element-properties label {\n  font-weight: bold;\n}\n\n.element-properties label:after {\n  content: ': ';\n}\n\n.element-properties button + button {\n  margin-left: 10px;\n}", ""]);
-
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/ButtonSuggest/suggest.css":
-/*!*****************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/ButtonSuggest/suggest.css ***!
-  \*****************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
-// Module
-exports.push([module.i, "textarea {\n    float: left;\n    width: 100%;\n    max-width: 100%;\n    border: none;\n    margin: 0.5rem 0;\n    border-radius: 0.3rem;\n    background: #e7ffcc;\n    color: #1c1c1c;\n    font-family: Arial, Helvetica, sans-serif;\n}\n\n.suggestButton {\n    justify-content: space-between;\n    color: rgb(51, 51, 51);\n    background-color: #cee9cd;\n    transition: 0.3s;\n\n    font-family: Arial, Helvetica, sans-serif;\n    font-size: 110%;\n}", ""]);
-
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/DropZone/DropZone.css":
-/*!*************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/DropZone/DropZone.css ***!
-  \*************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
-// Module
-exports.push([module.i, ".dropzone {\n    background-color: #FFF5EE;\n    box-shadow: 0 0 5px 1px #ccc;\n    border-radius: 8px;\n    border: 3px dashed #c0c0c0;\n    color: rgb(65, 45, 20);\n    text-align: center;\n    font-weight: bold;\n}", ""]);
-
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/@pathofdev/react-tag-input/build/index.css":
-/*!*******************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/@pathofdev/react-tag-input/build/index.css ***!
-  \*******************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
-// Module
-exports.push([module.i, ".react-tag-input{box-sizing:border-box;position:relative;width:100%;height:auto;min-height:2.375em;padding:.1875em .375em;overflow-y:auto;display:flex;flex-wrap:wrap;align-items:center;font-size:1rem;background:#fff;color:#333;border:1px solid #e1e1e1;border-radius:3px}.react-tag-input *{box-sizing:border-box}.react-tag-input>*{margin:.1875em}.react-tag-input__input{width:auto;flex-grow:1;height:1.875em;padding:0 0 0 .1875em;margin:0 .1875em;font-size:1em;line-height:1;background:transparent;color:#333;border:none;border-radius:3px;outline:0;box-shadow:none;-webkit-appearance:none}.react-tag-input__input::placeholder,.react-tag-input__input:-moz-placeholder,.react-tag-input__input:-ms-input-placeholder,.react-tag-input__input::-moz-placeholder,.react-tag-input__input::-webkit-input-placeholder{color:#333}.react-tag-input__input:focus{border:none}.react-tag-input__tag{position:relative;display:flex;align-items:center;font-size:.85em;line-height:1;background:#e1e1e1;border-radius:3px}.react-tag-input__tag__content{outline:0;border:none;white-space:nowrap;padding:0 .46875em}.react-tag-input__tag__remove{position:relative;height:2em;width:2em;font-size:.85em;cursor:pointer;background:#d4d4d4;border-top-right-radius:3px;border-bottom-right-radius:3px}.react-tag-input__tag__remove:before,.react-tag-input__tag__remove:after{position:absolute;top:50%;left:50%;content:\" \";height:.9em;width:.15em;background-color:#333}.react-tag-input__tag__remove:before{transform:translateX(-50%) translateY(-50%) rotate(45deg)}.react-tag-input__tag__remove:after{transform:translateX(-50%) translateY(-50%) rotate(-45deg)}.react-tag-input__tag__remove-readonly{width:0}.react-tag-input__tag__remove-readonly:before,.react-tag-input__tag__remove-readonly:after{content:\"\";width:0}\n", ""]);
-
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/runtime/api.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function (useSourceMap) {
-  var list = []; // return the list of modules as css string
-
-  list.toString = function toString() {
-    return this.map(function (item) {
-      var content = cssWithMappingToString(item, useSourceMap);
-
-      if (item[2]) {
-        return '@media ' + item[2] + '{' + content + '}';
-      } else {
-        return content;
-      }
-    }).join('');
-  }; // import a list of modules into the list
-
-
-  list.i = function (modules, mediaQuery) {
-    if (typeof modules === 'string') {
-      modules = [[null, modules, '']];
-    }
-
-    var alreadyImportedModules = {};
-
-    for (var i = 0; i < this.length; i++) {
-      var id = this[i][0];
-
-      if (id != null) {
-        alreadyImportedModules[id] = true;
-      }
-    }
-
-    for (i = 0; i < modules.length; i++) {
-      var item = modules[i]; // skip already imported module
-      // this implementation is not 100% perfect for weird media query combinations
-      // when a module is imported multiple times with different media queries.
-      // I hope this will never occur (Hey this way we have smaller bundles)
-
-      if (item[0] == null || !alreadyImportedModules[item[0]]) {
-        if (mediaQuery && !item[2]) {
-          item[2] = mediaQuery;
-        } else if (mediaQuery) {
-          item[2] = '(' + item[2] + ') and (' + mediaQuery + ')';
-        }
-
-        list.push(item);
-      }
-    }
-  };
-
-  return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-  var content = item[1] || '';
-  var cssMapping = item[3];
-
-  if (!cssMapping) {
-    return content;
-  }
-
-  if (useSourceMap && typeof btoa === 'function') {
-    var sourceMapping = toComment(cssMapping);
-    var sourceURLs = cssMapping.sources.map(function (source) {
-      return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */';
-    });
-    return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-  }
-
-  return [content].join('\n');
-} // Adapted from convert-source-map (MIT)
-
-
-function toComment(sourceMap) {
-  // eslint-disable-next-line no-undef
-  var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-  var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-  return '/*# ' + data + ' */';
-}
-
-/***/ }),
-
-/***/ "./node_modules/css.escape/css.escape.js":
-/*!***********************************************!*\
-  !*** ./node_modules/css.escape/css.escape.js ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {/*! https://mths.be/cssescape v1.5.1 by @mathias | MIT license */
-;(function(root, factory) {
-	// https://github.com/umdjs/umd/blob/master/returnExports.js
-	if (true) {
-		// For Node.js.
-		module.exports = factory(root);
-	} else {}
-}(typeof global != 'undefined' ? global : this, function(root) {
-
-	if (root.CSS && root.CSS.escape) {
-		return root.CSS.escape;
-	}
-
-	// https://drafts.csswg.org/cssom/#serialize-an-identifier
-	var cssEscape = function(value) {
-		if (arguments.length == 0) {
-			throw new TypeError('`CSS.escape` requires an argument.');
-		}
-		var string = String(value);
-		var length = string.length;
-		var index = -1;
-		var codeUnit;
-		var result = '';
-		var firstCodeUnit = string.charCodeAt(0);
-		while (++index < length) {
-			codeUnit = string.charCodeAt(index);
-			// Note: there’s no need to special-case astral symbols, surrogate
-			// pairs, or lone surrogates.
-
-			// If the character is NULL (U+0000), then the REPLACEMENT CHARACTER
-			// (U+FFFD).
-			if (codeUnit == 0x0000) {
-				result += '\uFFFD';
-				continue;
-			}
-
-			if (
-				// If the character is in the range [\1-\1F] (U+0001 to U+001F) or is
-				// U+007F, […]
-				(codeUnit >= 0x0001 && codeUnit <= 0x001F) || codeUnit == 0x007F ||
-				// If the character is the first character and is in the range [0-9]
-				// (U+0030 to U+0039), […]
-				(index == 0 && codeUnit >= 0x0030 && codeUnit <= 0x0039) ||
-				// If the character is the second character and is in the range [0-9]
-				// (U+0030 to U+0039) and the first character is a `-` (U+002D), […]
-				(
-					index == 1 &&
-					codeUnit >= 0x0030 && codeUnit <= 0x0039 &&
-					firstCodeUnit == 0x002D
-				)
-			) {
-				// https://drafts.csswg.org/cssom/#escape-a-character-as-code-point
-				result += '\\' + codeUnit.toString(16) + ' ';
-				continue;
-			}
-
-			if (
-				// If the character is the first character and is a `-` (U+002D), and
-				// there is no second character, […]
-				index == 0 &&
-				length == 1 &&
-				codeUnit == 0x002D
-			) {
-				result += '\\' + string.charAt(index);
-				continue;
-			}
-
-			// If the character is not handled by one of the above rules and is
-			// greater than or equal to U+0080, is `-` (U+002D) or `_` (U+005F), or
-			// is in one of the ranges [0-9] (U+0030 to U+0039), [A-Z] (U+0041 to
-			// U+005A), or [a-z] (U+0061 to U+007A), […]
-			if (
-				codeUnit >= 0x0080 ||
-				codeUnit == 0x002D ||
-				codeUnit == 0x005F ||
-				codeUnit >= 0x0030 && codeUnit <= 0x0039 ||
-				codeUnit >= 0x0041 && codeUnit <= 0x005A ||
-				codeUnit >= 0x0061 && codeUnit <= 0x007A
-			) {
-				// the character itself
-				result += string.charAt(index);
-				continue;
-			}
-
-			// Otherwise, the escaped character.
-			// https://drafts.csswg.org/cssom/#escape-a-character
-			result += '\\' + string.charAt(index);
-
-		}
-		return result;
-	};
-
-	if (!root.CSS) {
-		root.CSS = {};
-	}
-
-	root.CSS.escape = cssEscape;
-	return cssEscape;
-
-}));
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
-
-/***/ }),
-
-/***/ "./node_modules/diagram-js-direct-editing/index.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/diagram-js-direct-editing/index.js ***!
-  \*********************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var diagram_js_lib_features_interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/interaction-events */ "./node_modules/diagram-js/lib/features/interaction-events/index.js");
-/* harmony import */ var _lib_DirectEditing__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/DirectEditing */ "./node_modules/diagram-js-direct-editing/lib/DirectEditing.js");
+/* harmony import */ var diagram_js_lib_features_interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/features/interaction-events */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/index.js");
+/* harmony import */ var _lib_DirectEditing__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/DirectEditing */ "./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/lib/DirectEditing.js");
 
 
 
@@ -23240,10 +22871,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js-direct-editing/lib/DirectEditing.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/diagram-js-direct-editing/lib/DirectEditing.js ***!
-  \*********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/lib/DirectEditing.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/lib/DirectEditing.js ***!
+  \******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -23251,7 +22882,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DirectEditing; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _TextBox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TextBox */ "./node_modules/diagram-js-direct-editing/lib/TextBox.js");
+/* harmony import */ var _TextBox__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TextBox */ "./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/lib/TextBox.js");
 
 
 
@@ -23442,10 +23073,10 @@ DirectEditing.prototype.activate = function(element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js-direct-editing/lib/TextBox.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js-direct-editing/lib/TextBox.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/lib/TextBox.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js-direct-editing/lib/TextBox.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -23909,34 +23540,34 @@ function normalizeEndOfLineSequences(string) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/index.js":
-/*!******************************************!*\
-  !*** ./node_modules/diagram-js/index.js ***!
-  \******************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/index.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/index.js ***!
+  \***************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _lib_Diagram__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Diagram */ "./node_modules/diagram-js/lib/Diagram.js");
+/* harmony import */ var _lib_Diagram__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/Diagram */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/Diagram.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _lib_Diagram__WEBPACK_IMPORTED_MODULE_0__["default"]; });
 
 
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/Diagram.js":
-/*!************************************************!*\
-  !*** ./node_modules/diagram-js/lib/Diagram.js ***!
-  \************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/Diagram.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/Diagram.js ***!
+  \*********************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Diagram; });
-/* harmony import */ var didi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! didi */ "./node_modules/didi/dist/index.esm.js");
-/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core */ "./node_modules/diagram-js/lib/core/index.js");
+/* harmony import */ var didi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! didi */ "./node_modules/bpmn-js/node_modules/didi/dist/index.esm.js");
+/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./core */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/index.js");
 
 
 
@@ -24143,10 +23774,10 @@ Diagram.prototype.clear = function() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/command/CommandInterceptor.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/command/CommandInterceptor.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -24295,10 +23926,10 @@ Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["forEach"])(hooks, function(hook) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/command/CommandStack.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/command/CommandStack.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandStack.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandStack.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -24811,16 +24442,16 @@ CommandStack.prototype._setHandler = function(command, handler) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/command/index.js":
-/*!******************************************************!*\
-  !*** ./node_modules/diagram-js/lib/command/index.js ***!
-  \******************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/index.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/command/index.js ***!
+  \***************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _CommandStack__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommandStack */ "./node_modules/diagram-js/lib/command/CommandStack.js");
+/* harmony import */ var _CommandStack__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommandStack */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandStack.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -24830,10 +24461,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/core/Canvas.js":
-/*!****************************************************!*\
-  !*** ./node_modules/diagram-js/lib/core/Canvas.js ***!
-  \****************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/Canvas.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/core/Canvas.js ***!
+  \*************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -24841,8 +24472,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Canvas; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 
 
@@ -25886,17 +25517,17 @@ Canvas.prototype.resized = function() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/core/ElementFactory.js":
-/*!************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/core/ElementFactory.js ***!
-  \************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/ElementFactory.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/core/ElementFactory.js ***!
+  \*********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ElementFactory; });
-/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../model */ "./node_modules/diagram-js/lib/model/index.js");
+/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../model */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/model/index.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 
 
@@ -25947,10 +25578,10 @@ ElementFactory.prototype.create = function(type, attrs) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/core/ElementRegistry.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/core/ElementRegistry.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/ElementRegistry.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/core/ElementRegistry.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -26167,10 +25798,10 @@ ElementRegistry.prototype._validateId = function(id) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/core/EventBus.js":
-/*!******************************************************!*\
-  !*** ./node_modules/diagram-js/lib/core/EventBus.js ***!
-  \******************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/EventBus.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/core/EventBus.js ***!
+  \***************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -26686,10 +26317,10 @@ function invokeFunction(fn, args) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/core/GraphicsFactory.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/core/GraphicsFactory.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/GraphicsFactory.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/core/GraphicsFactory.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -26697,8 +26328,8 @@ function invokeFunction(fn, args) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GraphicsFactory; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_GraphicsUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/GraphicsUtil */ "./node_modules/diagram-js/lib/util/GraphicsUtil.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_GraphicsUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/GraphicsUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/GraphicsUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 
@@ -26919,21 +26550,21 @@ function prependTo(newNode, parentNode, siblingNode) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/core/index.js":
-/*!***************************************************!*\
-  !*** ./node_modules/diagram-js/lib/core/index.js ***!
-  \***************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/index.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/core/index.js ***!
+  \************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _draw__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../draw */ "./node_modules/diagram-js/lib/draw/index.js");
-/* harmony import */ var _Canvas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Canvas */ "./node_modules/diagram-js/lib/core/Canvas.js");
-/* harmony import */ var _ElementRegistry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ElementRegistry */ "./node_modules/diagram-js/lib/core/ElementRegistry.js");
-/* harmony import */ var _ElementFactory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ElementFactory */ "./node_modules/diagram-js/lib/core/ElementFactory.js");
-/* harmony import */ var _EventBus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./EventBus */ "./node_modules/diagram-js/lib/core/EventBus.js");
-/* harmony import */ var _GraphicsFactory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./GraphicsFactory */ "./node_modules/diagram-js/lib/core/GraphicsFactory.js");
+/* harmony import */ var _draw__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../draw */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/index.js");
+/* harmony import */ var _Canvas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Canvas */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/Canvas.js");
+/* harmony import */ var _ElementRegistry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ElementRegistry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/ElementRegistry.js");
+/* harmony import */ var _ElementFactory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ElementFactory */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/ElementFactory.js");
+/* harmony import */ var _EventBus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./EventBus */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/EventBus.js");
+/* harmony import */ var _GraphicsFactory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./GraphicsFactory */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/core/GraphicsFactory.js");
 
 
 
@@ -26954,10 +26585,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/draw/BaseRenderer.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/draw/BaseRenderer.js ***!
-  \**********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/BaseRenderer.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/BaseRenderer.js ***!
+  \*******************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -27053,10 +26684,10 @@ BaseRenderer.prototype.getConnectionPath = function() {};
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/draw/DefaultRenderer.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/draw/DefaultRenderer.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/DefaultRenderer.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/DefaultRenderer.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -27065,8 +26696,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DefaultRenderer; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _BaseRenderer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BaseRenderer */ "./node_modules/diagram-js/lib/draw/BaseRenderer.js");
-/* harmony import */ var _util_RenderUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/RenderUtil */ "./node_modules/diagram-js/lib/util/RenderUtil.js");
+/* harmony import */ var _BaseRenderer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BaseRenderer */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/BaseRenderer.js");
+/* harmony import */ var _util_RenderUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/RenderUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/RenderUtil.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 
 
@@ -27166,10 +26797,10 @@ DefaultRenderer.$inject = [ 'eventBus', 'styles' ];
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/draw/Styles.js":
-/*!****************************************************!*\
-  !*** ./node_modules/diagram-js/lib/draw/Styles.js ***!
-  \****************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/Styles.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/Styles.js ***!
+  \*************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -27250,17 +26881,17 @@ function Styles() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/draw/index.js":
-/*!***************************************************!*\
-  !*** ./node_modules/diagram-js/lib/draw/index.js ***!
-  \***************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/index.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/index.js ***!
+  \************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _DefaultRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DefaultRenderer */ "./node_modules/diagram-js/lib/draw/DefaultRenderer.js");
-/* harmony import */ var _Styles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Styles */ "./node_modules/diagram-js/lib/draw/Styles.js");
+/* harmony import */ var _DefaultRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DefaultRenderer */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/DefaultRenderer.js");
+/* harmony import */ var _Styles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Styles */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/draw/Styles.js");
 
 
 
@@ -27273,10 +26904,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/align-elements/AlignElements.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/align-elements/AlignElements.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/align-elements/AlignElements.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/align-elements/AlignElements.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -27454,16 +27085,16 @@ AlignElements.prototype.trigger = function(elements, type) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/align-elements/index.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/align-elements/index.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/align-elements/index.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/align-elements/index.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _AlignElements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AlignElements */ "./node_modules/diagram-js/lib/features/align-elements/AlignElements.js");
+/* harmony import */ var _AlignElements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AlignElements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/align-elements/AlignElements.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -27474,10 +27105,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/attach-support/AttachSupport.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/attach-support/AttachSupport.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/attach-support/AttachSupport.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/attach-support/AttachSupport.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -27485,12 +27116,12 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AttachSupport; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Removal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Removal */ "./node_modules/diagram-js/lib/util/Removal.js");
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
-/* harmony import */ var _util_AttachUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/AttachUtil */ "./node_modules/diagram-js/lib/util/AttachUtil.js");
+/* harmony import */ var _util_Removal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Removal */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Removal.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _util_AttachUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/AttachUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/AttachUtil.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -27812,17 +27443,17 @@ function removeAttached(elements) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/attach-support/index.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/attach-support/index.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/attach-support/index.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/attach-support/index.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _AttachSupport__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AttachSupport */ "./node_modules/diagram-js/lib/features/attach-support/AttachSupport.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _AttachSupport__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AttachSupport */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/attach-support/AttachSupport.js");
 
 
 
@@ -27838,10 +27469,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/auto-resize/AutoResize.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/auto-resize/AutoResize.js ***!
-  \************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-resize/AutoResize.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-resize/AutoResize.js ***!
+  \*********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -27850,10 +27481,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AutoResize; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
-/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -28095,17 +27726,17 @@ function boundsChanged(newBounds, oldBounds) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/auto-resize/AutoResizeProvider.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/auto-resize/AutoResizeProvider.js ***!
-  \********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-resize/AutoResizeProvider.js":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-resize/AutoResizeProvider.js ***!
+  \*****************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AutoResizeProvider; });
-/* harmony import */ var _rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../rules/RuleProvider */ "./node_modules/diagram-js/lib/features/rules/RuleProvider.js");
+/* harmony import */ var _rules_RuleProvider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../rules/RuleProvider */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/RuleProvider.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
 
@@ -28144,10 +27775,10 @@ AutoResizeProvider.prototype.canResize = function(elements, target) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/auto-scroll/AutoScroll.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/auto-scroll/AutoScroll.js ***!
-  \************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-scroll/AutoScroll.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-scroll/AutoScroll.js ***!
+  \*********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -28155,7 +27786,7 @@ AutoResizeProvider.prototype.canResize = function(elements, target) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AutoScroll; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
 
 
 
@@ -28303,18 +27934,18 @@ AutoScroll.prototype._toBorderPoint = function(event) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/auto-scroll/index.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/auto-scroll/index.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-scroll/index.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-scroll/index.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _mouse_tracking__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../mouse-tracking */ "./node_modules/diagram-js/lib/features/mouse-tracking/index.js");
-/* harmony import */ var _AutoScroll__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AutoScroll */ "./node_modules/diagram-js/lib/features/auto-scroll/AutoScroll.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _mouse_tracking__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../mouse-tracking */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/mouse-tracking/index.js");
+/* harmony import */ var _AutoScroll__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AutoScroll */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/auto-scroll/AutoScroll.js");
 
 
 
@@ -28332,20 +27963,20 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/bendpoints/BendpointMove.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/bendpoints/BendpointMove.js ***!
-  \**************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointMove.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointMove.js ***!
+  \***********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BendpointMove; });
-/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/diagram-js/lib/util/Geometry.js");
-/* harmony import */ var _BendpointUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BendpointUtil */ "./node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js");
+/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js");
+/* harmony import */ var _BendpointUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BendpointUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 
@@ -28623,10 +28254,10 @@ BendpointMove.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/bendpoints/BendpointSnapping.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/bendpoints/BendpointSnapping.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointSnapping.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointSnapping.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -28829,10 +28460,10 @@ BendpointSnapping.$inject = [ 'eventBus' ];
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js ***!
-  \**************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js ***!
+  \***********************************************************************************************/
 /*! exports provided: BENDPOINT_CLS, SEGMENT_DRAGGER_CLS, toCanvasCoordinates, addBendpoint, addSegmentDragger */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -28843,10 +28474,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toCanvasCoordinates", function() { return toCanvasCoordinates; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addBendpoint", function() { return addBendpoint; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addSegmentDragger", function() { return addSegmentDragger; });
-/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/diagram-js/lib/util/Event.js");
-/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/diagram-js/lib/util/Geometry.js");
+/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 
@@ -28975,10 +28606,10 @@ function addSegmentDragger(parentGfx, segmentStart, segmentEnd) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/bendpoints/Bendpoints.js":
-/*!***********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/bendpoints/Bendpoints.js ***!
-  \***********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/Bendpoints.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/Bendpoints.js ***!
+  \********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -28987,12 +28618,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Bendpoints; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _BendpointUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BendpointUtil */ "./node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js");
-/* harmony import */ var _util_EscapeUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/EscapeUtil */ "./node_modules/diagram-js/lib/util/EscapeUtil.js");
-/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/diagram-js/lib/util/Geometry.js");
-/* harmony import */ var _util_LineIntersection__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/LineIntersection */ "./node_modules/diagram-js/lib/util/LineIntersection.js");
+/* harmony import */ var _BendpointUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BendpointUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js");
+/* harmony import */ var _util_EscapeUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/EscapeUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/EscapeUtil.js");
+/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js");
+/* harmony import */ var _util_LineIntersection__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/LineIntersection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/LineIntersection.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 
@@ -29279,21 +28910,21 @@ Bendpoints.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/bendpoints/ConnectionSegmentMove.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/bendpoints/ConnectionSegmentMove.js ***!
-  \**********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/ConnectionSegmentMove.js":
+/*!*******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/ConnectionSegmentMove.js ***!
+  \*******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ConnectionSegmentMove; });
-/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/diagram-js/lib/util/Geometry.js");
-/* harmony import */ var _BendpointUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BendpointUtil */ "./node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js");
-/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Geometry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js");
+/* harmony import */ var _BendpointUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BendpointUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointUtil.js");
+/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 
@@ -29703,21 +29334,21 @@ ConnectionSegmentMove.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/bendpoints/index.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/bendpoints/index.js ***!
-  \******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/index.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/index.js ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _Bendpoints__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Bendpoints */ "./node_modules/diagram-js/lib/features/bendpoints/Bendpoints.js");
-/* harmony import */ var _BendpointMove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./BendpointMove */ "./node_modules/diagram-js/lib/features/bendpoints/BendpointMove.js");
-/* harmony import */ var _ConnectionSegmentMove__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ConnectionSegmentMove */ "./node_modules/diagram-js/lib/features/bendpoints/ConnectionSegmentMove.js");
-/* harmony import */ var _BendpointSnapping__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./BendpointSnapping */ "./node_modules/diagram-js/lib/features/bendpoints/BendpointSnapping.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _Bendpoints__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Bendpoints */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/Bendpoints.js");
+/* harmony import */ var _BendpointMove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./BendpointMove */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointMove.js");
+/* harmony import */ var _ConnectionSegmentMove__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ConnectionSegmentMove */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/ConnectionSegmentMove.js");
+/* harmony import */ var _BendpointSnapping__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./BendpointSnapping */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/bendpoints/BendpointSnapping.js");
 
 
 
@@ -29742,17 +29373,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/change-support/ChangeSupport.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/change-support/ChangeSupport.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/change-support/ChangeSupport.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/change-support/ChangeSupport.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ChangeSupport; });
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 
 
 /**
@@ -29821,16 +29452,16 @@ ChangeSupport.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/change-support/index.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/change-support/index.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/change-support/index.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/change-support/index.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ChangeSupport__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ChangeSupport */ "./node_modules/diagram-js/lib/features/change-support/ChangeSupport.js");
+/* harmony import */ var _ChangeSupport__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ChangeSupport */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/change-support/ChangeSupport.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -29840,10 +29471,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/clipboard/Clipboard.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/clipboard/Clipboard.js ***!
-  \*********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/clipboard/Clipboard.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/clipboard/Clipboard.js ***!
+  \******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -29878,16 +29509,16 @@ Clipboard.prototype.isEmpty = function() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/clipboard/index.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/clipboard/index.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/clipboard/index.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/clipboard/index.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Clipboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Clipboard */ "./node_modules/diagram-js/lib/features/clipboard/Clipboard.js");
+/* harmony import */ var _Clipboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Clipboard */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/clipboard/Clipboard.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -29897,17 +29528,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/connect/Connect.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/connect/Connect.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/connect/Connect.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/connect/Connect.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Connect; });
-/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 
 
@@ -30099,19 +29730,19 @@ Connect.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/connect/index.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/connect/index.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/connect/index.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/connect/index.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _Connect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Connect */ "./node_modules/diagram-js/lib/features/connect/Connect.js");
+/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _Connect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Connect */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/connect/Connect.js");
 
 
 
@@ -30130,10 +29761,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/context-pad/ContextPad.js":
-/*!************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/context-pad/ContextPad.js ***!
-  \************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/context-pad/ContextPad.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/context-pad/ContextPad.js ***!
+  \*********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -30454,18 +30085,18 @@ function addClasses(element, classNames) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/context-pad/index.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/context-pad/index.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/context-pad/index.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/context-pad/index.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/diagram-js/lib/features/interaction-events/index.js");
-/* harmony import */ var _overlays__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../overlays */ "./node_modules/diagram-js/lib/features/overlays/index.js");
-/* harmony import */ var _ContextPad__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ContextPad */ "./node_modules/diagram-js/lib/features/context-pad/ContextPad.js");
+/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/index.js");
+/* harmony import */ var _overlays__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../overlays */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/index.js");
+/* harmony import */ var _ContextPad__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ContextPad */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/context-pad/ContextPad.js");
 
 
 
@@ -30482,10 +30113,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/copy-paste/CopyPaste.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/copy-paste/CopyPaste.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/copy-paste/CopyPaste.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/copy-paste/CopyPaste.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -30493,9 +30124,9 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CopyPaste; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
-/* harmony import */ var _util_PositionUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/PositionUtil */ "./node_modules/diagram-js/lib/util/PositionUtil.js");
-/* harmony import */ var _util_CopyPasteUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/CopyPasteUtil */ "./node_modules/diagram-js/lib/util/CopyPasteUtil.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_PositionUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/PositionUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/PositionUtil.js");
+/* harmony import */ var _util_CopyPasteUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/CopyPasteUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/CopyPasteUtil.js");
 
 
 
@@ -30956,19 +30587,19 @@ CopyPaste.prototype.createTree = function(elements) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/copy-paste/index.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/copy-paste/index.js ***!
-  \******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/copy-paste/index.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/copy-paste/index.js ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _clipboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../clipboard */ "./node_modules/diagram-js/lib/features/clipboard/index.js");
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _mouse_tracking__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../mouse-tracking */ "./node_modules/diagram-js/lib/features/mouse-tracking/index.js");
-/* harmony import */ var _CopyPaste__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./CopyPaste */ "./node_modules/diagram-js/lib/features/copy-paste/CopyPaste.js");
+/* harmony import */ var _clipboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../clipboard */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/clipboard/index.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _mouse_tracking__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../mouse-tracking */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/mouse-tracking/index.js");
+/* harmony import */ var _CopyPaste__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./CopyPaste */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/copy-paste/CopyPaste.js");
 
 
 
@@ -30989,10 +30620,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/create/Create.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/create/Create.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/create/Create.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/create/Create.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -31000,7 +30631,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Create; });
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 var LOW_PRIORITY = 750;
 
 var MARKER_OK = 'drop-ok',
@@ -31287,19 +30918,19 @@ Create.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/create/index.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/create/index.js ***!
-  \**************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/create/index.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/create/index.js ***!
+  \***********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _Create__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Create */ "./node_modules/diagram-js/lib/features/create/Create.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _Create__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Create */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/create/Create.js");
 
 
 
@@ -31319,10 +30950,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/distribute-elements/DistributeElements.js":
-/*!****************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/distribute-elements/DistributeElements.js ***!
-  \****************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/distribute-elements/DistributeElements.js":
+/*!*************************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/distribute-elements/DistributeElements.js ***!
+  \*************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -31547,16 +31178,16 @@ DistributeElements.prototype._findRange = function(element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/distribute-elements/index.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/distribute-elements/index.js ***!
-  \***************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/distribute-elements/index.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/distribute-elements/index.js ***!
+  \************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _DistributeElements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DistributeElements */ "./node_modules/diagram-js/lib/features/distribute-elements/DistributeElements.js");
+/* harmony import */ var _DistributeElements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DistributeElements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/distribute-elements/DistributeElements.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -31567,10 +31198,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/dragging/Dragging.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/dragging/Dragging.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/Dragging.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/Dragging.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -31579,10 +31210,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Dragging; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/diagram-js/lib/util/Event.js");
-/* harmony import */ var _util_Cursor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Cursor */ "./node_modules/diagram-js/lib/util/Cursor.js");
-/* harmony import */ var _util_ClickTrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/ClickTrap */ "./node_modules/diagram-js/lib/util/ClickTrap.js");
-/* harmony import */ var _util_PositionUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/PositionUtil */ "./node_modules/diagram-js/lib/util/PositionUtil.js");
+/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _util_Cursor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Cursor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Cursor.js");
+/* harmony import */ var _util_ClickTrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/ClickTrap */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/ClickTrap.js");
+/* harmony import */ var _util_PositionUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/PositionUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/PositionUtil.js");
 /* global TouchEvent */
 
 var round = Math.round;
@@ -32123,10 +31754,10 @@ Dragging.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/dragging/HoverFix.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/dragging/HoverFix.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/HoverFix.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/HoverFix.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -32134,7 +31765,7 @@ Dragging.$inject = [
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HoverFix; });
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
 
 
 
@@ -32228,18 +31859,18 @@ HoverFix.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/dragging/index.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/dragging/index.js ***!
-  \****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js ***!
+  \*************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var _Dragging__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Dragging */ "./node_modules/diagram-js/lib/features/dragging/Dragging.js");
-/* harmony import */ var _HoverFix__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./HoverFix */ "./node_modules/diagram-js/lib/features/dragging/HoverFix.js");
+/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var _Dragging__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/Dragging.js");
+/* harmony import */ var _HoverFix__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./HoverFix */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/HoverFix.js");
 
 
 
@@ -32258,10 +31889,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/editor-actions/EditorActions.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/editor-actions/EditorActions.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/editor-actions/EditorActions.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/editor-actions/EditorActions.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -32531,16 +32162,16 @@ function error(action, message) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/editor-actions/index.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/editor-actions/index.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/editor-actions/index.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/editor-actions/index.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _EditorActions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EditorActions */ "./node_modules/diagram-js/lib/features/editor-actions/EditorActions.js");
+/* harmony import */ var _EditorActions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EditorActions */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/editor-actions/EditorActions.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -32551,10 +32182,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/global-connect/GlobalConnect.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/global-connect/GlobalConnect.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/global-connect/GlobalConnect.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/global-connect/GlobalConnect.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -32690,20 +32321,20 @@ GlobalConnect.prototype.canStartConnect = function(startTarget) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/global-connect/index.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/global-connect/index.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/global-connect/index.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/global-connect/index.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _connect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../connect */ "./node_modules/diagram-js/lib/features/connect/index.js");
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/diagram-js/lib/features/tool-manager/index.js");
-/* harmony import */ var _GlobalConnect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./GlobalConnect */ "./node_modules/diagram-js/lib/features/global-connect/GlobalConnect.js");
+/* harmony import */ var _connect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../connect */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/connect/index.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/index.js");
+/* harmony import */ var _GlobalConnect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./GlobalConnect */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/global-connect/GlobalConnect.js");
 
 
 
@@ -32724,17 +32355,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/hand-tool/HandTool.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/hand-tool/HandTool.js ***!
-  \********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/hand-tool/HandTool.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/hand-tool/HandTool.js ***!
+  \*****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return HandTool; });
-/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
 
 
 var HIGH_PRIORITY = 1500;
@@ -32855,17 +32486,17 @@ HandTool.prototype.isActive = function() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/hand-tool/index.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/hand-tool/index.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/hand-tool/index.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/hand-tool/index.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/diagram-js/lib/features/tool-manager/index.js");
-/* harmony import */ var _HandTool__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HandTool */ "./node_modules/diagram-js/lib/features/hand-tool/HandTool.js");
+/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/index.js");
+/* harmony import */ var _HandTool__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HandTool */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/hand-tool/HandTool.js");
 
 
 
@@ -32881,10 +32512,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/interaction-events/InteractionEvents.js":
-/*!**************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/interaction-events/InteractionEvents.js ***!
-  \**************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/InteractionEvents.js":
+/*!***********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/InteractionEvents.js ***!
+  \***********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -32893,9 +32524,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return InteractionEvents; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_RenderUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/RenderUtil */ "./node_modules/diagram-js/lib/util/RenderUtil.js");
+/* harmony import */ var _util_RenderUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/RenderUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/RenderUtil.js");
 
 
 
@@ -33230,16 +32861,16 @@ InteractionEvents.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/interaction-events/index.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/interaction-events/index.js ***!
-  \**************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/index.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/index.js ***!
+  \***********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _InteractionEvents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InteractionEvents */ "./node_modules/diagram-js/lib/features/interaction-events/InteractionEvents.js");
+/* harmony import */ var _InteractionEvents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InteractionEvents */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/InteractionEvents.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -33249,10 +32880,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/keyboard-move-selection/KeyboardMoveSelection.js":
-/*!***********************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/keyboard-move-selection/KeyboardMoveSelection.js ***!
-  \***********************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard-move-selection/KeyboardMoveSelection.js":
+/*!********************************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard-move-selection/KeyboardMoveSelection.js ***!
+  \********************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -33394,18 +33025,18 @@ KeyboardMoveSelection.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/keyboard-move-selection/index.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/keyboard-move-selection/index.js ***!
-  \*******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard-move-selection/index.js":
+/*!****************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard-move-selection/index.js ***!
+  \****************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../keyboard */ "./node_modules/diagram-js/lib/features/keyboard/index.js");
-/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var _KeyboardMoveSelection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./KeyboardMoveSelection */ "./node_modules/diagram-js/lib/features/keyboard-move-selection/KeyboardMoveSelection.js");
+/* harmony import */ var _keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../keyboard */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/index.js");
+/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var _KeyboardMoveSelection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./KeyboardMoveSelection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard-move-selection/KeyboardMoveSelection.js");
 
 
 
@@ -33425,10 +33056,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/keyboard/Keyboard.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/keyboard/Keyboard.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/Keyboard.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/Keyboard.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -33437,7 +33068,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Keyboard; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _KeyboardUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./KeyboardUtil */ "./node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js");
+/* harmony import */ var _KeyboardUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./KeyboardUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js");
 
 
 
@@ -33595,17 +33226,17 @@ function isInput(target) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js ***!
-  \***************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js ***!
+  \************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return KeyboardBindings; });
-/* harmony import */ var _KeyboardUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./KeyboardUtil */ "./node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js");
+/* harmony import */ var _KeyboardUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./KeyboardUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js");
 
 
 var LOW_PRIORITY = 500;
@@ -33769,10 +33400,10 @@ KeyboardBindings.prototype.registerBindings = function(keyboard, editorActions) 
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js":
-/*!***********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js ***!
-  \***********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardUtil.js ***!
+  \********************************************************************************************/
 /*! exports provided: hasModifier, isCmd, isKey, isShift */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -33828,17 +33459,17 @@ function isShift(event) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/keyboard/index.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/keyboard/index.js ***!
-  \****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/index.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/index.js ***!
+  \*************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Keyboard */ "./node_modules/diagram-js/lib/features/keyboard/Keyboard.js");
-/* harmony import */ var _KeyboardBindings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KeyboardBindings */ "./node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js");
+/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Keyboard */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/Keyboard.js");
+/* harmony import */ var _KeyboardBindings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KeyboardBindings */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/KeyboardBindings.js");
 
 
 
@@ -33851,10 +33482,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/label-support/LabelSupport.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/label-support/LabelSupport.js ***!
-  \****************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/label-support/LabelSupport.js":
+/*!*************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/label-support/LabelSupport.js ***!
+  \*************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -33864,9 +33495,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
-/* harmony import */ var _util_Removal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Removal */ "./node_modules/diagram-js/lib/util/Removal.js");
-/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _util_Removal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Removal */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Removal.js");
+/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -34035,16 +33666,16 @@ function removeLabels(elements) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/label-support/index.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/label-support/index.js ***!
-  \*********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/label-support/index.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/label-support/index.js ***!
+  \******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _LabelSupport__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LabelSupport */ "./node_modules/diagram-js/lib/features/label-support/LabelSupport.js");
+/* harmony import */ var _LabelSupport__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LabelSupport */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/label-support/LabelSupport.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -34055,10 +33686,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/lasso-tool/LassoTool.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/lasso-tool/LassoTool.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/lasso-tool/LassoTool.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/lasso-tool/LassoTool.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -34066,8 +33697,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return LassoTool; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
-/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 
 
@@ -34321,17 +33952,17 @@ function toBBox(event) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/lasso-tool/index.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/lasso-tool/index.js ***!
-  \******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/lasso-tool/index.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/lasso-tool/index.js ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/diagram-js/lib/features/tool-manager/index.js");
-/* harmony import */ var _LassoTool__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LassoTool */ "./node_modules/diagram-js/lib/features/lasso-tool/LassoTool.js");
+/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/index.js");
+/* harmony import */ var _LassoTool__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LassoTool */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/lasso-tool/LassoTool.js");
 
 
 
@@ -34347,10 +33978,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/Modeling.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/Modeling.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/Modeling.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/Modeling.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -34358,28 +33989,28 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Modeling; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../model */ "./node_modules/diagram-js/lib/model/index.js");
-/* harmony import */ var _cmd_AppendShapeHandler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cmd/AppendShapeHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/AppendShapeHandler.js");
-/* harmony import */ var _cmd_CreateShapeHandler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./cmd/CreateShapeHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js");
-/* harmony import */ var _cmd_DeleteShapeHandler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./cmd/DeleteShapeHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/DeleteShapeHandler.js");
-/* harmony import */ var _cmd_MoveShapeHandler__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./cmd/MoveShapeHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/MoveShapeHandler.js");
-/* harmony import */ var _cmd_ResizeShapeHandler__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./cmd/ResizeShapeHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/ResizeShapeHandler.js");
-/* harmony import */ var _cmd_ReplaceShapeHandler__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./cmd/ReplaceShapeHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/ReplaceShapeHandler.js");
-/* harmony import */ var _cmd_ToggleShapeCollapseHandler__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./cmd/ToggleShapeCollapseHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/ToggleShapeCollapseHandler.js");
-/* harmony import */ var _cmd_SpaceToolHandler__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./cmd/SpaceToolHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/SpaceToolHandler.js");
-/* harmony import */ var _cmd_CreateLabelHandler__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./cmd/CreateLabelHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/CreateLabelHandler.js");
-/* harmony import */ var _cmd_CreateConnectionHandler__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./cmd/CreateConnectionHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/CreateConnectionHandler.js");
-/* harmony import */ var _cmd_DeleteConnectionHandler__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./cmd/DeleteConnectionHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/DeleteConnectionHandler.js");
-/* harmony import */ var _cmd_MoveConnectionHandler__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./cmd/MoveConnectionHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/MoveConnectionHandler.js");
-/* harmony import */ var _cmd_LayoutConnectionHandler__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./cmd/LayoutConnectionHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/LayoutConnectionHandler.js");
-/* harmony import */ var _cmd_UpdateWaypointsHandler__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./cmd/UpdateWaypointsHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/UpdateWaypointsHandler.js");
-/* harmony import */ var _cmd_ReconnectConnectionHandler__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./cmd/ReconnectConnectionHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/ReconnectConnectionHandler.js");
-/* harmony import */ var _cmd_MoveElementsHandler__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./cmd/MoveElementsHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/MoveElementsHandler.js");
-/* harmony import */ var _cmd_DeleteElementsHandler__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./cmd/DeleteElementsHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/DeleteElementsHandler.js");
-/* harmony import */ var _cmd_DistributeElementsHandler__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./cmd/DistributeElementsHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/DistributeElementsHandler.js");
-/* harmony import */ var _cmd_AlignElementsHandler__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./cmd/AlignElementsHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/AlignElementsHandler.js");
-/* harmony import */ var _cmd_UpdateAttachmentHandler__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./cmd/UpdateAttachmentHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/UpdateAttachmentHandler.js");
-/* harmony import */ var _cmd_PasteHandler__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./cmd/PasteHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/PasteHandler.js");
+/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../model */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/model/index.js");
+/* harmony import */ var _cmd_AppendShapeHandler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cmd/AppendShapeHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/AppendShapeHandler.js");
+/* harmony import */ var _cmd_CreateShapeHandler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./cmd/CreateShapeHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js");
+/* harmony import */ var _cmd_DeleteShapeHandler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./cmd/DeleteShapeHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteShapeHandler.js");
+/* harmony import */ var _cmd_MoveShapeHandler__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./cmd/MoveShapeHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveShapeHandler.js");
+/* harmony import */ var _cmd_ResizeShapeHandler__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./cmd/ResizeShapeHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ResizeShapeHandler.js");
+/* harmony import */ var _cmd_ReplaceShapeHandler__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./cmd/ReplaceShapeHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ReplaceShapeHandler.js");
+/* harmony import */ var _cmd_ToggleShapeCollapseHandler__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./cmd/ToggleShapeCollapseHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ToggleShapeCollapseHandler.js");
+/* harmony import */ var _cmd_SpaceToolHandler__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./cmd/SpaceToolHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/SpaceToolHandler.js");
+/* harmony import */ var _cmd_CreateLabelHandler__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./cmd/CreateLabelHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateLabelHandler.js");
+/* harmony import */ var _cmd_CreateConnectionHandler__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./cmd/CreateConnectionHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateConnectionHandler.js");
+/* harmony import */ var _cmd_DeleteConnectionHandler__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./cmd/DeleteConnectionHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteConnectionHandler.js");
+/* harmony import */ var _cmd_MoveConnectionHandler__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./cmd/MoveConnectionHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveConnectionHandler.js");
+/* harmony import */ var _cmd_LayoutConnectionHandler__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./cmd/LayoutConnectionHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/LayoutConnectionHandler.js");
+/* harmony import */ var _cmd_UpdateWaypointsHandler__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./cmd/UpdateWaypointsHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/UpdateWaypointsHandler.js");
+/* harmony import */ var _cmd_ReconnectConnectionHandler__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./cmd/ReconnectConnectionHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ReconnectConnectionHandler.js");
+/* harmony import */ var _cmd_MoveElementsHandler__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./cmd/MoveElementsHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveElementsHandler.js");
+/* harmony import */ var _cmd_DeleteElementsHandler__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./cmd/DeleteElementsHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteElementsHandler.js");
+/* harmony import */ var _cmd_DistributeElementsHandler__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./cmd/DistributeElementsHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DistributeElementsHandler.js");
+/* harmony import */ var _cmd_AlignElementsHandler__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./cmd/AlignElementsHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/AlignElementsHandler.js");
+/* harmony import */ var _cmd_UpdateAttachmentHandler__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./cmd/UpdateAttachmentHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/UpdateAttachmentHandler.js");
+/* harmony import */ var _cmd_PasteHandler__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./cmd/PasteHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/PasteHandler.js");
 
 
 
@@ -34870,10 +34501,10 @@ Modeling.prototype.toggleCollapse = function(shape, hints) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/AlignElementsHandler.js":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/AlignElementsHandler.js ***!
-  \***********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/AlignElementsHandler.js":
+/*!********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/AlignElementsHandler.js ***!
+  \********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -34938,10 +34569,10 @@ AlignElements.prototype.postExecute = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/AppendShapeHandler.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/AppendShapeHandler.js ***!
-  \*********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/AppendShapeHandler.js":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/AppendShapeHandler.js ***!
+  \******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35018,10 +34649,10 @@ function existsConnection(source, target) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/CreateConnectionHandler.js":
-/*!**************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/CreateConnectionHandler.js ***!
-  \**************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateConnectionHandler.js":
+/*!***********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateConnectionHandler.js ***!
+  \***********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35088,10 +34719,10 @@ CreateConnectionHandler.prototype.revert = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/CreateLabelHandler.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/CreateLabelHandler.js ***!
-  \*********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateLabelHandler.js":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateLabelHandler.js ***!
+  \******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35100,7 +34731,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CreateLabelHandler; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _CreateShapeHandler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CreateShapeHandler */ "./node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js");
+/* harmony import */ var _CreateShapeHandler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CreateShapeHandler */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js");
 
 
 
@@ -35171,10 +34802,10 @@ function ensureValidDimensions(label) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js ***!
-  \*********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/CreateShapeHandler.js ***!
+  \******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35252,17 +34883,17 @@ CreateShapeHandler.prototype.revert = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/DeleteConnectionHandler.js":
-/*!**************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/DeleteConnectionHandler.js ***!
-  \**************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteConnectionHandler.js":
+/*!***********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteConnectionHandler.js ***!
+  \***********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DeleteConnectionHandler; });
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
 
 
 
@@ -35324,10 +34955,10 @@ DeleteConnectionHandler.prototype.revert = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/DeleteElementsHandler.js":
-/*!************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/DeleteElementsHandler.js ***!
-  \************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteElementsHandler.js":
+/*!*********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteElementsHandler.js ***!
+  \*********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35373,18 +35004,18 @@ DeleteElementsHandler.prototype.postExecute = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/DeleteShapeHandler.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/DeleteShapeHandler.js ***!
-  \*********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteShapeHandler.js":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DeleteShapeHandler.js ***!
+  \******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DeleteShapeHandler; });
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
-/* harmony import */ var _util_Removal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../util/Removal */ "./node_modules/diagram-js/lib/util/Removal.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _util_Removal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../util/Removal */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Removal.js");
 
 
 
@@ -35480,10 +35111,10 @@ function isConnection(element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/DistributeElementsHandler.js":
-/*!****************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/DistributeElementsHandler.js ***!
-  \****************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DistributeElementsHandler.js":
+/*!*************************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/DistributeElementsHandler.js ***!
+  \*************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35646,10 +35277,10 @@ DistributeElements.prototype.postExecute = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/LayoutConnectionHandler.js":
-/*!**************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/LayoutConnectionHandler.js ***!
-  \**************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/LayoutConnectionHandler.js":
+/*!***********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/LayoutConnectionHandler.js ***!
+  \***********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35697,10 +35328,10 @@ LayoutConnectionHandler.prototype.revert = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/MoveConnectionHandler.js":
-/*!************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/MoveConnectionHandler.js ***!
-  \************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveConnectionHandler.js":
+/*!*********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveConnectionHandler.js ***!
+  \*********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35708,7 +35339,7 @@ LayoutConnectionHandler.prototype.revert = function(context) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MoveConnectionHandler; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
 
 
 
@@ -35790,17 +35421,17 @@ MoveConnectionHandler.prototype.revert = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/MoveElementsHandler.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/MoveElementsHandler.js ***!
-  \**********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveElementsHandler.js":
+/*!*******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveElementsHandler.js ***!
+  \*******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MoveElementsHandler; });
-/* harmony import */ var _helper_MoveHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helper/MoveHelper */ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js");
+/* harmony import */ var _helper_MoveHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helper/MoveHelper */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js");
 
 
 
@@ -35838,10 +35469,10 @@ MoveElementsHandler.prototype.postExecute = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/MoveShapeHandler.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/MoveShapeHandler.js ***!
-  \*******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveShapeHandler.js":
+/*!****************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/MoveShapeHandler.js ***!
+  \****************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -35849,9 +35480,9 @@ MoveElementsHandler.prototype.postExecute = function(context) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MoveShapeHandler; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _helper_MoveHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helper/MoveHelper */ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js");
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
-/* harmony import */ var _helper_AnchorsHelper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helper/AnchorsHelper */ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js");
+/* harmony import */ var _helper_MoveHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helper/MoveHelper */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _helper_AnchorsHelper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helper/AnchorsHelper */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js");
 
 
 
@@ -35963,10 +35594,10 @@ MoveShapeHandler.prototype.getNewParent = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/PasteHandler.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/PasteHandler.js ***!
-  \***************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/PasteHandler.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/PasteHandler.js ***!
+  \************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36270,10 +35901,10 @@ PasteHandler.prototype._getCreatedElement = function(id, tree) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/ReconnectConnectionHandler.js":
-/*!*****************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/ReconnectConnectionHandler.js ***!
-  \*****************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ReconnectConnectionHandler.js":
+/*!**************************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ReconnectConnectionHandler.js ***!
+  \**************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36377,10 +36008,10 @@ function getDocking(point) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/ReplaceShapeHandler.js":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/ReplaceShapeHandler.js ***!
-  \**********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ReplaceShapeHandler.js":
+/*!*******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ReplaceShapeHandler.js ***!
+  \*******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36545,10 +36176,10 @@ ReplaceShapeHandler.prototype.reconnectEnd = function(connection, newTarget, doc
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/ResizeShapeHandler.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/ResizeShapeHandler.js ***!
-  \*********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ResizeShapeHandler.js":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ResizeShapeHandler.js ***!
+  \******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36556,7 +36187,7 @@ ReplaceShapeHandler.prototype.reconnectEnd = function(connection, newTarget, doc
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ResizeShapeHandler; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _helper_AnchorsHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helper/AnchorsHelper */ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js");
+/* harmony import */ var _helper_AnchorsHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helper/AnchorsHelper */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js");
 
 
 
@@ -36662,10 +36293,10 @@ ResizeShapeHandler.prototype.revert = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/SpaceToolHandler.js":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/SpaceToolHandler.js ***!
-  \*******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/SpaceToolHandler.js":
+/*!****************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/SpaceToolHandler.js ***!
+  \****************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36673,7 +36304,7 @@ ResizeShapeHandler.prototype.revert = function(context) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SpaceToolHandler; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _space_tool_SpaceUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../space-tool/SpaceUtil */ "./node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js");
+/* harmony import */ var _space_tool_SpaceUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../space-tool/SpaceUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js");
 
 
 
@@ -36724,10 +36355,10 @@ SpaceToolHandler.prototype.revert = function(context) {};
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/ToggleShapeCollapseHandler.js":
-/*!*****************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/ToggleShapeCollapseHandler.js ***!
-  \*****************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ToggleShapeCollapseHandler.js":
+/*!**************************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/ToggleShapeCollapseHandler.js ***!
+  \**************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36818,17 +36449,17 @@ function restoreVisibility(elements, lastState) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/UpdateAttachmentHandler.js":
-/*!**************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/UpdateAttachmentHandler.js ***!
-  \**************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/UpdateAttachmentHandler.js":
+/*!***********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/UpdateAttachmentHandler.js ***!
+  \***********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UpdateAttachmentHandler; });
-/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/diagram-js/lib/util/Collections.js");
+/* harmony import */ var _util_Collections__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../util/Collections */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js");
 
 
 /**
@@ -36901,10 +36532,10 @@ function addAttacher(host, attacher, idx) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/UpdateWaypointsHandler.js":
-/*!*************************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/UpdateWaypointsHandler.js ***!
-  \*************************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/UpdateWaypointsHandler.js":
+/*!**********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/UpdateWaypointsHandler.js ***!
+  \**********************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36937,10 +36568,10 @@ UpdateWaypointsHandler.prototype.revert = function(context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js ***!
-  \***********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js":
+/*!********************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js ***!
+  \********************************************************************************************************/
 /*! exports provided: getResizedSourceAnchor, getResizedTargetAnchor, getMovedSourceAnchor, getMovedTargetAnchor */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -36950,7 +36581,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getResizedTargetAnchor", function() { return getResizedTargetAnchor; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getMovedSourceAnchor", function() { return getMovedSourceAnchor; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getMovedTargetAnchor", function() { return getMovedTargetAnchor; });
-/* harmony import */ var _util_AttachUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../util/AttachUtil */ "./node_modules/diagram-js/lib/util/AttachUtil.js");
+/* harmony import */ var _util_AttachUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../util/AttachUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/AttachUtil.js");
 
 
 
@@ -37015,10 +36646,10 @@ function safeGetWaypoints(connection) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveClosure.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveClosure.js ***!
-  \*********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveClosure.js":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveClosure.js ***!
+  \******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -37026,7 +36657,7 @@ function safeGetWaypoints(connection) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MoveClosure; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 
 
 
@@ -37060,10 +36691,10 @@ MoveClosure.prototype.addAll = function(elements, isTopLevel) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js ***!
-  \********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveHelper.js ***!
+  \*****************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -37071,8 +36702,8 @@ MoveClosure.prototype.addAll = function(elements, isTopLevel) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MoveHelper; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _AnchorsHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AnchorsHelper */ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js");
-/* harmony import */ var _MoveClosure__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MoveClosure */ "./node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveClosure.js");
+/* harmony import */ var _AnchorsHelper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AnchorsHelper */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/AnchorsHelper.js");
+/* harmony import */ var _MoveClosure__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MoveClosure */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/modeling/cmd/helper/MoveClosure.js");
 
 
 
@@ -37170,10 +36801,10 @@ MoveHelper.prototype.getClosure = function(elements) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/mouse-tracking/MouseTracking.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/mouse-tracking/MouseTracking.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/mouse-tracking/MouseTracking.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/mouse-tracking/MouseTracking.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -37240,16 +36871,16 @@ MouseTracking.prototype._setMousePosition = function(event) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/mouse-tracking/index.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/mouse-tracking/index.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/mouse-tracking/index.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/mouse-tracking/index.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _MouseTracking__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MouseTracking */ "./node_modules/diagram-js/lib/features/mouse-tracking/MouseTracking.js");
+/* harmony import */ var _MouseTracking__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MouseTracking */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/mouse-tracking/MouseTracking.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -37260,10 +36891,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/move/Move.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/move/Move.js ***!
-  \***********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/Move.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/Move.js ***!
+  \********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -37271,7 +36902,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MoveEvents; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
 
 
 var LOW_PRIORITY = 500,
@@ -37503,10 +37134,10 @@ function removeNested(elements) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/move/MovePreview.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/move/MovePreview.js ***!
-  \******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/MovePreview.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/MovePreview.js ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -37514,9 +37145,9 @@ function removeNested(elements) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MovePreview; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 
@@ -37759,23 +37390,23 @@ function isConnection(element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/move/index.js":
-/*!************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/move/index.js ***!
-  \************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/index.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/index.js ***!
+  \*********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/diagram-js/lib/features/interaction-events/index.js");
-/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var _outline__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../outline */ "./node_modules/diagram-js/lib/features/outline/index.js");
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _preview_support__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../preview-support */ "./node_modules/diagram-js/lib/features/preview-support/index.js");
-/* harmony import */ var _Move__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Move */ "./node_modules/diagram-js/lib/features/move/Move.js");
-/* harmony import */ var _MovePreview__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./MovePreview */ "./node_modules/diagram-js/lib/features/move/MovePreview.js");
+/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/index.js");
+/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var _outline__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../outline */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/outline/index.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _preview_support__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../preview-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/index.js");
+/* harmony import */ var _Move__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Move */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/Move.js");
+/* harmony import */ var _MovePreview__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./MovePreview */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/move/MovePreview.js");
 
 
 
@@ -37806,10 +37437,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/ordering/OrderingProvider.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/ordering/OrderingProvider.js ***!
-  \***************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/ordering/OrderingProvider.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/ordering/OrderingProvider.js ***!
+  \************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -37818,7 +37449,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return OrderingProvider; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -37917,17 +37548,17 @@ inherits__WEBPACK_IMPORTED_MODULE_0___default()(OrderingProvider, _command_Comma
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/outline/Outline.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/outline/Outline.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/outline/Outline.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/outline/Outline.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Outline; });
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
@@ -38049,16 +37680,16 @@ Outline.$inject = ['eventBus', 'styles', 'elementRegistry'];
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/outline/index.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/outline/index.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/outline/index.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/outline/index.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Outline__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Outline */ "./node_modules/diagram-js/lib/features/outline/Outline.js");
+/* harmony import */ var _Outline__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Outline */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/outline/Outline.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -38068,10 +37699,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/overlays/Overlays.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/overlays/Overlays.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/Overlays.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/Overlays.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -38080,8 +37711,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Overlays; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
-/* harmony import */ var _util_IdGenerator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/IdGenerator */ "./node_modules/diagram-js/lib/util/IdGenerator.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_IdGenerator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/IdGenerator */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/IdGenerator.js");
 
 
 
@@ -38712,16 +38343,16 @@ function setTransform(el, transform) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/overlays/index.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/overlays/index.js ***!
-  \****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/index.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/index.js ***!
+  \*************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Overlays__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Overlays */ "./node_modules/diagram-js/lib/features/overlays/Overlays.js");
+/* harmony import */ var _Overlays__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Overlays */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/Overlays.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -38731,10 +38362,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/palette/Palette.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/palette/Palette.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/palette/Palette.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/palette/Palette.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -39146,16 +38777,16 @@ function addClasses(element, classNames) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/palette/index.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/palette/index.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/palette/index.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/palette/index.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Palette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Palette */ "./node_modules/diagram-js/lib/features/palette/Palette.js");
+/* harmony import */ var _Palette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Palette */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/palette/Palette.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -39166,10 +38797,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/popup-menu/PopupMenu.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/popup-menu/PopupMenu.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/popup-menu/PopupMenu.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/popup-menu/PopupMenu.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -39678,16 +39309,16 @@ function setTransform(element, transform) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/popup-menu/index.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/popup-menu/index.js ***!
-  \******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/popup-menu/index.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/popup-menu/index.js ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _PopupMenu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PopupMenu */ "./node_modules/diagram-js/lib/features/popup-menu/PopupMenu.js");
+/* harmony import */ var _PopupMenu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PopupMenu */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/popup-menu/PopupMenu.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -39698,10 +39329,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/preview-support/PreviewSupport.js":
-/*!********************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/preview-support/PreviewSupport.js ***!
-  \********************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/PreviewSupport.js":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/PreviewSupport.js ***!
+  \*****************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -39831,16 +39462,16 @@ function isConnection(element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/preview-support/index.js":
-/*!***********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/preview-support/index.js ***!
-  \***********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/index.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/index.js ***!
+  \********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _PreviewSupport__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PreviewSupport */ "./node_modules/diagram-js/lib/features/preview-support/PreviewSupport.js");
+/* harmony import */ var _PreviewSupport__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PreviewSupport */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/PreviewSupport.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -39851,10 +39482,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/replace/Replace.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/replace/Replace.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/replace/Replace.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/replace/Replace.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -39905,16 +39536,16 @@ Replace.prototype.replaceElement = function(oldElement, newElementData, options)
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/replace/index.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/replace/index.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/replace/index.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/replace/index.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Replace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Replace */ "./node_modules/diagram-js/lib/features/replace/Replace.js");
+/* harmony import */ var _Replace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Replace */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/replace/Replace.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -39924,10 +39555,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/resize/Resize.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/resize/Resize.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/Resize.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/Resize.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -39935,8 +39566,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Resize; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _ResizeUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ResizeUtil */ "./node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
-/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _ResizeUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ResizeUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeUtil.js");
+/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 
 
 
@@ -40161,10 +39792,10 @@ Resize.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/resize/ResizeHandles.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/resize/ResizeHandles.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeHandles.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeHandles.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -40174,9 +39805,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
-/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 var HANDLE_OFFSET = -2,
@@ -40351,10 +39982,10 @@ ResizeHandles.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/resize/ResizePreview.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/resize/ResizePreview.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizePreview.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizePreview.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -40447,10 +40078,10 @@ ResizePreview.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/resize/ResizeUtil.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/resize/ResizeUtil.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeUtil.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeUtil.js ***!
+  \****************************************************************************************/
 /*! exports provided: substractTRBL, resizeBounds, resizeTRBL, reattachPoint, ensureConstraints, getMinResizeBounds, addPadding, computeChildrenBBox */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -40465,8 +40096,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addPadding", function() { return addPadding; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "computeChildrenBBox", function() { return computeChildrenBBox; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
-/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 
 
 var max = Math.max,
@@ -40722,21 +40353,21 @@ function computeChildrenBBox(shapeOrChildren, padding) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/resize/index.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/resize/index.js ***!
-  \**************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/index.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/index.js ***!
+  \***********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _preview_support__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../preview-support */ "./node_modules/diagram-js/lib/features/preview-support/index.js");
-/* harmony import */ var _Resize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Resize */ "./node_modules/diagram-js/lib/features/resize/Resize.js");
-/* harmony import */ var _ResizePreview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ResizePreview */ "./node_modules/diagram-js/lib/features/resize/ResizePreview.js");
-/* harmony import */ var _ResizeHandles__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ResizeHandles */ "./node_modules/diagram-js/lib/features/resize/ResizeHandles.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _preview_support__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../preview-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/index.js");
+/* harmony import */ var _Resize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Resize */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/Resize.js");
+/* harmony import */ var _ResizePreview__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ResizePreview */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizePreview.js");
+/* harmony import */ var _ResizeHandles__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ResizeHandles */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/resize/ResizeHandles.js");
 
 
 
@@ -40764,10 +40395,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/rules/RuleProvider.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/rules/RuleProvider.js ***!
-  \********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/RuleProvider.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/RuleProvider.js ***!
+  \*****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -40776,7 +40407,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RuleProvider; });
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits */ "./node_modules/inherits/inherits_browser.js");
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/command/CommandInterceptor.js");
 
 
 
@@ -40867,10 +40498,10 @@ RuleProvider.prototype.init = function() {};
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/rules/Rules.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/rules/Rules.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/Rules.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/Rules.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -40926,16 +40557,16 @@ Rules.prototype.allowed = function(action, context) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/rules/index.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/rules/index.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Rules */ "./node_modules/diagram-js/lib/features/rules/Rules.js");
+/* harmony import */ var _Rules__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/Rules.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -40946,10 +40577,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/search-pad/SearchPad.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/search-pad/SearchPad.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/search-pad/SearchPad.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/search-pad/SearchPad.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -40957,8 +40588,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SearchPad; });
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
-/* harmony import */ var _util_EscapeUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/EscapeUtil */ "./node_modules/diagram-js/lib/util/EscapeUtil.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _util_EscapeUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/EscapeUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/EscapeUtil.js");
 
 
 
@@ -41503,18 +41134,18 @@ SearchPad.RESULT_SECONDARY_HTML =
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/search-pad/index.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/search-pad/index.js ***!
-  \******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/search-pad/index.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/search-pad/index.js ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _overlays__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../overlays */ "./node_modules/diagram-js/lib/features/overlays/index.js");
-/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/diagram-js/lib/features/selection/index.js");
-/* harmony import */ var _SearchPad__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SearchPad */ "./node_modules/diagram-js/lib/features/search-pad/SearchPad.js");
+/* harmony import */ var _overlays__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../overlays */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/overlays/index.js");
+/* harmony import */ var _selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js");
+/* harmony import */ var _SearchPad__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SearchPad */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/search-pad/SearchPad.js");
 
 
 
@@ -41531,10 +41162,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/selection/Selection.js":
-/*!*********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/selection/Selection.js ***!
-  \*********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/Selection.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/Selection.js ***!
+  \******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -41638,17 +41269,17 @@ Selection.prototype.select = function(elements, add) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/selection/SelectionBehavior.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/selection/SelectionBehavior.js ***!
-  \*****************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/SelectionBehavior.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/SelectionBehavior.js ***!
+  \**************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SelectionBehavior; });
-/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 
 
@@ -41736,10 +41367,10 @@ SelectionBehavior.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/selection/SelectionVisuals.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/selection/SelectionVisuals.js ***!
-  \****************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/SelectionVisuals.js":
+/*!*************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/SelectionVisuals.js ***!
+  \*************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -41821,20 +41452,20 @@ SelectionVisuals.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/selection/index.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/selection/index.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/index.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/diagram-js/lib/features/interaction-events/index.js");
-/* harmony import */ var _outline__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../outline */ "./node_modules/diagram-js/lib/features/outline/index.js");
-/* harmony import */ var _Selection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Selection */ "./node_modules/diagram-js/lib/features/selection/Selection.js");
-/* harmony import */ var _SelectionVisuals__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SelectionVisuals */ "./node_modules/diagram-js/lib/features/selection/SelectionVisuals.js");
-/* harmony import */ var _SelectionBehavior__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SelectionBehavior */ "./node_modules/diagram-js/lib/features/selection/SelectionBehavior.js");
+/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/index.js");
+/* harmony import */ var _outline__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../outline */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/outline/index.js");
+/* harmony import */ var _Selection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Selection */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/Selection.js");
+/* harmony import */ var _SelectionVisuals__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SelectionVisuals */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/SelectionVisuals.js");
+/* harmony import */ var _SelectionBehavior__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SelectionBehavior */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/selection/SelectionBehavior.js");
 
 
 
@@ -41857,10 +41488,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/snapping/SnapContext.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/snapping/SnapContext.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapContext.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapContext.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -41868,7 +41499,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SnapContext; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _SnapUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SnapUtil */ "./node_modules/diagram-js/lib/features/snapping/SnapUtil.js");
+/* harmony import */ var _SnapUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SnapUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapUtil.js");
 
 
 
@@ -42038,10 +41669,10 @@ SnapPoints.prototype.initDefaults = function(defaultSnaps) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/snapping/SnapUtil.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/snapping/SnapUtil.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapUtil.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapUtil.js ***!
+  \****************************************************************************************/
 /*! exports provided: snapTo, topLeft, mid, bottomRight, isSnapped, setSnapped */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -42177,10 +41808,10 @@ function setSnapped(event, axis, value) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/snapping/Snapping.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/snapping/Snapping.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/Snapping.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/Snapping.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -42188,8 +41819,8 @@ function setSnapped(event, axis, value) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Snapping; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _SnapContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SnapContext */ "./node_modules/diagram-js/lib/features/snapping/SnapContext.js");
-/* harmony import */ var _SnapUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SnapUtil */ "./node_modules/diagram-js/lib/features/snapping/SnapUtil.js");
+/* harmony import */ var _SnapContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SnapContext */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapContext.js");
+/* harmony import */ var _SnapUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SnapUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/snapping/SnapUtil.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
 
 
@@ -42432,20 +42063,20 @@ Snapping.prototype.getSiblings = function(element, target) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/space-tool/SpaceTool.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/space-tool/SpaceTool.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceTool.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceTool.js ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SpaceTool; });
-/* harmony import */ var _SpaceUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SpaceUtil */ "./node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js");
-/* harmony import */ var _util_Cursor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Cursor */ "./node_modules/diagram-js/lib/util/Cursor.js");
-/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/diagram-js/lib/util/Mouse.js");
-/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/diagram-js/lib/util/Elements.js");
+/* harmony import */ var _SpaceUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SpaceUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js");
+/* harmony import */ var _util_Cursor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/Cursor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Cursor.js");
+/* harmony import */ var _util_Mouse__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Mouse */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js");
+/* harmony import */ var _util_Elements__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Elements */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 
 
@@ -42739,10 +42370,10 @@ SpaceTool.prototype.isActive = function() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/space-tool/SpaceToolPreview.js":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/space-tool/SpaceToolPreview.js ***!
-  \*****************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceToolPreview.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceToolPreview.js ***!
+  \**************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -42751,7 +42382,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SpaceToolPreview; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! tiny-svg */ "./node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js");
+/* harmony import */ var _util_SvgTransformUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/SvgTransformUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js");
 
 
 var MARKER_DRAGGING = 'djs-dragging',
@@ -43026,10 +42657,10 @@ function isConnection(element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js ***!
-  \**********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceUtil.js ***!
+  \*******************************************************************************************/
 /*! exports provided: getDirection, resizeBounds */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -43126,21 +42757,21 @@ function resizeBounds(bounds, direction, delta) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/space-tool/index.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/space-tool/index.js ***!
-  \******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/index.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/index.js ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/diagram-js/lib/features/rules/index.js");
-/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/diagram-js/lib/features/tool-manager/index.js");
-/* harmony import */ var _preview_support__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../preview-support */ "./node_modules/diagram-js/lib/features/preview-support/index.js");
-/* harmony import */ var _SpaceTool__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SpaceTool */ "./node_modules/diagram-js/lib/features/space-tool/SpaceTool.js");
-/* harmony import */ var _SpaceToolPreview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./SpaceToolPreview */ "./node_modules/diagram-js/lib/features/space-tool/SpaceToolPreview.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _rules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../rules */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/rules/index.js");
+/* harmony import */ var _tool_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tool-manager */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/index.js");
+/* harmony import */ var _preview_support__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../preview-support */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/preview-support/index.js");
+/* harmony import */ var _SpaceTool__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./SpaceTool */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceTool.js");
+/* harmony import */ var _SpaceToolPreview__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./SpaceToolPreview */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/space-tool/SpaceToolPreview.js");
 
 
 
@@ -43164,10 +42795,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/tool-manager/ToolManager.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/tool-manager/ToolManager.js ***!
-  \**************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/ToolManager.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/ToolManager.js ***!
+  \***********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -43277,17 +42908,17 @@ ToolManager.prototype.bindEvents = function(name, events) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/tool-manager/index.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/tool-manager/index.js ***!
-  \********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/index.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/index.js ***!
+  \*****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/diagram-js/lib/features/dragging/index.js");
-/* harmony import */ var _ToolManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ToolManager */ "./node_modules/diagram-js/lib/features/tool-manager/ToolManager.js");
+/* harmony import */ var _dragging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../dragging */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/dragging/index.js");
+/* harmony import */ var _ToolManager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ToolManager */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tool-manager/ToolManager.js");
 
 
 
@@ -43303,10 +42934,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/tooltips/Tooltips.js":
-/*!*******************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/tooltips/Tooltips.js ***!
-  \*******************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tooltips/Tooltips.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tooltips/Tooltips.js ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -43315,7 +42946,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Tooltips; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_IdGenerator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/IdGenerator */ "./node_modules/diagram-js/lib/util/IdGenerator.js");
+/* harmony import */ var _util_IdGenerator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/IdGenerator */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/IdGenerator.js");
 
 
 
@@ -43677,16 +43308,16 @@ Tooltips.prototype._init = function() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/tooltips/index.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/tooltips/index.js ***!
-  \****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tooltips/index.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tooltips/index.js ***!
+  \*************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Tooltips__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tooltips */ "./node_modules/diagram-js/lib/features/tooltips/Tooltips.js");
+/* harmony import */ var _Tooltips__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tooltips */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/tooltips/Tooltips.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -43696,10 +43327,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/touch/TouchFix.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/touch/TouchFix.js ***!
-  \****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/TouchFix.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/TouchFix.js ***!
+  \*************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -43762,10 +43393,10 @@ TouchFix.prototype.addBBoxMarker = function(svg) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/touch/TouchInteractionEvents.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/touch/TouchInteractionEvents.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/TouchInteractionEvents.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/TouchInteractionEvents.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -43776,7 +43407,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
 /* harmony import */ var hammerjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! hammerjs */ "./node_modules/hammerjs/hammer.js");
 /* harmony import */ var hammerjs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(hammerjs__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
 
 
 
@@ -44117,18 +43748,18 @@ TouchInteractionEvents.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/features/touch/index.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/features/touch/index.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/index.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/index.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/diagram-js/lib/features/interaction-events/index.js");
-/* harmony import */ var _TouchInteractionEvents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TouchInteractionEvents */ "./node_modules/diagram-js/lib/features/touch/TouchInteractionEvents.js");
-/* harmony import */ var _TouchFix__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TouchFix */ "./node_modules/diagram-js/lib/features/touch/TouchFix.js");
+/* harmony import */ var _interaction_events__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interaction-events */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/interaction-events/index.js");
+/* harmony import */ var _TouchInteractionEvents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TouchInteractionEvents */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/TouchInteractionEvents.js");
+/* harmony import */ var _TouchFix__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TouchFix */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/TouchFix.js");
 
 
 
@@ -44143,16 +43774,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/i18n/translate/index.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/i18n/translate/index.js ***!
-  \*************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/index.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/index.js ***!
+  \**********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _translate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./translate */ "./node_modules/diagram-js/lib/i18n/translate/translate.js");
+/* harmony import */ var _translate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./translate */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/translate.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -44161,10 +43792,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/i18n/translate/translate.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/i18n/translate/translate.js ***!
-  \*****************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/translate.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/i18n/translate/translate.js ***!
+  \**************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -44200,17 +43831,17 @@ function translate(template, replacements) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/layout/BaseLayouter.js":
-/*!************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/layout/BaseLayouter.js ***!
-  \************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/BaseLayouter.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/BaseLayouter.js ***!
+  \*********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BaseLayouter; });
-/* harmony import */ var _LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 
 
 
@@ -44248,10 +43879,10 @@ BaseLayouter.prototype.layoutConnection = function(connection, hints) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/layout/CroppingConnectionDocking.js":
-/*!*************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/layout/CroppingConnectionDocking.js ***!
-  \*************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/CroppingConnectionDocking.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/CroppingConnectionDocking.js ***!
+  \**********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -44259,7 +43890,7 @@ BaseLayouter.prototype.layoutConnection = function(connection, hints) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CroppingConnectionDocking; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
 
 
 
@@ -44355,10 +43986,10 @@ CroppingConnectionDocking.prototype._getGfx = function(element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/layout/LayoutUtil.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/layout/LayoutUtil.js ***!
-  \**********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js ***!
+  \*******************************************************************************/
 /*! exports provided: roundBounds, roundPoint, asTRBL, asBounds, getMid, getOrientation, getElementLineIntersection, getIntersections */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -44373,8 +44004,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getElementLineIntersection", function() { return getElementLineIntersection; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getIntersections", function() { return getIntersections; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/Geometry */ "./node_modules/diagram-js/lib/util/Geometry.js");
-/* harmony import */ var path_intersection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! path-intersection */ "./node_modules/path-intersection/intersect.js");
+/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/Geometry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js");
+/* harmony import */ var path_intersection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! path-intersection */ "./node_modules/bpmn-js/node_modules/path-intersection/intersect.js");
 /* harmony import */ var path_intersection__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(path_intersection__WEBPACK_IMPORTED_MODULE_2__);
 
 
@@ -44550,10 +44181,10 @@ function getIntersections(a, b) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/layout/ManhattanLayout.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/layout/ManhattanLayout.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/ManhattanLayout.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/ManhattanLayout.js ***!
+  \************************************************************************************/
 /*! exports provided: connectPoints, connectRectangles, repairConnection, tryLayoutStraight, withoutRedundantPoints */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -44565,8 +44196,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tryLayoutStraight", function() { return tryLayoutStraight; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "withoutRedundantPoints", function() { return withoutRedundantPoints; });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
-/* harmony import */ var _LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
-/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/Geometry */ "./node_modules/diagram-js/lib/util/Geometry.js");
+/* harmony import */ var _LayoutUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _util_Geometry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/Geometry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js");
 
 
 
@@ -45300,10 +44931,10 @@ function withoutRedundantPoints(waypoints) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/model/index.js":
-/*!****************************************************!*\
-  !*** ./node_modules/diagram-js/lib/model/index.js ***!
-  \****************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/model/index.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/model/index.js ***!
+  \*************************************************************************/
 /*! exports provided: Base, Shape, Root, Label, Connection, create */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -45554,10 +45185,10 @@ function create(type, attrs) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/keyboard-move/KeyboardMove.js":
-/*!******************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/keyboard-move/KeyboardMove.js ***!
-  \******************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/keyboard-move/KeyboardMove.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/keyboard-move/KeyboardMove.js ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -45689,17 +45320,17 @@ KeyboardMove.$inject = [
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/keyboard-move/index.js":
-/*!***********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/keyboard-move/index.js ***!
-  \***********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/keyboard-move/index.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/keyboard-move/index.js ***!
+  \********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _features_keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../features/keyboard */ "./node_modules/diagram-js/lib/features/keyboard/index.js");
-/* harmony import */ var _KeyboardMove__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KeyboardMove */ "./node_modules/diagram-js/lib/navigation/keyboard-move/KeyboardMove.js");
+/* harmony import */ var _features_keyboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../features/keyboard */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/keyboard/index.js");
+/* harmony import */ var _KeyboardMove__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KeyboardMove */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/keyboard-move/KeyboardMove.js");
 
 
 
@@ -45715,21 +45346,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/movecanvas/MoveCanvas.js":
-/*!*************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/movecanvas/MoveCanvas.js ***!
-  \*************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/movecanvas/MoveCanvas.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/movecanvas/MoveCanvas.js ***!
+  \**********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return MoveCanvas; });
-/* harmony import */ var _util_Cursor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Cursor */ "./node_modules/diagram-js/lib/util/Cursor.js");
-/* harmony import */ var _util_ClickTrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/ClickTrap */ "./node_modules/diagram-js/lib/util/ClickTrap.js");
-/* harmony import */ var _util_PositionUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/PositionUtil */ "./node_modules/diagram-js/lib/util/PositionUtil.js");
+/* harmony import */ var _util_Cursor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Cursor */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Cursor.js");
+/* harmony import */ var _util_ClickTrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/ClickTrap */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/ClickTrap.js");
+/* harmony import */ var _util_PositionUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/PositionUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/PositionUtil.js");
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _util_Event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
 
 
 
@@ -45846,16 +45477,16 @@ function length(point) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/movecanvas/index.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/movecanvas/index.js ***!
-  \********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/movecanvas/index.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/movecanvas/index.js ***!
+  \*****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _MoveCanvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MoveCanvas */ "./node_modules/diagram-js/lib/navigation/movecanvas/MoveCanvas.js");
+/* harmony import */ var _MoveCanvas__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MoveCanvas */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/movecanvas/MoveCanvas.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -45865,16 +45496,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/touch/index.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/touch/index.js ***!
-  \***************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/touch/index.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/touch/index.js ***!
+  \************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _features_touch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../features/touch */ "./node_modules/diagram-js/lib/features/touch/index.js");
+/* harmony import */ var _features_touch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../features/touch */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/features/touch/index.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -45885,10 +45516,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/zoomscroll/ZoomScroll.js":
-/*!*************************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/zoomscroll/ZoomScroll.js ***!
-  \*************************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/ZoomScroll.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/ZoomScroll.js ***!
+  \**********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -45896,8 +45527,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ZoomScroll; });
 /* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dom */ "./node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _ZoomUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ZoomUtil */ "./node_modules/diagram-js/lib/navigation/zoomscroll/ZoomUtil.js");
-/* harmony import */ var _util_Math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Math */ "./node_modules/diagram-js/lib/util/Math.js");
+/* harmony import */ var _ZoomUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ZoomUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/ZoomUtil.js");
+/* harmony import */ var _util_Math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/Math */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Math.js");
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
 
 
@@ -46130,10 +45761,10 @@ ZoomScroll.prototype._init = function(newEnabled) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/zoomscroll/ZoomUtil.js":
-/*!***********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/zoomscroll/ZoomUtil.js ***!
-  \***********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/ZoomUtil.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/ZoomUtil.js ***!
+  \********************************************************************************************/
 /*! exports provided: getStepSize, cap */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46141,7 +45772,7 @@ ZoomScroll.prototype._init = function(newEnabled) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getStepSize", function() { return getStepSize; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cap", function() { return cap; });
-/* harmony import */ var _util_Math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Math */ "./node_modules/diagram-js/lib/util/Math.js");
+/* harmony import */ var _util_Math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../util/Math */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Math.js");
 
 
 /**
@@ -46168,16 +45799,16 @@ function cap(range, scale) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/navigation/zoomscroll/index.js":
-/*!********************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/navigation/zoomscroll/index.js ***!
-  \********************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/index.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/index.js ***!
+  \*****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ZoomScroll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ZoomScroll */ "./node_modules/diagram-js/lib/navigation/zoomscroll/ZoomScroll.js");
+/* harmony import */ var _ZoomScroll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ZoomScroll */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/navigation/zoomscroll/ZoomScroll.js");
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -46187,10 +45818,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/AttachUtil.js":
-/*!********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/AttachUtil.js ***!
-  \********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/AttachUtil.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/AttachUtil.js ***!
+  \*****************************************************************************/
 /*! exports provided: getNewAttachPoint, getNewAttachShapeDelta */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46198,8 +45829,8 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewAttachPoint", function() { return getNewAttachPoint; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewAttachShapeDelta", function() { return getNewAttachShapeDelta; });
-/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../layout/LayoutUtil */ "./node_modules/diagram-js/lib/layout/LayoutUtil.js");
-/* harmony import */ var _PositionUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PositionUtil */ "./node_modules/diagram-js/lib/util/PositionUtil.js");
+/* harmony import */ var _layout_LayoutUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../layout/LayoutUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/layout/LayoutUtil.js");
+/* harmony import */ var _PositionUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PositionUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/PositionUtil.js");
 
 
 
@@ -46266,10 +45897,10 @@ function getNewAttachShapeDelta(shape, oldBounds, newBounds) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/ClickTrap.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/ClickTrap.js ***!
-  \*******************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/ClickTrap.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/ClickTrap.js ***!
+  \****************************************************************************/
 /*! exports provided: install */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46300,10 +45931,10 @@ function install(eventBus, eventName) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Collections.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Collections.js ***!
-  \*********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Collections.js ***!
+  \******************************************************************************/
 /*! exports provided: remove, add, indexOf */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46403,10 +46034,10 @@ function indexOf(collection, element) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/CopyPasteUtil.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/CopyPasteUtil.js ***!
-  \***********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/CopyPasteUtil.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/CopyPasteUtil.js ***!
+  \********************************************************************************/
 /*! exports provided: getTopLevel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46458,10 +46089,10 @@ function getTopLevel(elements) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Cursor.js":
-/*!****************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Cursor.js ***!
-  \****************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Cursor.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Cursor.js ***!
+  \*************************************************************************/
 /*! exports provided: set, unset, has */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46499,10 +46130,10 @@ function has(mode) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Elements.js":
-/*!******************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Elements.js ***!
-  \******************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Elements.js ***!
+  \***************************************************************************/
 /*! exports provided: add, eachElement, selfAndChildren, selfAndDirectChildren, selfAndAllChildren, getClosure, getBBox, getEnclosedElements, getType */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46831,10 +46462,10 @@ function copyObject(src1, src2) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/EscapeUtil.js":
-/*!********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/EscapeUtil.js ***!
-  \********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/EscapeUtil.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/EscapeUtil.js ***!
+  \*****************************************************************************/
 /*! exports provided: escapeCSS, escapeHTML */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46859,10 +46490,10 @@ function escapeHTML(str) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Event.js":
-/*!***************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Event.js ***!
-  \***************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js ***!
+  \************************************************************************/
 /*! exports provided: getOriginal, stopPropagation, toPoint */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -46909,10 +46540,10 @@ function toPoint(event) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Geometry.js":
-/*!******************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Geometry.js ***!
-  \******************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js ***!
+  \***************************************************************************/
 /*! exports provided: pointDistance, pointsOnLine, pointsAligned, pointInRect, getMidPoint */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47032,10 +46663,10 @@ function getMidPoint(p, q) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/GraphicsUtil.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/GraphicsUtil.js ***!
-  \**********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/GraphicsUtil.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/GraphicsUtil.js ***!
+  \*******************************************************************************/
 /*! exports provided: getVisual, getChildren */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47076,10 +46707,10 @@ function getChildren(gfx) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/IdGenerator.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/IdGenerator.js ***!
-  \*********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/IdGenerator.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/IdGenerator.js ***!
+  \******************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47117,18 +46748,18 @@ IdGenerator.prototype.next = function() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/LineIntersection.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/LineIntersection.js ***!
-  \**************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/LineIntersection.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/LineIntersection.js ***!
+  \***********************************************************************************/
 /*! exports provided: getApproxIntersection */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getApproxIntersection", function() { return getApproxIntersection; });
-/* harmony import */ var _Geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Geometry */ "./node_modules/diagram-js/lib/util/Geometry.js");
-/* harmony import */ var path_intersection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! path-intersection */ "./node_modules/path-intersection/intersect.js");
+/* harmony import */ var _Geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Geometry */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Geometry.js");
+/* harmony import */ var path_intersection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! path-intersection */ "./node_modules/bpmn-js/node_modules/path-intersection/intersect.js");
 /* harmony import */ var path_intersection__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path_intersection__WEBPACK_IMPORTED_MODULE_1__);
 
 
@@ -47243,17 +46874,17 @@ function getApproxIntersection(waypoints, reference) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Math.js":
-/*!**************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Math.js ***!
-  \**************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Math.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Math.js ***!
+  \***********************************************************************/
 /*! exports provided: log10, substract */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "log10", function() { return log10; });
-/* harmony import */ var _PositionUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PositionUtil */ "./node_modules/diagram-js/lib/util/PositionUtil.js");
+/* harmony import */ var _PositionUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PositionUtil */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/PositionUtil.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "substract", function() { return _PositionUtil__WEBPACK_IMPORTED_MODULE_0__["delta"]; });
 
 /**
@@ -47269,10 +46900,10 @@ function log10(x) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Mouse.js":
-/*!***************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Mouse.js ***!
-  \***************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Mouse.js ***!
+  \************************************************************************/
 /*! exports provided: isMac, isPrimaryButton, hasPrimaryModifier, hasSecondaryModifier */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47281,8 +46912,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isPrimaryButton", function() { return isPrimaryButton; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasPrimaryModifier", function() { return hasPrimaryModifier; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hasSecondaryModifier", function() { return hasSecondaryModifier; });
-/* harmony import */ var _Event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Event */ "./node_modules/diagram-js/lib/util/Event.js");
-/* harmony import */ var _Platform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Platform */ "./node_modules/diagram-js/lib/util/Platform.js");
+/* harmony import */ var _Event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Event */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Event.js");
+/* harmony import */ var _Platform__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Platform */ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Platform.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "isMac", function() { return _Platform__WEBPACK_IMPORTED_MODULE_1__["isMac"]; });
 
 
@@ -47321,10 +46952,10 @@ function hasSecondaryModifier(event) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Platform.js":
-/*!******************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Platform.js ***!
-  \******************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Platform.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Platform.js ***!
+  \***************************************************************************/
 /*! exports provided: isMac */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47337,10 +46968,10 @@ function isMac() {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/PositionUtil.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/PositionUtil.js ***!
-  \**********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/PositionUtil.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/PositionUtil.js ***!
+  \*******************************************************************************/
 /*! exports provided: center, delta */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47365,10 +46996,10 @@ function delta(a, b) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Removal.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Removal.js ***!
-  \*****************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Removal.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Removal.js ***!
+  \**************************************************************************/
 /*! exports provided: saveClear */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47413,10 +47044,10 @@ function saveClear(collection, removeFn) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/RenderUtil.js":
-/*!********************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/RenderUtil.js ***!
-  \********************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/RenderUtil.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/RenderUtil.js ***!
+  \*****************************************************************************/
 /*! exports provided: componentsToPath, toSVGPoints, createLine, updateLine */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47465,10 +47096,10 @@ function updateLine(gfx, points) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/SvgTransformUtil.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/SvgTransformUtil.js ***!
-  \**************************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/SvgTransformUtil.js ***!
+  \***********************************************************************************/
 /*! exports provided: transform, translate, rotate, scale */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47541,10 +47172,10 @@ function scale(gfx, amount) {
 
 /***/ }),
 
-/***/ "./node_modules/diagram-js/lib/util/Text.js":
-/*!**************************************************!*\
-  !*** ./node_modules/diagram-js/lib/util/Text.js ***!
-  \**************************************************/
+/***/ "./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Text.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/diagram-js/lib/util/Text.js ***!
+  \***********************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -47906,10 +47537,10 @@ function getLineHeight(style) {
 
 /***/ }),
 
-/***/ "./node_modules/didi/dist/index.esm.js":
-/*!*********************************************!*\
-  !*** ./node_modules/didi/dist/index.esm.js ***!
-  \*********************************************/
+/***/ "./node_modules/bpmn-js/node_modules/didi/dist/index.esm.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/didi/dist/index.esm.js ***!
+  \******************************************************************/
 /*! exports provided: annotate, Module, Injector */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -48250,6 +47881,1886 @@ function hasProp(obj, prop) {
 
 
 
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-js/node_modules/path-intersection/intersect.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/bpmn-js/node_modules/path-intersection/intersect.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * This file contains portions that got extraced from Snap.svg (licensed Apache-2.0).
+ *
+ * @see https://github.com/adobe-webplatform/Snap.svg/blob/master/src/path.js
+ */
+
+/* eslint no-fallthrough: "off" */
+
+var has = 'hasOwnProperty',
+    p2s = /,?([a-z]),?/gi,
+    toFloat = parseFloat,
+    math = Math,
+    PI = math.PI,
+    mmin = math.min,
+    mmax = math.max,
+    pow = math.pow,
+    abs = math.abs,
+    pathCommand = /([a-z])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/ig,
+    pathValues = /(-?\d*\.?\d*(?:e[-+]?\\d+)?)[\s]*,?[\s]*/ig;
+
+function is(o, type) {
+  type = String.prototype.toLowerCase.call(type);
+
+  if (type == 'finite') {
+    return isFinite(o);
+  }
+
+  if (type == 'array' && (o instanceof Array || Array.isArray && Array.isArray(o))) {
+    return true;
+  }
+
+  return (type == 'null' && o === null) ||
+         (type == typeof o && o !== null) ||
+         (type == 'object' && o === Object(o)) ||
+         Object.prototype.toString.call(o).slice(8, -1).toLowerCase() == type;
+}
+
+function clone(obj) {
+
+  if (typeof obj == 'function' || Object(obj) !== obj) {
+    return obj;
+  }
+
+  var res = new obj.constructor;
+
+  for (var key in obj) if (obj[has](key)) {
+    res[key] = clone(obj[key]);
+  }
+
+  return res;
+}
+
+function repush(array, item) {
+  for (var i = 0, ii = array.length; i < ii; i++) if (array[i] === item) {
+    return array.push(array.splice(i, 1)[0]);
+  }
+}
+
+function cacher(f, scope, postprocessor) {
+
+  function newf() {
+
+    var arg = Array.prototype.slice.call(arguments, 0),
+        args = arg.join('\u2400'),
+        cache = newf.cache = newf.cache || {},
+        count = newf.count = newf.count || [];
+
+    if (cache[has](args)) {
+      repush(count, args);
+      return postprocessor ? postprocessor(cache[args]) : cache[args];
+    }
+
+    count.length >= 1e3 && delete cache[count.shift()];
+    count.push(args);
+    cache[args] = f.apply(scope, arg);
+
+    return postprocessor ? postprocessor(cache[args]) : cache[args];
+  }
+  return newf;
+}
+
+function parsePathString(pathString) {
+
+  if (!pathString) {
+    return null;
+  }
+
+  var pth = paths(pathString);
+
+  if (pth.arr) {
+    return clone(pth.arr);
+  }
+
+  var paramCounts = { a: 7, c: 6, o: 2, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, u: 3, z: 0 },
+      data = [];
+
+  if (is(pathString, 'array') && is(pathString[0], 'array')) { // rough assumption
+    data = clone(pathString);
+  }
+
+  if (!data.length) {
+
+    String(pathString).replace(pathCommand, function(a, b, c) {
+      var params = [],
+          name = b.toLowerCase();
+
+      c.replace(pathValues, function(a, b) {
+        b && params.push(+b);
+      });
+
+      if (name == 'm' && params.length > 2) {
+        data.push([b].concat(params.splice(0, 2)));
+        name = 'l';
+        b = b == 'm' ? 'l' : 'L';
+      }
+
+      if (name == 'o' && params.length == 1) {
+        data.push([b, params[0]]);
+      }
+
+      if (name == 'r') {
+        data.push([b].concat(params));
+      } else while (params.length >= paramCounts[name]) {
+        data.push([b].concat(params.splice(0, paramCounts[name])));
+        if (!paramCounts[name]) {
+          break;
+        }
+      }
+    });
+  }
+
+  data.toString = paths.toString;
+  pth.arr = clone(data);
+
+  return data;
+}
+
+function paths(ps) {
+  var p = paths.ps = paths.ps || {};
+
+  if (p[ps]) {
+    p[ps].sleep = 100;
+  } else {
+    p[ps] = {
+      sleep: 100
+    };
+  }
+
+  setTimeout(function() {
+    for (var key in p) if (p[has](key) && key != ps) {
+      p[key].sleep--;
+      !p[key].sleep && delete p[key];
+    }
+  });
+
+  return p[ps];
+}
+
+function box(x, y, width, height) {
+  if (x == null) {
+    x = y = width = height = 0;
+  }
+
+  if (y == null) {
+    y = x.y;
+    width = x.width;
+    height = x.height;
+    x = x.x;
+  }
+
+  return {
+    x: x,
+    y: y,
+    width: width,
+    w: width,
+    height: height,
+    h: height,
+    x2: x + width,
+    y2: y + height,
+    cx: x + width / 2,
+    cy: y + height / 2,
+    r1: math.min(width, height) / 2,
+    r2: math.max(width, height) / 2,
+    r0: math.sqrt(width * width + height * height) / 2,
+    path: rectPath(x, y, width, height),
+    vb: [x, y, width, height].join(' ')
+  };
+}
+
+function pathToString() {
+  return this.join(',').replace(p2s, '$1');
+}
+
+function pathClone(pathArray) {
+  var res = clone(pathArray);
+  res.toString = pathToString;
+  return res;
+}
+
+function findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+  var t1 = 1 - t,
+      t13 = pow(t1, 3),
+      t12 = pow(t1, 2),
+      t2 = t * t,
+      t3 = t2 * t,
+      x = t13 * p1x + t12 * 3 * t * c1x + t1 * 3 * t * t * c2x + t3 * p2x,
+      y = t13 * p1y + t12 * 3 * t * c1y + t1 * 3 * t * t * c2y + t3 * p2y,
+      mx = p1x + 2 * t * (c1x - p1x) + t2 * (c2x - 2 * c1x + p1x),
+      my = p1y + 2 * t * (c1y - p1y) + t2 * (c2y - 2 * c1y + p1y),
+      nx = c1x + 2 * t * (c2x - c1x) + t2 * (p2x - 2 * c2x + c1x),
+      ny = c1y + 2 * t * (c2y - c1y) + t2 * (p2y - 2 * c2y + c1y),
+      ax = t1 * p1x + t * c1x,
+      ay = t1 * p1y + t * c1y,
+      cx = t1 * c2x + t * p2x,
+      cy = t1 * c2y + t * p2y,
+      alpha = (90 - math.atan2(mx - nx, my - ny) * 180 / PI);
+
+  return {
+    x: x,
+    y: y,
+    m: { x: mx, y: my },
+    n: { x: nx, y: ny },
+    start: { x: ax, y: ay },
+    end: { x: cx, y: cy },
+    alpha: alpha
+  };
+}
+
+function bezierBBox(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+
+  if (!is(p1x, 'array')) {
+    p1x = [p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y];
+  }
+
+  var bbox = curveBBox.apply(null, p1x);
+
+  return box(
+    bbox.min.x,
+    bbox.min.y,
+    bbox.max.x - bbox.min.x,
+    bbox.max.y - bbox.min.y
+  );
+}
+
+function isPointInsideBBox(bbox, x, y) {
+  return x >= bbox.x &&
+    x <= bbox.x + bbox.width &&
+    y >= bbox.y &&
+    y <= bbox.y + bbox.height;
+}
+
+function isBBoxIntersect(bbox1, bbox2) {
+  bbox1 = box(bbox1);
+  bbox2 = box(bbox2);
+  return isPointInsideBBox(bbox2, bbox1.x, bbox1.y)
+    || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y)
+    || isPointInsideBBox(bbox2, bbox1.x, bbox1.y2)
+    || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y2)
+    || isPointInsideBBox(bbox1, bbox2.x, bbox2.y)
+    || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y)
+    || isPointInsideBBox(bbox1, bbox2.x, bbox2.y2)
+    || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y2)
+    || (bbox1.x < bbox2.x2 && bbox1.x > bbox2.x
+        || bbox2.x < bbox1.x2 && bbox2.x > bbox1.x)
+    && (bbox1.y < bbox2.y2 && bbox1.y > bbox2.y
+        || bbox2.y < bbox1.y2 && bbox2.y > bbox1.y);
+}
+
+function base3(t, p1, p2, p3, p4) {
+  var t1 = -3 * p1 + 9 * p2 - 9 * p3 + 3 * p4,
+      t2 = t * t1 + 6 * p1 - 12 * p2 + 6 * p3;
+  return t * t2 - 3 * p1 + 3 * p2;
+}
+
+function bezlen(x1, y1, x2, y2, x3, y3, x4, y4, z) {
+
+  if (z == null) {
+    z = 1;
+  }
+
+  z = z > 1 ? 1 : z < 0 ? 0 : z;
+
+  var z2 = z / 2,
+      n = 12,
+      Tvalues = [-.1252,.1252,-.3678,.3678,-.5873,.5873,-.7699,.7699,-.9041,.9041,-.9816,.9816],
+      Cvalues = [0.2491,0.2491,0.2335,0.2335,0.2032,0.2032,0.1601,0.1601,0.1069,0.1069,0.0472,0.0472],
+      sum = 0;
+
+  for (var i = 0; i < n; i++) {
+    var ct = z2 * Tvalues[i] + z2,
+        xbase = base3(ct, x1, x2, x3, x4),
+        ybase = base3(ct, y1, y2, y3, y4),
+        comb = xbase * xbase + ybase * ybase;
+
+    sum += Cvalues[i] * math.sqrt(comb);
+  }
+
+  return z2 * sum;
+}
+
+
+function intersectLines(x1, y1, x2, y2, x3, y3, x4, y4) {
+
+  if (
+    mmax(x1, x2) < mmin(x3, x4) ||
+      mmin(x1, x2) > mmax(x3, x4) ||
+      mmax(y1, y2) < mmin(y3, y4) ||
+      mmin(y1, y2) > mmax(y3, y4)
+  ) {
+    return;
+  }
+
+  var nx = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4),
+      ny = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4),
+      denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+  if (!denominator) {
+    return;
+  }
+
+  var px = nx / denominator,
+      py = ny / denominator,
+      px2 = +px.toFixed(2),
+      py2 = +py.toFixed(2);
+
+  if (
+    px2 < +mmin(x1, x2).toFixed(2) ||
+      px2 > +mmax(x1, x2).toFixed(2) ||
+      px2 < +mmin(x3, x4).toFixed(2) ||
+      px2 > +mmax(x3, x4).toFixed(2) ||
+      py2 < +mmin(y1, y2).toFixed(2) ||
+      py2 > +mmax(y1, y2).toFixed(2) ||
+      py2 < +mmin(y3, y4).toFixed(2) ||
+      py2 > +mmax(y3, y4).toFixed(2)
+  ) {
+    return;
+  }
+
+  return { x: px, y: py };
+}
+
+function findBezierIntersections(bez1, bez2, justCount) {
+  var bbox1 = bezierBBox(bez1),
+      bbox2 = bezierBBox(bez2);
+
+  if (!isBBoxIntersect(bbox1, bbox2)) {
+    return justCount ? 0 : [];
+  }
+
+  var l1 = bezlen.apply(0, bez1),
+      l2 = bezlen.apply(0, bez2),
+      n1 = ~~(l1 / 5),
+      n2 = ~~(l2 / 5),
+      dots1 = [],
+      dots2 = [],
+      xy = {},
+      res = justCount ? 0 : [];
+
+  for (var i = 0; i < n1 + 1; i++) {
+    var p = findDotsAtSegment.apply(0, bez1.concat(i / n1));
+    dots1.push({ x: p.x, y: p.y, t: i / n1 });
+  }
+
+  for (i = 0; i < n2 + 1; i++) {
+    p = findDotsAtSegment.apply(0, bez2.concat(i / n2));
+    dots2.push({ x: p.x, y: p.y, t: i / n2 });
+  }
+
+  for (i = 0; i < n1; i++) {
+
+    for (var j = 0; j < n2; j++) {
+      var di = dots1[i],
+          di1 = dots1[i + 1],
+          dj = dots2[j],
+          dj1 = dots2[j + 1],
+          ci = abs(di1.x - di.x) < .01 ? 'y' : 'x',
+          cj = abs(dj1.x - dj.x) < .01 ? 'y' : 'x',
+          is = intersectLines(di.x, di.y, di1.x, di1.y, dj.x, dj.y, dj1.x, dj1.y);
+
+      if (is) {
+
+        if (xy[is.x.toFixed(0)] == is.y.toFixed(0)) {
+          continue;
+        }
+
+        xy[is.x.toFixed(0)] = is.y.toFixed(0);
+
+        var t1 = di.t + abs((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
+            t2 = dj.t + abs((is[cj] - dj[cj]) / (dj1[cj] - dj[cj])) * (dj1.t - dj.t);
+
+        if (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1) {
+
+          if (justCount) {
+            res++;
+          } else {
+            res.push({
+              x: is.x,
+              y: is.y,
+              t1: t1,
+              t2: t2
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return res;
+}
+
+
+/**
+ * Find or counts the intersections between two SVG paths.
+ *
+ * Returns a number in counting mode and a list of intersections otherwise.
+ *
+ * A single intersection entry contains the intersection coordinates (x, y)
+ * as well as additional information regarding the intersecting segments
+ * on each path (segment1, segment2) and the relative location of the
+ * intersection on these segments (t1, t2).
+ *
+ * The path may be an SVG path string or a list of path components
+ * such as `[ [ 'M', 0, 10 ], [ 'L', 20, 0 ] ]`.
+ *
+ * @example
+ *
+ * var intersections = findPathIntersections(
+ *   'M0,0L100,100',
+ *   [ [ 'M', 0, 100 ], [ 'L', 100, 0 ] ]
+ * );
+ *
+ * // intersections = [
+ * //   { x: 50, y: 50, segment1: 1, segment2: 1, t1: 0.5, t2: 0.5 }
+ * //
+ *
+ * @param {String|Array<PathDef>} path1
+ * @param {String|Array<PathDef>} path2
+ * @param {Boolean} [justCount=false]
+ *
+ * @return {Array<Intersection>|Number}
+ */
+function findPathIntersections(path1, path2, justCount) {
+  path1 = pathToCurve(path1);
+  path2 = pathToCurve(path2);
+
+  var x1, y1, x2, y2, x1m, y1m, x2m, y2m, bez1, bez2,
+      res = justCount ? 0 : [];
+
+  for (var i = 0, ii = path1.length; i < ii; i++) {
+    var pi = path1[i];
+
+    if (pi[0] == 'M') {
+      x1 = x1m = pi[1];
+      y1 = y1m = pi[2];
+    } else {
+
+      if (pi[0] == 'C') {
+        bez1 = [x1, y1].concat(pi.slice(1));
+        x1 = bez1[6];
+        y1 = bez1[7];
+      } else {
+        bez1 = [x1, y1, x1, y1, x1m, y1m, x1m, y1m];
+        x1 = x1m;
+        y1 = y1m;
+      }
+
+      for (var j = 0, jj = path2.length; j < jj; j++) {
+        var pj = path2[j];
+
+        if (pj[0] == 'M') {
+          x2 = x2m = pj[1];
+          y2 = y2m = pj[2];
+        } else {
+
+          if (pj[0] == 'C') {
+            bez2 = [x2, y2].concat(pj.slice(1));
+            x2 = bez2[6];
+            y2 = bez2[7];
+          } else {
+            bez2 = [x2, y2, x2, y2, x2m, y2m, x2m, y2m];
+            x2 = x2m;
+            y2 = y2m;
+          }
+
+          var intr = findBezierIntersections(bez1, bez2, justCount);
+
+          if (justCount) {
+            res += intr;
+          } else {
+
+            for (var k = 0, kk = intr.length; k < kk; k++) {
+              intr[k].segment1 = i;
+              intr[k].segment2 = j;
+              intr[k].bez1 = bez1;
+              intr[k].bez2 = bez2;
+            }
+
+            res = res.concat(intr);
+          }
+        }
+      }
+    }
+  }
+
+  return res;
+}
+
+
+function rectPath(x, y, w, h, r) {
+  if (r) {
+    return [
+      ['M', +x + (+r), y],
+      ['l', w - r * 2, 0],
+      ['a', r, r, 0, 0, 1, r, r],
+      ['l', 0, h - r * 2],
+      ['a', r, r, 0, 0, 1, -r, r],
+      ['l', r * 2 - w, 0],
+      ['a', r, r, 0, 0, 1, -r, -r],
+      ['l', 0, r * 2 - h],
+      ['a', r, r, 0, 0, 1, r, -r],
+      ['z']
+    ];
+  }
+
+  var res = [['M', x, y], ['l', w, 0], ['l', 0, h], ['l', -w, 0], ['z']];
+  res.toString = pathToString;
+
+  return res;
+}
+
+function ellipsePath(x, y, rx, ry, a) {
+  if (a == null && ry == null) {
+    ry = rx;
+  }
+
+  x = +x;
+  y = +y;
+  rx = +rx;
+  ry = +ry;
+
+  if (a != null) {
+    var rad = Math.PI / 180,
+        x1 = x + rx * Math.cos(-ry * rad),
+        x2 = x + rx * Math.cos(-a * rad),
+        y1 = y + rx * Math.sin(-ry * rad),
+        y2 = y + rx * Math.sin(-a * rad),
+        res = [['M', x1, y1], ['A', rx, rx, 0, +(a - ry > 180), 0, x2, y2]];
+  } else {
+    res = [
+      ['M', x, y],
+      ['m', 0, -ry],
+      ['a', rx, ry, 0, 1, 1, 0, 2 * ry],
+      ['a', rx, ry, 0, 1, 1, 0, -2 * ry],
+      ['z']
+    ];
+  }
+
+  res.toString = pathToString;
+
+  return res;
+}
+
+
+function pathToAbsolute(pathArray) {
+  var pth = paths(pathArray);
+
+  if (pth.abs) {
+    return pathClone(pth.abs);
+  }
+
+  if (!is(pathArray, 'array') || !is(pathArray && pathArray[0], 'array')) { // rough assumption
+    pathArray = parsePathString(pathArray);
+  }
+
+  if (!pathArray || !pathArray.length) {
+    return [['M', 0, 0]];
+  }
+
+  var res = [],
+      x = 0,
+      y = 0,
+      mx = 0,
+      my = 0,
+      start = 0,
+      pa0;
+
+  if (pathArray[0][0] == 'M') {
+    x = +pathArray[0][1];
+    y = +pathArray[0][2];
+    mx = x;
+    my = y;
+    start++;
+    res[0] = ['M', x, y];
+  }
+
+  var crz = pathArray.length == 3 &&
+      pathArray[0][0] == 'M' &&
+      pathArray[1][0].toUpperCase() == 'R' &&
+      pathArray[2][0].toUpperCase() == 'Z';
+
+  for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
+    res.push(r = []);
+    pa = pathArray[i];
+    pa0 = pa[0];
+
+    if (pa0 != pa0.toUpperCase()) {
+      r[0] = pa0.toUpperCase();
+
+      switch (r[0]) {
+      case 'A':
+        r[1] = pa[1];
+        r[2] = pa[2];
+        r[3] = pa[3];
+        r[4] = pa[4];
+        r[5] = pa[5];
+        r[6] = +pa[6] + x;
+        r[7] = +pa[7] + y;
+        break;
+      case 'V':
+        r[1] = +pa[1] + y;
+        break;
+      case 'H':
+        r[1] = +pa[1] + x;
+        break;
+      case 'R':
+        var dots = [x, y].concat(pa.slice(1));
+
+        for (var j = 2, jj = dots.length; j < jj; j++) {
+          dots[j] = +dots[j] + x;
+          dots[++j] = +dots[j] + y;
+        }
+
+        res.pop();
+        res = res.concat(catmulRomToBezier(dots, crz));
+        break;
+      case 'O':
+        res.pop();
+        dots = ellipsePath(x, y, pa[1], pa[2]);
+        dots.push(dots[0]);
+        res = res.concat(dots);
+        break;
+      case 'U':
+        res.pop();
+        res = res.concat(ellipsePath(x, y, pa[1], pa[2], pa[3]));
+        r = ['U'].concat(res[res.length - 1].slice(-2));
+        break;
+      case 'M':
+        mx = +pa[1] + x;
+        my = +pa[2] + y;
+      default:
+
+        for (j = 1, jj = pa.length; j < jj; j++) {
+          r[j] = +pa[j] + ((j % 2) ? x : y);
+        }
+      }
+    } else if (pa0 == 'R') {
+      dots = [x, y].concat(pa.slice(1));
+      res.pop();
+      res = res.concat(catmulRomToBezier(dots, crz));
+      r = ['R'].concat(pa.slice(-2));
+    } else if (pa0 == 'O') {
+      res.pop();
+      dots = ellipsePath(x, y, pa[1], pa[2]);
+      dots.push(dots[0]);
+      res = res.concat(dots);
+    } else if (pa0 == 'U') {
+      res.pop();
+      res = res.concat(ellipsePath(x, y, pa[1], pa[2], pa[3]));
+      r = ['U'].concat(res[res.length - 1].slice(-2));
+    } else {
+
+      for (var k = 0, kk = pa.length; k < kk; k++) {
+        r[k] = pa[k];
+      }
+    }
+    pa0 = pa0.toUpperCase();
+
+    if (pa0 != 'O') {
+      switch (r[0]) {
+      case 'Z':
+        x = +mx;
+        y = +my;
+        break;
+      case 'H':
+        x = r[1];
+        break;
+      case 'V':
+        y = r[1];
+        break;
+      case 'M':
+        mx = r[r.length - 2];
+        my = r[r.length - 1];
+      default:
+        x = r[r.length - 2];
+        y = r[r.length - 1];
+      }
+    }
+  }
+
+  res.toString = pathToString;
+  pth.abs = pathClone(res);
+
+  return res;
+}
+
+function lineToCurve(x1, y1, x2, y2) {
+  return [
+    x1, y1, x2,
+    y2, x2, y2
+  ];
+}
+
+function qubicToCurve(x1, y1, ax, ay, x2, y2) {
+  var _13 = 1 / 3,
+      _23 = 2 / 3;
+
+  return [
+    _13 * x1 + _23 * ax,
+    _13 * y1 + _23 * ay,
+    _13 * x2 + _23 * ax,
+    _13 * y2 + _23 * ay,
+    x2,
+    y2
+  ];
+}
+
+function arcToCurve(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
+
+  // for more information of where this math came from visit:
+  // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+  var _120 = PI * 120 / 180,
+      rad = PI / 180 * (+angle || 0),
+      res = [],
+      xy,
+      rotate = cacher(function(x, y, rad) {
+        var X = x * math.cos(rad) - y * math.sin(rad),
+            Y = x * math.sin(rad) + y * math.cos(rad);
+
+        return { x: X, y: Y };
+      });
+
+  if (!recursive) {
+    xy = rotate(x1, y1, -rad);
+    x1 = xy.x;
+    y1 = xy.y;
+    xy = rotate(x2, y2, -rad);
+    x2 = xy.x;
+    y2 = xy.y;
+
+    var x = (x1 - x2) / 2,
+        y = (y1 - y2) / 2;
+
+    var h = (x * x) / (rx * rx) + (y * y) / (ry * ry);
+
+    if (h > 1) {
+      h = math.sqrt(h);
+      rx = h * rx;
+      ry = h * ry;
+    }
+
+    var rx2 = rx * rx,
+        ry2 = ry * ry,
+        k = (large_arc_flag == sweep_flag ? -1 : 1) *
+            math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
+        cx = k * rx * y / ry + (x1 + x2) / 2,
+        cy = k * -ry * x / rx + (y1 + y2) / 2,
+        f1 = math.asin(((y1 - cy) / ry).toFixed(9)),
+        f2 = math.asin(((y2 - cy) / ry).toFixed(9));
+
+    f1 = x1 < cx ? PI - f1 : f1;
+    f2 = x2 < cx ? PI - f2 : f2;
+    f1 < 0 && (f1 = PI * 2 + f1);
+    f2 < 0 && (f2 = PI * 2 + f2);
+
+    if (sweep_flag && f1 > f2) {
+      f1 = f1 - PI * 2;
+    }
+    if (!sweep_flag && f2 > f1) {
+      f2 = f2 - PI * 2;
+    }
+  } else {
+    f1 = recursive[0];
+    f2 = recursive[1];
+    cx = recursive[2];
+    cy = recursive[3];
+  }
+
+  var df = f2 - f1;
+
+  if (abs(df) > _120) {
+    var f2old = f2,
+        x2old = x2,
+        y2old = y2;
+
+    f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
+    x2 = cx + rx * math.cos(f2);
+    y2 = cy + ry * math.sin(f2);
+    res = arcToCurve(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
+  }
+
+  df = f2 - f1;
+
+  var c1 = math.cos(f1),
+      s1 = math.sin(f1),
+      c2 = math.cos(f2),
+      s2 = math.sin(f2),
+      t = math.tan(df / 4),
+      hx = 4 / 3 * rx * t,
+      hy = 4 / 3 * ry * t,
+      m1 = [x1, y1],
+      m2 = [x1 + hx * s1, y1 - hy * c1],
+      m3 = [x2 + hx * s2, y2 - hy * c2],
+      m4 = [x2, y2];
+
+  m2[0] = 2 * m1[0] - m2[0];
+  m2[1] = 2 * m1[1] - m2[1];
+
+  if (recursive) {
+    return [m2, m3, m4].concat(res);
+  } else {
+    res = [m2, m3, m4].concat(res).join().split(',');
+    var newres = [];
+
+    for (var i = 0, ii = res.length; i < ii; i++) {
+      newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
+    }
+
+    return newres;
+  }
+}
+
+// http://schepers.cc/getting-to-the-point
+function catmulRomToBezier(crp, z) {
+  var d = [];
+
+  for (var i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2) {
+    var p = [
+      { x: +crp[i - 2], y: +crp[i - 1] },
+      { x: +crp[i], y: +crp[i + 1] },
+      { x: +crp[i + 2], y: +crp[i + 3] },
+      { x: +crp[i + 4], y: +crp[i + 5] }
+    ];
+
+    if (z) {
+
+      if (!i) {
+        p[0] = { x: +crp[iLen - 2], y: +crp[iLen - 1] };
+      } else if (iLen - 4 == i) {
+        p[3] = { x: +crp[0], y: +crp[1] };
+      } else if (iLen - 2 == i) {
+        p[2] = { x: +crp[0], y: +crp[1] };
+        p[3] = { x: +crp[2], y: +crp[3] };
+      }
+
+    } else {
+
+      if (iLen - 4 == i) {
+        p[3] = p[2];
+      } else if (!i) {
+        p[0] = { x: +crp[i], y: +crp[i + 1] };
+      }
+
+    }
+
+    d.push(['C',
+      (-p[0].x + 6 * p[1].x + p[2].x) / 6,
+      (-p[0].y + 6 * p[1].y + p[2].y) / 6,
+      (p[1].x + 6 * p[2].x - p[3].x) / 6,
+      (p[1].y + 6*p[2].y - p[3].y) / 6,
+      p[2].x,
+      p[2].y
+    ]);
+  }
+
+  return d;
+}
+
+// Returns bounding box of cubic bezier curve.
+// Source: http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
+// Original version: NISHIO Hirokazu
+// Modifications: https://github.com/timo22345
+function curveBBox(x0, y0, x1, y1, x2, y2, x3, y3) {
+  var tvalues = [],
+      bounds = [[], []],
+      a, b, c, t, t1, t2, b2ac, sqrtb2ac;
+
+  for (var i = 0; i < 2; ++i) {
+
+    if (i == 0) {
+      b = 6 * x0 - 12 * x1 + 6 * x2;
+      a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
+      c = 3 * x1 - 3 * x0;
+    } else {
+      b = 6 * y0 - 12 * y1 + 6 * y2;
+      a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
+      c = 3 * y1 - 3 * y0;
+    }
+
+    if (abs(a) < 1e-12) {
+
+      if (abs(b) < 1e-12) {
+        continue;
+      }
+
+      t = -c / b;
+
+      if (0 < t && t < 1) {
+        tvalues.push(t);
+      }
+
+      continue;
+    }
+
+    b2ac = b * b - 4 * c * a;
+    sqrtb2ac = math.sqrt(b2ac);
+
+    if (b2ac < 0) {
+      continue;
+    }
+
+    t1 = (-b + sqrtb2ac) / (2 * a);
+
+    if (0 < t1 && t1 < 1) {
+      tvalues.push(t1);
+    }
+
+    t2 = (-b - sqrtb2ac) / (2 * a);
+
+    if (0 < t2 && t2 < 1) {
+      tvalues.push(t2);
+    }
+  }
+
+  var j = tvalues.length,
+      jlen = j,
+      mt;
+
+  while (j--) {
+    t = tvalues[j];
+    mt = 1 - t;
+    bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
+    bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
+  }
+
+  bounds[0][jlen] = x0;
+  bounds[1][jlen] = y0;
+  bounds[0][jlen + 1] = x3;
+  bounds[1][jlen + 1] = y3;
+  bounds[0].length = bounds[1].length = jlen + 2;
+
+  return {
+    min: { x: mmin.apply(0, bounds[0]), y: mmin.apply(0, bounds[1]) },
+    max: { x: mmax.apply(0, bounds[0]), y: mmax.apply(0, bounds[1]) }
+  };
+}
+
+function pathToCurve(path, path2) {
+  var pth = !path2 && paths(path);
+
+  if (!path2 && pth.curve) {
+    return pathClone(pth.curve);
+  }
+
+  var p = pathToAbsolute(path),
+      p2 = path2 && pathToAbsolute(path2),
+      attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
+      attrs2 = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
+      processPath = function(path, d, pcom) {
+        var nx, ny;
+
+        if (!path) {
+          return ['C', d.x, d.y, d.x, d.y, d.x, d.y];
+        }
+
+        !(path[0] in { T: 1, Q: 1 }) && (d.qx = d.qy = null);
+
+        switch (path[0]) {
+        case 'M':
+          d.X = path[1];
+          d.Y = path[2];
+          break;
+        case 'A':
+          path = ['C'].concat(arcToCurve.apply(0, [d.x, d.y].concat(path.slice(1))));
+          break;
+        case 'S':
+          if (pcom == 'C' || pcom == 'S') {
+            // In 'S' case we have to take into account, if the previous command is C/S.
+            nx = d.x * 2 - d.bx;
+            // And reflect the previous
+            ny = d.y * 2 - d.by;
+            // command's control point relative to the current point.
+          }
+          else {
+            // or some else or nothing
+            nx = d.x;
+            ny = d.y;
+          }
+          path = ['C', nx, ny].concat(path.slice(1));
+          break;
+        case 'T':
+          if (pcom == 'Q' || pcom == 'T') {
+            // In 'T' case we have to take into account, if the previous command is Q/T.
+            d.qx = d.x * 2 - d.qx;
+            // And make a reflection similar
+            d.qy = d.y * 2 - d.qy;
+            // to case 'S'.
+          }
+          else {
+            // or something else or nothing
+            d.qx = d.x;
+            d.qy = d.y;
+          }
+          path = ['C'].concat(qubicToCurve(d.x, d.y, d.qx, d.qy, path[1], path[2]));
+          break;
+        case 'Q':
+          d.qx = path[1];
+          d.qy = path[2];
+          path = ['C'].concat(qubicToCurve(d.x, d.y, path[1], path[2], path[3], path[4]));
+          break;
+        case 'L':
+          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], path[2]));
+          break;
+        case 'H':
+          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], d.y));
+          break;
+        case 'V':
+          path = ['C'].concat(lineToCurve(d.x, d.y, d.x, path[1]));
+          break;
+        case 'Z':
+          path = ['C'].concat(lineToCurve(d.x, d.y, d.X, d.Y));
+          break;
+        }
+
+        return path;
+      },
+
+      fixArc = function(pp, i) {
+
+        if (pp[i].length > 7) {
+          pp[i].shift();
+          var pi = pp[i];
+
+          while (pi.length) {
+            pcoms1[i] = 'A'; // if created multiple C:s, their original seg is saved
+            p2 && (pcoms2[i] = 'A'); // the same as above
+            pp.splice(i++, 0, ['C'].concat(pi.splice(0, 6)));
+          }
+
+          pp.splice(i, 1);
+          ii = mmax(p.length, p2 && p2.length || 0);
+        }
+      },
+
+      fixM = function(path1, path2, a1, a2, i) {
+
+        if (path1 && path2 && path1[i][0] == 'M' && path2[i][0] != 'M') {
+          path2.splice(i, 0, ['M', a2.x, a2.y]);
+          a1.bx = 0;
+          a1.by = 0;
+          a1.x = path1[i][1];
+          a1.y = path1[i][2];
+          ii = mmax(p.length, p2 && p2.length || 0);
+        }
+      },
+
+      pcoms1 = [], // path commands of original path p
+      pcoms2 = [], // path commands of original path p2
+      pfirst = '', // temporary holder for original path command
+      pcom = ''; // holder for previous path command of original path
+
+  for (var i = 0, ii = mmax(p.length, p2 && p2.length || 0); i < ii; i++) {
+    p[i] && (pfirst = p[i][0]); // save current path command
+
+    if (pfirst != 'C') // C is not saved yet, because it may be result of conversion
+    {
+      pcoms1[i] = pfirst; // Save current path command
+      i && (pcom = pcoms1[i - 1]); // Get previous path command pcom
+    }
+    p[i] = processPath(p[i], attrs, pcom); // Previous path command is inputted to processPath
+
+    if (pcoms1[i] != 'A' && pfirst == 'C') pcoms1[i] = 'C'; // A is the only command
+    // which may produce multiple C:s
+    // so we have to make sure that C is also C in original path
+
+    fixArc(p, i); // fixArc adds also the right amount of A:s to pcoms1
+
+    if (p2) { // the same procedures is done to p2
+      p2[i] && (pfirst = p2[i][0]);
+
+      if (pfirst != 'C') {
+        pcoms2[i] = pfirst;
+        i && (pcom = pcoms2[i - 1]);
+      }
+
+      p2[i] = processPath(p2[i], attrs2, pcom);
+
+      if (pcoms2[i] != 'A' && pfirst == 'C') {
+        pcoms2[i] = 'C';
+      }
+
+      fixArc(p2, i);
+    }
+
+    fixM(p, p2, attrs, attrs2, i);
+    fixM(p2, p, attrs2, attrs, i);
+
+    var seg = p[i],
+        seg2 = p2 && p2[i],
+        seglen = seg.length,
+        seg2len = p2 && seg2.length;
+
+    attrs.x = seg[seglen - 2];
+    attrs.y = seg[seglen - 1];
+    attrs.bx = toFloat(seg[seglen - 4]) || attrs.x;
+    attrs.by = toFloat(seg[seglen - 3]) || attrs.y;
+    attrs2.bx = p2 && (toFloat(seg2[seg2len - 4]) || attrs2.x);
+    attrs2.by = p2 && (toFloat(seg2[seg2len - 3]) || attrs2.y);
+    attrs2.x = p2 && seg2[seg2len - 2];
+    attrs2.y = p2 && seg2[seg2len - 1];
+  }
+
+  if (!p2) {
+    pth.curve = pathClone(p);
+  }
+
+  return p2 ? [p, p2] : p;
+}
+
+module.exports = findPathIntersections;
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/index.js":
+/*!*******************************************!*\
+  !*** ./node_modules/bpmn-moddle/index.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_simple__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/simple */ "./node_modules/bpmn-moddle/lib/simple.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _lib_simple__WEBPACK_IMPORTED_MODULE_0__["default"]; });
+
+
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/lib/bpmn-moddle.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/bpmn-moddle/lib/bpmn-moddle.js ***!
+  \*****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BpmnModdle; });
+/* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
+/* harmony import */ var moddle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moddle */ "./node_modules/moddle/index.js");
+/* harmony import */ var moddle_xml__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moddle-xml */ "./node_modules/moddle-xml/index.js");
+
+
+
+
+
+
+
+/**
+ * A sub class of {@link Moddle} with support for import and export of BPMN 2.0 xml files.
+ *
+ * @class BpmnModdle
+ * @extends Moddle
+ *
+ * @param {Object|Array} packages to use for instantiating the model
+ * @param {Object} [options] additional options to pass over
+ */
+function BpmnModdle(packages, options) {
+  moddle__WEBPACK_IMPORTED_MODULE_1__["default"].call(this, packages, options);
+}
+
+BpmnModdle.prototype = Object.create(moddle__WEBPACK_IMPORTED_MODULE_1__["default"].prototype);
+
+
+/**
+ * Instantiates a BPMN model tree from a given xml string.
+ *
+ * @param {String}   xmlStr
+ * @param {String}   [typeName='bpmn:Definitions'] name of the root element
+ * @param {Object}   [options]  options to pass to the underlying reader
+ * @param {Function} done       callback that is invoked with (err, result, parseContext)
+ *                              once the import completes
+ */
+BpmnModdle.prototype.fromXML = function(xmlStr, typeName, options, done) {
+
+  if (!Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isString"])(typeName)) {
+    done = options;
+    options = typeName;
+    typeName = 'bpmn:Definitions';
+  }
+
+  if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(options)) {
+    done = options;
+    options = {};
+  }
+
+  var reader = new moddle_xml__WEBPACK_IMPORTED_MODULE_2__["Reader"](Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["assign"])({ model: this, lax: true }, options));
+  var rootHandler = reader.handler(typeName);
+
+  reader.fromXML(xmlStr, rootHandler, done);
+};
+
+
+/**
+ * Serializes a BPMN 2.0 object tree to XML.
+ *
+ * @param {String}   element    the root element, typically an instance of `bpmn:Definitions`
+ * @param {Object}   [options]  to pass to the underlying writer
+ * @param {Function} done       callback invoked with (err, xmlStr) once the import completes
+ */
+BpmnModdle.prototype.toXML = function(element, options, done) {
+
+  if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(options)) {
+    done = options;
+    options = {};
+  }
+
+  var writer = new moddle_xml__WEBPACK_IMPORTED_MODULE_2__["Writer"](options);
+
+  var result;
+  var err;
+
+  try {
+    result = writer.toXML(element);
+  } catch (e) {
+    err = e;
+  }
+
+  return done(err, result);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/lib/simple.js":
+/*!************************************************!*\
+  !*** ./node_modules/bpmn-moddle/lib/simple.js ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
+/* harmony import */ var _bpmn_moddle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bpmn-moddle */ "./node_modules/bpmn-moddle/lib/bpmn-moddle.js");
+/* harmony import */ var _resources_bpmn_json_bpmn_json__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../resources/bpmn/json/bpmn.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json");
+var _resources_bpmn_json_bpmn_json__WEBPACK_IMPORTED_MODULE_2___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/bpmn.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json", 1);
+/* harmony import */ var _resources_bpmn_json_bpmndi_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../resources/bpmn/json/bpmndi.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json");
+var _resources_bpmn_json_bpmndi_json__WEBPACK_IMPORTED_MODULE_3___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/bpmndi.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json", 1);
+/* harmony import */ var _resources_bpmn_json_dc_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../resources/bpmn/json/dc.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/dc.json");
+var _resources_bpmn_json_dc_json__WEBPACK_IMPORTED_MODULE_4___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/dc.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/dc.json", 1);
+/* harmony import */ var _resources_bpmn_json_di_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../resources/bpmn/json/di.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/di.json");
+var _resources_bpmn_json_di_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn/json/di.json */ "./node_modules/bpmn-moddle/resources/bpmn/json/di.json", 1);
+/* harmony import */ var _resources_bpmn_io_json_bioc_json__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../resources/bpmn-io/json/bioc.json */ "./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json");
+var _resources_bpmn_io_json_bioc_json__WEBPACK_IMPORTED_MODULE_6___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../resources/bpmn-io/json/bioc.json */ "./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json", 1);
+
+
+
+
+
+
+
+
+
+
+var packages = {
+  bpmn: _resources_bpmn_json_bpmn_json__WEBPACK_IMPORTED_MODULE_2__,
+  bpmndi: _resources_bpmn_json_bpmndi_json__WEBPACK_IMPORTED_MODULE_3__,
+  dc: _resources_bpmn_json_dc_json__WEBPACK_IMPORTED_MODULE_4__,
+  di: _resources_bpmn_json_di_json__WEBPACK_IMPORTED_MODULE_5__,
+  bioc: _resources_bpmn_io_json_bioc_json__WEBPACK_IMPORTED_MODULE_6__
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (function(additionalPackages, options) {
+  var pks = Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["assign"])({}, packages, additionalPackages);
+
+  return new _bpmn_moddle__WEBPACK_IMPORTED_MODULE_1__["default"](pks, options);
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json":
+/*!*******************************************************************!*\
+  !*** ./node_modules/bpmn-moddle/resources/bpmn-io/json/bioc.json ***!
+  \*******************************************************************/
+/*! exports provided: name, uri, prefix, types, enumerations, associations, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"name\":\"bpmn.io colors for BPMN\",\"uri\":\"http://bpmn.io/schema/bpmn/biocolor/1.0\",\"prefix\":\"bioc\",\"types\":[{\"name\":\"ColoredShape\",\"extends\":[\"bpmndi:BPMNShape\"],\"properties\":[{\"name\":\"stroke\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"fill\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ColoredEdge\",\"extends\":[\"bpmndi:BPMNEdge\"],\"properties\":[{\"name\":\"stroke\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"fill\",\"isAttr\":true,\"type\":\"String\"}]}],\"enumerations\":[],\"associations\":[]}");
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json":
+/*!****************************************************************!*\
+  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/bpmn.json ***!
+  \****************************************************************/
+/*! exports provided: name, uri, associations, types, enumerations, prefix, xml, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"name\":\"BPMN20\",\"uri\":\"http://www.omg.org/spec/BPMN/20100524/MODEL\",\"associations\":[],\"types\":[{\"name\":\"Interface\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"operations\",\"type\":\"Operation\",\"isMany\":true},{\"name\":\"implementationRef\",\"type\":\"String\",\"isAttr\":true}]},{\"name\":\"Operation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"inMessageRef\",\"type\":\"Message\",\"isReference\":true},{\"name\":\"outMessageRef\",\"type\":\"Message\",\"isReference\":true},{\"name\":\"errorRef\",\"type\":\"Error\",\"isMany\":true,\"isReference\":true},{\"name\":\"implementationRef\",\"type\":\"String\",\"isAttr\":true}]},{\"name\":\"EndPoint\",\"superClass\":[\"RootElement\"]},{\"name\":\"Auditing\",\"superClass\":[\"BaseElement\"]},{\"name\":\"GlobalTask\",\"superClass\":[\"CallableElement\"],\"properties\":[{\"name\":\"resources\",\"type\":\"ResourceRole\",\"isMany\":true}]},{\"name\":\"Monitoring\",\"superClass\":[\"BaseElement\"]},{\"name\":\"Performer\",\"superClass\":[\"ResourceRole\"]},{\"name\":\"Process\",\"superClass\":[\"FlowElementsContainer\",\"CallableElement\"],\"properties\":[{\"name\":\"processType\",\"type\":\"ProcessType\",\"isAttr\":true},{\"name\":\"isClosed\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"auditing\",\"type\":\"Auditing\"},{\"name\":\"monitoring\",\"type\":\"Monitoring\"},{\"name\":\"properties\",\"type\":\"Property\",\"isMany\":true},{\"name\":\"laneSets\",\"type\":\"LaneSet\",\"isMany\":true,\"replaces\":\"FlowElementsContainer#laneSets\"},{\"name\":\"flowElements\",\"type\":\"FlowElement\",\"isMany\":true,\"replaces\":\"FlowElementsContainer#flowElements\"},{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true},{\"name\":\"resources\",\"type\":\"ResourceRole\",\"isMany\":true},{\"name\":\"correlationSubscriptions\",\"type\":\"CorrelationSubscription\",\"isMany\":true},{\"name\":\"supports\",\"type\":\"Process\",\"isMany\":true,\"isReference\":true},{\"name\":\"definitionalCollaborationRef\",\"type\":\"Collaboration\",\"isAttr\":true,\"isReference\":true},{\"name\":\"isExecutable\",\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"LaneSet\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"lanes\",\"type\":\"Lane\",\"isMany\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Lane\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"partitionElementRef\",\"type\":\"BaseElement\",\"isAttr\":true,\"isReference\":true},{\"name\":\"partitionElement\",\"type\":\"BaseElement\"},{\"name\":\"flowNodeRef\",\"type\":\"FlowNode\",\"isMany\":true,\"isReference\":true},{\"name\":\"childLaneSet\",\"type\":\"LaneSet\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"GlobalManualTask\",\"superClass\":[\"GlobalTask\"]},{\"name\":\"ManualTask\",\"superClass\":[\"Task\"]},{\"name\":\"UserTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"renderings\",\"type\":\"Rendering\",\"isMany\":true},{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Rendering\",\"superClass\":[\"BaseElement\"]},{\"name\":\"HumanPerformer\",\"superClass\":[\"Performer\"]},{\"name\":\"PotentialOwner\",\"superClass\":[\"HumanPerformer\"]},{\"name\":\"GlobalUserTask\",\"superClass\":[\"GlobalTask\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"renderings\",\"type\":\"Rendering\",\"isMany\":true}]},{\"name\":\"Gateway\",\"isAbstract\":true,\"superClass\":[\"FlowNode\"],\"properties\":[{\"name\":\"gatewayDirection\",\"type\":\"GatewayDirection\",\"default\":\"Unspecified\",\"isAttr\":true}]},{\"name\":\"EventBasedGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"instantiate\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"eventGatewayType\",\"type\":\"EventBasedGatewayType\",\"isAttr\":true,\"default\":\"Exclusive\"}]},{\"name\":\"ComplexGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"activationCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ExclusiveGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"InclusiveGateway\",\"superClass\":[\"Gateway\"],\"properties\":[{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ParallelGateway\",\"superClass\":[\"Gateway\"]},{\"name\":\"RootElement\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"]},{\"name\":\"Relationship\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"type\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"direction\",\"type\":\"RelationshipDirection\",\"isAttr\":true},{\"name\":\"source\",\"isMany\":true,\"isReference\":true,\"type\":\"Element\"},{\"name\":\"target\",\"isMany\":true,\"isReference\":true,\"type\":\"Element\"}]},{\"name\":\"BaseElement\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"isAttr\":true,\"type\":\"String\",\"isId\":true},{\"name\":\"documentation\",\"type\":\"Documentation\",\"isMany\":true},{\"name\":\"extensionDefinitions\",\"type\":\"ExtensionDefinition\",\"isMany\":true,\"isReference\":true},{\"name\":\"extensionElements\",\"type\":\"ExtensionElements\"}]},{\"name\":\"Extension\",\"properties\":[{\"name\":\"mustUnderstand\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"definition\",\"type\":\"ExtensionDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ExtensionDefinition\",\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"extensionAttributeDefinitions\",\"type\":\"ExtensionAttributeDefinition\",\"isMany\":true}]},{\"name\":\"ExtensionAttributeDefinition\",\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"type\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isReference\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"extensionDefinition\",\"type\":\"ExtensionDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ExtensionElements\",\"properties\":[{\"name\":\"valueRef\",\"isAttr\":true,\"isReference\":true,\"type\":\"Element\"},{\"name\":\"values\",\"type\":\"Element\",\"isMany\":true},{\"name\":\"extensionAttributeDefinition\",\"type\":\"ExtensionAttributeDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Documentation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"text\",\"type\":\"String\",\"isBody\":true},{\"name\":\"textFormat\",\"default\":\"text/plain\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Event\",\"isAbstract\":true,\"superClass\":[\"FlowNode\",\"InteractionNode\"],\"properties\":[{\"name\":\"properties\",\"type\":\"Property\",\"isMany\":true}]},{\"name\":\"IntermediateCatchEvent\",\"superClass\":[\"CatchEvent\"]},{\"name\":\"IntermediateThrowEvent\",\"superClass\":[\"ThrowEvent\"]},{\"name\":\"EndEvent\",\"superClass\":[\"ThrowEvent\"]},{\"name\":\"StartEvent\",\"superClass\":[\"CatchEvent\"],\"properties\":[{\"name\":\"isInterrupting\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"ThrowEvent\",\"isAbstract\":true,\"superClass\":[\"Event\"],\"properties\":[{\"name\":\"dataInputs\",\"type\":\"DataInput\",\"isMany\":true},{\"name\":\"dataInputAssociations\",\"type\":\"DataInputAssociation\",\"isMany\":true},{\"name\":\"inputSet\",\"type\":\"InputSet\"},{\"name\":\"eventDefinitions\",\"type\":\"EventDefinition\",\"isMany\":true},{\"name\":\"eventDefinitionRef\",\"type\":\"EventDefinition\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"CatchEvent\",\"isAbstract\":true,\"superClass\":[\"Event\"],\"properties\":[{\"name\":\"parallelMultiple\",\"isAttr\":true,\"type\":\"Boolean\",\"default\":false},{\"name\":\"dataOutputs\",\"type\":\"DataOutput\",\"isMany\":true},{\"name\":\"dataOutputAssociations\",\"type\":\"DataOutputAssociation\",\"isMany\":true},{\"name\":\"outputSet\",\"type\":\"OutputSet\"},{\"name\":\"eventDefinitions\",\"type\":\"EventDefinition\",\"isMany\":true},{\"name\":\"eventDefinitionRef\",\"type\":\"EventDefinition\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"BoundaryEvent\",\"superClass\":[\"CatchEvent\"],\"properties\":[{\"name\":\"cancelActivity\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"attachedToRef\",\"type\":\"Activity\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"EventDefinition\",\"isAbstract\":true,\"superClass\":[\"RootElement\"]},{\"name\":\"CancelEventDefinition\",\"superClass\":[\"EventDefinition\"]},{\"name\":\"ErrorEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"errorRef\",\"type\":\"Error\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"TerminateEventDefinition\",\"superClass\":[\"EventDefinition\"]},{\"name\":\"EscalationEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"escalationRef\",\"type\":\"Escalation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Escalation\",\"properties\":[{\"name\":\"structureRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"escalationCode\",\"isAttr\":true,\"type\":\"String\"}],\"superClass\":[\"RootElement\"]},{\"name\":\"CompensateEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"waitForCompletion\",\"isAttr\":true,\"type\":\"Boolean\",\"default\":true},{\"name\":\"activityRef\",\"type\":\"Activity\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"TimerEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"timeDate\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"timeCycle\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"timeDuration\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"LinkEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"target\",\"type\":\"LinkEventDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"source\",\"type\":\"LinkEventDefinition\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"MessageEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ConditionalEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"condition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"SignalEventDefinition\",\"superClass\":[\"EventDefinition\"],\"properties\":[{\"name\":\"signalRef\",\"type\":\"Signal\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Signal\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"structureRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ImplicitThrowEvent\",\"superClass\":[\"ThrowEvent\"]},{\"name\":\"DataState\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ItemAwareElement\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"itemSubjectRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"dataState\",\"type\":\"DataState\"}]},{\"name\":\"DataAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"assignment\",\"type\":\"Assignment\",\"isMany\":true},{\"name\":\"sourceRef\",\"type\":\"ItemAwareElement\",\"isMany\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"ItemAwareElement\",\"isReference\":true},{\"name\":\"transformation\",\"type\":\"FormalExpression\",\"xml\":{\"serialize\":\"property\"}}]},{\"name\":\"DataInput\",\"superClass\":[\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"inputSetRef\",\"type\":\"InputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"inputSetWithOptional\",\"type\":\"InputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"inputSetWithWhileExecuting\",\"type\":\"InputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"DataOutput\",\"superClass\":[\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"outputSetRef\",\"type\":\"OutputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"outputSetWithOptional\",\"type\":\"OutputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"outputSetWithWhileExecuting\",\"type\":\"OutputSet\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"InputSet\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"dataInputRefs\",\"type\":\"DataInput\",\"isMany\":true,\"isReference\":true},{\"name\":\"optionalInputRefs\",\"type\":\"DataInput\",\"isMany\":true,\"isReference\":true},{\"name\":\"whileExecutingInputRefs\",\"type\":\"DataInput\",\"isMany\":true,\"isReference\":true},{\"name\":\"outputSetRefs\",\"type\":\"OutputSet\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"OutputSet\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"dataOutputRefs\",\"type\":\"DataOutput\",\"isMany\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"inputSetRefs\",\"type\":\"InputSet\",\"isMany\":true,\"isReference\":true},{\"name\":\"optionalOutputRefs\",\"type\":\"DataOutput\",\"isMany\":true,\"isReference\":true},{\"name\":\"whileExecutingOutputRefs\",\"type\":\"DataOutput\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"Property\",\"superClass\":[\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"DataInputAssociation\",\"superClass\":[\"DataAssociation\"]},{\"name\":\"DataOutputAssociation\",\"superClass\":[\"DataAssociation\"]},{\"name\":\"InputOutputSpecification\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"dataInputs\",\"type\":\"DataInput\",\"isMany\":true},{\"name\":\"dataOutputs\",\"type\":\"DataOutput\",\"isMany\":true},{\"name\":\"inputSets\",\"type\":\"InputSet\",\"isMany\":true},{\"name\":\"outputSets\",\"type\":\"OutputSet\",\"isMany\":true}]},{\"name\":\"DataObject\",\"superClass\":[\"FlowElement\",\"ItemAwareElement\"],\"properties\":[{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"InputOutputBinding\",\"properties\":[{\"name\":\"inputDataRef\",\"type\":\"InputSet\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outputDataRef\",\"type\":\"OutputSet\",\"isAttr\":true,\"isReference\":true},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Assignment\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"from\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"to\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"DataStore\",\"superClass\":[\"RootElement\",\"ItemAwareElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"capacity\",\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"isUnlimited\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"DataStoreReference\",\"superClass\":[\"ItemAwareElement\",\"FlowElement\"],\"properties\":[{\"name\":\"dataStoreRef\",\"type\":\"DataStore\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"DataObjectReference\",\"superClass\":[\"ItemAwareElement\",\"FlowElement\"],\"properties\":[{\"name\":\"dataObjectRef\",\"type\":\"DataObject\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ConversationLink\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"sourceRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ConversationAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"innerConversationNodeRef\",\"type\":\"ConversationNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outerConversationNodeRef\",\"type\":\"ConversationNode\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"CallConversation\",\"superClass\":[\"ConversationNode\"],\"properties\":[{\"name\":\"calledCollaborationRef\",\"type\":\"Collaboration\",\"isAttr\":true,\"isReference\":true},{\"name\":\"participantAssociations\",\"type\":\"ParticipantAssociation\",\"isMany\":true}]},{\"name\":\"Conversation\",\"superClass\":[\"ConversationNode\"]},{\"name\":\"SubConversation\",\"superClass\":[\"ConversationNode\"],\"properties\":[{\"name\":\"conversationNodes\",\"type\":\"ConversationNode\",\"isMany\":true}]},{\"name\":\"ConversationNode\",\"isAbstract\":true,\"superClass\":[\"InteractionNode\",\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true},{\"name\":\"messageFlowRefs\",\"type\":\"MessageFlow\",\"isMany\":true,\"isReference\":true},{\"name\":\"correlationKeys\",\"type\":\"CorrelationKey\",\"isMany\":true}]},{\"name\":\"GlobalConversation\",\"superClass\":[\"Collaboration\"]},{\"name\":\"PartnerEntity\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"PartnerRole\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"CorrelationProperty\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"correlationPropertyRetrievalExpression\",\"type\":\"CorrelationPropertyRetrievalExpression\",\"isMany\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"type\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Error\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"structureRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"errorCode\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"CorrelationKey\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"correlationPropertyRef\",\"type\":\"CorrelationProperty\",\"isMany\":true,\"isReference\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Expression\",\"superClass\":[\"BaseElement\"],\"isAbstract\":false,\"properties\":[{\"name\":\"body\",\"type\":\"String\",\"isBody\":true}]},{\"name\":\"FormalExpression\",\"superClass\":[\"Expression\"],\"properties\":[{\"name\":\"language\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"evaluatesToTypeRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Message\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"itemRef\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ItemDefinition\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"itemKind\",\"type\":\"ItemKind\",\"isAttr\":true},{\"name\":\"structureRef\",\"type\":\"String\",\"isAttr\":true},{\"name\":\"isCollection\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"import\",\"type\":\"Import\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"FlowElement\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"auditing\",\"type\":\"Auditing\"},{\"name\":\"monitoring\",\"type\":\"Monitoring\"},{\"name\":\"categoryValueRef\",\"type\":\"CategoryValue\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"SequenceFlow\",\"superClass\":[\"FlowElement\"],\"properties\":[{\"name\":\"isImmediate\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"conditionExpression\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"sourceRef\",\"type\":\"FlowNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"FlowNode\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"FlowElementsContainer\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"laneSets\",\"type\":\"LaneSet\",\"isMany\":true},{\"name\":\"flowElements\",\"type\":\"FlowElement\",\"isMany\":true}]},{\"name\":\"CallableElement\",\"isAbstract\":true,\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"ioSpecification\",\"type\":\"InputOutputSpecification\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"supportedInterfaceRef\",\"type\":\"Interface\",\"isMany\":true,\"isReference\":true},{\"name\":\"ioBinding\",\"type\":\"InputOutputBinding\",\"isMany\":true,\"xml\":{\"serialize\":\"property\"}}]},{\"name\":\"FlowNode\",\"isAbstract\":true,\"superClass\":[\"FlowElement\"],\"properties\":[{\"name\":\"incoming\",\"type\":\"SequenceFlow\",\"isMany\":true,\"isReference\":true},{\"name\":\"outgoing\",\"type\":\"SequenceFlow\",\"isMany\":true,\"isReference\":true},{\"name\":\"lanes\",\"type\":\"Lane\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"CorrelationPropertyRetrievalExpression\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"messagePath\",\"type\":\"FormalExpression\"},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"CorrelationPropertyBinding\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"dataPath\",\"type\":\"FormalExpression\"},{\"name\":\"correlationPropertyRef\",\"type\":\"CorrelationProperty\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Resource\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"resourceParameters\",\"type\":\"ResourceParameter\",\"isMany\":true}]},{\"name\":\"ResourceParameter\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isRequired\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"type\",\"type\":\"ItemDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"CorrelationSubscription\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"correlationKeyRef\",\"type\":\"CorrelationKey\",\"isAttr\":true,\"isReference\":true},{\"name\":\"correlationPropertyBinding\",\"type\":\"CorrelationPropertyBinding\",\"isMany\":true}]},{\"name\":\"MessageFlow\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"sourceRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"InteractionNode\",\"isAttr\":true,\"isReference\":true},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"MessageFlowAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"innerMessageFlowRef\",\"type\":\"MessageFlow\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outerMessageFlowRef\",\"type\":\"MessageFlow\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"InteractionNode\",\"isAbstract\":true,\"properties\":[{\"name\":\"incomingConversationLinks\",\"type\":\"ConversationLink\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"outgoingConversationLinks\",\"type\":\"ConversationLink\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true}]},{\"name\":\"Participant\",\"superClass\":[\"InteractionNode\",\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"interfaceRef\",\"type\":\"Interface\",\"isMany\":true,\"isReference\":true},{\"name\":\"participantMultiplicity\",\"type\":\"ParticipantMultiplicity\"},{\"name\":\"endPointRefs\",\"type\":\"EndPoint\",\"isMany\":true,\"isReference\":true},{\"name\":\"processRef\",\"type\":\"Process\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ParticipantAssociation\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"innerParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true},{\"name\":\"outerParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ParticipantMultiplicity\",\"properties\":[{\"name\":\"minimum\",\"default\":0,\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"maximum\",\"default\":1,\"isAttr\":true,\"type\":\"Integer\"}],\"superClass\":[\"BaseElement\"]},{\"name\":\"Collaboration\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"isClosed\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"participants\",\"type\":\"Participant\",\"isMany\":true},{\"name\":\"messageFlows\",\"type\":\"MessageFlow\",\"isMany\":true},{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true},{\"name\":\"conversations\",\"type\":\"ConversationNode\",\"isMany\":true},{\"name\":\"conversationAssociations\",\"type\":\"ConversationAssociation\"},{\"name\":\"participantAssociations\",\"type\":\"ParticipantAssociation\",\"isMany\":true},{\"name\":\"messageFlowAssociations\",\"type\":\"MessageFlowAssociation\",\"isMany\":true},{\"name\":\"correlationKeys\",\"type\":\"CorrelationKey\",\"isMany\":true},{\"name\":\"choreographyRef\",\"type\":\"Choreography\",\"isMany\":true,\"isReference\":true},{\"name\":\"conversationLinks\",\"type\":\"ConversationLink\",\"isMany\":true}]},{\"name\":\"ChoreographyActivity\",\"isAbstract\":true,\"superClass\":[\"FlowNode\"],\"properties\":[{\"name\":\"participantRef\",\"type\":\"Participant\",\"isMany\":true,\"isReference\":true},{\"name\":\"initiatingParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true},{\"name\":\"correlationKeys\",\"type\":\"CorrelationKey\",\"isMany\":true},{\"name\":\"loopType\",\"type\":\"ChoreographyLoopType\",\"default\":\"None\",\"isAttr\":true}]},{\"name\":\"CallChoreography\",\"superClass\":[\"ChoreographyActivity\"],\"properties\":[{\"name\":\"calledChoreographyRef\",\"type\":\"Choreography\",\"isAttr\":true,\"isReference\":true},{\"name\":\"participantAssociations\",\"type\":\"ParticipantAssociation\",\"isMany\":true}]},{\"name\":\"SubChoreography\",\"superClass\":[\"ChoreographyActivity\",\"FlowElementsContainer\"],\"properties\":[{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true}]},{\"name\":\"ChoreographyTask\",\"superClass\":[\"ChoreographyActivity\"],\"properties\":[{\"name\":\"messageFlowRef\",\"type\":\"MessageFlow\",\"isMany\":true,\"isReference\":true}]},{\"name\":\"Choreography\",\"superClass\":[\"Collaboration\",\"FlowElementsContainer\"]},{\"name\":\"GlobalChoreographyTask\",\"superClass\":[\"Choreography\"],\"properties\":[{\"name\":\"initiatingParticipantRef\",\"type\":\"Participant\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"TextAnnotation\",\"superClass\":[\"Artifact\"],\"properties\":[{\"name\":\"text\",\"type\":\"String\"},{\"name\":\"textFormat\",\"default\":\"text/plain\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Group\",\"superClass\":[\"Artifact\"],\"properties\":[{\"name\":\"categoryValueRef\",\"type\":\"CategoryValue\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Association\",\"superClass\":[\"Artifact\"],\"properties\":[{\"name\":\"associationDirection\",\"type\":\"AssociationDirection\",\"isAttr\":true},{\"name\":\"sourceRef\",\"type\":\"BaseElement\",\"isAttr\":true,\"isReference\":true},{\"name\":\"targetRef\",\"type\":\"BaseElement\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"Category\",\"superClass\":[\"RootElement\"],\"properties\":[{\"name\":\"categoryValue\",\"type\":\"CategoryValue\",\"isMany\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Artifact\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"]},{\"name\":\"CategoryValue\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"categorizedFlowElements\",\"type\":\"FlowElement\",\"isVirtual\":true,\"isMany\":true,\"isReference\":true},{\"name\":\"value\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Activity\",\"isAbstract\":true,\"superClass\":[\"FlowNode\"],\"properties\":[{\"name\":\"isForCompensation\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"default\",\"type\":\"SequenceFlow\",\"isAttr\":true,\"isReference\":true},{\"name\":\"ioSpecification\",\"type\":\"InputOutputSpecification\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"boundaryEventRefs\",\"type\":\"BoundaryEvent\",\"isMany\":true,\"isReference\":true},{\"name\":\"properties\",\"type\":\"Property\",\"isMany\":true},{\"name\":\"dataInputAssociations\",\"type\":\"DataInputAssociation\",\"isMany\":true},{\"name\":\"dataOutputAssociations\",\"type\":\"DataOutputAssociation\",\"isMany\":true},{\"name\":\"startQuantity\",\"default\":1,\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"resources\",\"type\":\"ResourceRole\",\"isMany\":true},{\"name\":\"completionQuantity\",\"default\":1,\"isAttr\":true,\"type\":\"Integer\"},{\"name\":\"loopCharacteristics\",\"type\":\"LoopCharacteristics\"}]},{\"name\":\"ServiceTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"SubProcess\",\"superClass\":[\"Activity\",\"FlowElementsContainer\",\"InteractionNode\"],\"properties\":[{\"name\":\"triggeredByEvent\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"artifacts\",\"type\":\"Artifact\",\"isMany\":true}]},{\"name\":\"LoopCharacteristics\",\"isAbstract\":true,\"superClass\":[\"BaseElement\"]},{\"name\":\"MultiInstanceLoopCharacteristics\",\"superClass\":[\"LoopCharacteristics\"],\"properties\":[{\"name\":\"isSequential\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"behavior\",\"type\":\"MultiInstanceBehavior\",\"default\":\"All\",\"isAttr\":true},{\"name\":\"loopCardinality\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"loopDataInputRef\",\"type\":\"ItemAwareElement\",\"isReference\":true},{\"name\":\"loopDataOutputRef\",\"type\":\"ItemAwareElement\",\"isReference\":true},{\"name\":\"inputDataItem\",\"type\":\"DataInput\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"outputDataItem\",\"type\":\"DataOutput\",\"xml\":{\"serialize\":\"property\"}},{\"name\":\"complexBehaviorDefinition\",\"type\":\"ComplexBehaviorDefinition\",\"isMany\":true},{\"name\":\"completionCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"oneBehaviorEventRef\",\"type\":\"EventDefinition\",\"isAttr\":true,\"isReference\":true},{\"name\":\"noneBehaviorEventRef\",\"type\":\"EventDefinition\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"StandardLoopCharacteristics\",\"superClass\":[\"LoopCharacteristics\"],\"properties\":[{\"name\":\"testBefore\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"loopCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"loopMaximum\",\"type\":\"Integer\",\"isAttr\":true}]},{\"name\":\"CallActivity\",\"superClass\":[\"Activity\"],\"properties\":[{\"name\":\"calledElement\",\"type\":\"String\",\"isAttr\":true}]},{\"name\":\"Task\",\"superClass\":[\"Activity\",\"InteractionNode\"]},{\"name\":\"SendTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ReceiveTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"instantiate\",\"default\":false,\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"operationRef\",\"type\":\"Operation\",\"isAttr\":true,\"isReference\":true},{\"name\":\"messageRef\",\"type\":\"Message\",\"isAttr\":true,\"isReference\":true}]},{\"name\":\"ScriptTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"scriptFormat\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"script\",\"type\":\"String\"}]},{\"name\":\"BusinessRuleTask\",\"superClass\":[\"Task\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"AdHocSubProcess\",\"superClass\":[\"SubProcess\"],\"properties\":[{\"name\":\"completionCondition\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"ordering\",\"type\":\"AdHocOrdering\",\"isAttr\":true},{\"name\":\"cancelRemainingInstances\",\"default\":true,\"isAttr\":true,\"type\":\"Boolean\"}]},{\"name\":\"Transaction\",\"superClass\":[\"SubProcess\"],\"properties\":[{\"name\":\"protocol\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"method\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"GlobalScriptTask\",\"superClass\":[\"GlobalTask\"],\"properties\":[{\"name\":\"scriptLanguage\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"script\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"GlobalBusinessRuleTask\",\"superClass\":[\"GlobalTask\"],\"properties\":[{\"name\":\"implementation\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ComplexBehaviorDefinition\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"condition\",\"type\":\"FormalExpression\"},{\"name\":\"event\",\"type\":\"ImplicitThrowEvent\"}]},{\"name\":\"ResourceRole\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"resourceRef\",\"type\":\"Resource\",\"isReference\":true},{\"name\":\"resourceParameterBindings\",\"type\":\"ResourceParameterBinding\",\"isMany\":true},{\"name\":\"resourceAssignmentExpression\",\"type\":\"ResourceAssignmentExpression\"},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"ResourceParameterBinding\",\"properties\":[{\"name\":\"expression\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}},{\"name\":\"parameterRef\",\"type\":\"ResourceParameter\",\"isAttr\":true,\"isReference\":true}],\"superClass\":[\"BaseElement\"]},{\"name\":\"ResourceAssignmentExpression\",\"properties\":[{\"name\":\"expression\",\"type\":\"Expression\",\"xml\":{\"serialize\":\"xsi:type\"}}],\"superClass\":[\"BaseElement\"]},{\"name\":\"Import\",\"properties\":[{\"name\":\"importType\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"location\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"namespace\",\"isAttr\":true,\"type\":\"String\"}]},{\"name\":\"Definitions\",\"superClass\":[\"BaseElement\"],\"properties\":[{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"targetNamespace\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"expressionLanguage\",\"default\":\"http://www.w3.org/1999/XPath\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"typeLanguage\",\"default\":\"http://www.w3.org/2001/XMLSchema\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"imports\",\"type\":\"Import\",\"isMany\":true},{\"name\":\"extensions\",\"type\":\"Extension\",\"isMany\":true},{\"name\":\"rootElements\",\"type\":\"RootElement\",\"isMany\":true},{\"name\":\"diagrams\",\"isMany\":true,\"type\":\"bpmndi:BPMNDiagram\"},{\"name\":\"exporter\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"relationships\",\"type\":\"Relationship\",\"isMany\":true},{\"name\":\"exporterVersion\",\"isAttr\":true,\"type\":\"String\"}]}],\"enumerations\":[{\"name\":\"ProcessType\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"Public\"},{\"name\":\"Private\"}]},{\"name\":\"GatewayDirection\",\"literalValues\":[{\"name\":\"Unspecified\"},{\"name\":\"Converging\"},{\"name\":\"Diverging\"},{\"name\":\"Mixed\"}]},{\"name\":\"EventBasedGatewayType\",\"literalValues\":[{\"name\":\"Parallel\"},{\"name\":\"Exclusive\"}]},{\"name\":\"RelationshipDirection\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"Forward\"},{\"name\":\"Backward\"},{\"name\":\"Both\"}]},{\"name\":\"ItemKind\",\"literalValues\":[{\"name\":\"Physical\"},{\"name\":\"Information\"}]},{\"name\":\"ChoreographyLoopType\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"Standard\"},{\"name\":\"MultiInstanceSequential\"},{\"name\":\"MultiInstanceParallel\"}]},{\"name\":\"AssociationDirection\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"One\"},{\"name\":\"Both\"}]},{\"name\":\"MultiInstanceBehavior\",\"literalValues\":[{\"name\":\"None\"},{\"name\":\"One\"},{\"name\":\"All\"},{\"name\":\"Complex\"}]},{\"name\":\"AdHocOrdering\",\"literalValues\":[{\"name\":\"Parallel\"},{\"name\":\"Sequential\"}]}],\"prefix\":\"bpmn\",\"xml\":{\"tagAlias\":\"lowerCase\",\"typePrefix\":\"t\"}}");
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json":
+/*!******************************************************************!*\
+  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/bpmndi.json ***!
+  \******************************************************************/
+/*! exports provided: name, uri, types, enumerations, associations, prefix, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"name\":\"BPMNDI\",\"uri\":\"http://www.omg.org/spec/BPMN/20100524/DI\",\"types\":[{\"name\":\"BPMNDiagram\",\"properties\":[{\"name\":\"plane\",\"type\":\"BPMNPlane\",\"redefines\":\"di:Diagram#rootElement\"},{\"name\":\"labelStyle\",\"type\":\"BPMNLabelStyle\",\"isMany\":true}],\"superClass\":[\"di:Diagram\"]},{\"name\":\"BPMNPlane\",\"properties\":[{\"name\":\"bpmnElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"bpmn:BaseElement\",\"redefines\":\"di:DiagramElement#modelElement\"}],\"superClass\":[\"di:Plane\"]},{\"name\":\"BPMNShape\",\"properties\":[{\"name\":\"bpmnElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"bpmn:BaseElement\",\"redefines\":\"di:DiagramElement#modelElement\"},{\"name\":\"isHorizontal\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"isExpanded\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"isMarkerVisible\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"label\",\"type\":\"BPMNLabel\"},{\"name\":\"isMessageVisible\",\"isAttr\":true,\"type\":\"Boolean\"},{\"name\":\"participantBandKind\",\"type\":\"ParticipantBandKind\",\"isAttr\":true},{\"name\":\"choreographyActivityShape\",\"type\":\"BPMNShape\",\"isAttr\":true,\"isReference\":true}],\"superClass\":[\"di:LabeledShape\"]},{\"name\":\"BPMNEdge\",\"properties\":[{\"name\":\"label\",\"type\":\"BPMNLabel\"},{\"name\":\"bpmnElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"bpmn:BaseElement\",\"redefines\":\"di:DiagramElement#modelElement\"},{\"name\":\"sourceElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"di:DiagramElement\",\"redefines\":\"di:Edge#source\"},{\"name\":\"targetElement\",\"isAttr\":true,\"isReference\":true,\"type\":\"di:DiagramElement\",\"redefines\":\"di:Edge#target\"},{\"name\":\"messageVisibleKind\",\"type\":\"MessageVisibleKind\",\"isAttr\":true,\"default\":\"initiating\"}],\"superClass\":[\"di:LabeledEdge\"]},{\"name\":\"BPMNLabel\",\"properties\":[{\"name\":\"labelStyle\",\"type\":\"BPMNLabelStyle\",\"isAttr\":true,\"isReference\":true,\"redefines\":\"di:DiagramElement#style\"}],\"superClass\":[\"di:Label\"]},{\"name\":\"BPMNLabelStyle\",\"properties\":[{\"name\":\"font\",\"type\":\"dc:Font\"}],\"superClass\":[\"di:Style\"]}],\"enumerations\":[{\"name\":\"ParticipantBandKind\",\"literalValues\":[{\"name\":\"top_initiating\"},{\"name\":\"middle_initiating\"},{\"name\":\"bottom_initiating\"},{\"name\":\"top_non_initiating\"},{\"name\":\"middle_non_initiating\"},{\"name\":\"bottom_non_initiating\"}]},{\"name\":\"MessageVisibleKind\",\"literalValues\":[{\"name\":\"initiating\"},{\"name\":\"non_initiating\"}]}],\"associations\":[],\"prefix\":\"bpmndi\"}");
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/dc.json":
+/*!**************************************************************!*\
+  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/dc.json ***!
+  \**************************************************************/
+/*! exports provided: name, uri, types, prefix, associations, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"name\":\"DC\",\"uri\":\"http://www.omg.org/spec/DD/20100524/DC\",\"types\":[{\"name\":\"Boolean\"},{\"name\":\"Integer\"},{\"name\":\"Real\"},{\"name\":\"String\"},{\"name\":\"Font\",\"properties\":[{\"name\":\"name\",\"type\":\"String\",\"isAttr\":true},{\"name\":\"size\",\"type\":\"Real\",\"isAttr\":true},{\"name\":\"isBold\",\"type\":\"Boolean\",\"isAttr\":true},{\"name\":\"isItalic\",\"type\":\"Boolean\",\"isAttr\":true},{\"name\":\"isUnderline\",\"type\":\"Boolean\",\"isAttr\":true},{\"name\":\"isStrikeThrough\",\"type\":\"Boolean\",\"isAttr\":true}]},{\"name\":\"Point\",\"properties\":[{\"name\":\"x\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true},{\"name\":\"y\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true}]},{\"name\":\"Bounds\",\"properties\":[{\"name\":\"x\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true},{\"name\":\"y\",\"type\":\"Real\",\"default\":\"0\",\"isAttr\":true},{\"name\":\"width\",\"type\":\"Real\",\"isAttr\":true},{\"name\":\"height\",\"type\":\"Real\",\"isAttr\":true}]}],\"prefix\":\"dc\",\"associations\":[]}");
+
+/***/ }),
+
+/***/ "./node_modules/bpmn-moddle/resources/bpmn/json/di.json":
+/*!**************************************************************!*\
+  !*** ./node_modules/bpmn-moddle/resources/bpmn/json/di.json ***!
+  \**************************************************************/
+/*! exports provided: name, uri, types, associations, prefix, xml, default */
+/***/ (function(module) {
+
+module.exports = JSON.parse("{\"name\":\"DI\",\"uri\":\"http://www.omg.org/spec/DD/20100524/DI\",\"types\":[{\"name\":\"DiagramElement\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"type\":\"String\",\"isAttr\":true,\"isId\":true},{\"name\":\"extension\",\"type\":\"Extension\"},{\"name\":\"owningDiagram\",\"type\":\"Diagram\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"owningElement\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"modelElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true,\"type\":\"Element\"},{\"name\":\"style\",\"type\":\"Style\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"ownedElement\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"Node\",\"isAbstract\":true,\"superClass\":[\"DiagramElement\"]},{\"name\":\"Edge\",\"isAbstract\":true,\"superClass\":[\"DiagramElement\"],\"properties\":[{\"name\":\"source\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"target\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true,\"isReference\":true},{\"name\":\"waypoint\",\"isUnique\":false,\"isMany\":true,\"type\":\"dc:Point\",\"xml\":{\"serialize\":\"xsi:type\"}}]},{\"name\":\"Diagram\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"type\":\"String\",\"isAttr\":true,\"isId\":true},{\"name\":\"rootElement\",\"type\":\"DiagramElement\",\"isReadOnly\":true,\"isVirtual\":true},{\"name\":\"name\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"documentation\",\"isAttr\":true,\"type\":\"String\"},{\"name\":\"resolution\",\"isAttr\":true,\"type\":\"Real\"},{\"name\":\"ownedStyle\",\"type\":\"Style\",\"isReadOnly\":true,\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"Shape\",\"isAbstract\":true,\"superClass\":[\"Node\"],\"properties\":[{\"name\":\"bounds\",\"type\":\"dc:Bounds\"}]},{\"name\":\"Plane\",\"isAbstract\":true,\"superClass\":[\"Node\"],\"properties\":[{\"name\":\"planeElement\",\"type\":\"DiagramElement\",\"subsettedProperty\":\"DiagramElement-ownedElement\",\"isMany\":true}]},{\"name\":\"LabeledEdge\",\"isAbstract\":true,\"superClass\":[\"Edge\"],\"properties\":[{\"name\":\"ownedLabel\",\"type\":\"Label\",\"isReadOnly\":true,\"subsettedProperty\":\"DiagramElement-ownedElement\",\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"LabeledShape\",\"isAbstract\":true,\"superClass\":[\"Shape\"],\"properties\":[{\"name\":\"ownedLabel\",\"type\":\"Label\",\"isReadOnly\":true,\"subsettedProperty\":\"DiagramElement-ownedElement\",\"isVirtual\":true,\"isMany\":true}]},{\"name\":\"Label\",\"isAbstract\":true,\"superClass\":[\"Node\"],\"properties\":[{\"name\":\"bounds\",\"type\":\"dc:Bounds\"}]},{\"name\":\"Style\",\"isAbstract\":true,\"properties\":[{\"name\":\"id\",\"type\":\"String\",\"isAttr\":true,\"isId\":true}]},{\"name\":\"Extension\",\"properties\":[{\"name\":\"values\",\"type\":\"Element\",\"isMany\":true}]}],\"associations\":[],\"prefix\":\"di\",\"xml\":{\"tagAlias\":\"lowerCase\"}}");
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./app/properties-panel/PropertiesView.css":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./app/properties-panel/PropertiesView.css ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
+// Module
+exports.push([module.i, ".element-properties label {\n  font-weight: bold;\n}\n\n.element-properties label:after {\n  content: ': ';\n}\n\n.element-properties button + button {\n  margin-left: 10px;\n}", ""]);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/ButtonSuggest/suggest.css":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/ButtonSuggest/suggest.css ***!
+  \*****************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
+// Module
+exports.push([module.i, "textarea {\n    float: left;\n    width: 100%;\n    height: 120px;\n    max-width: 100%;\n    border: 0;\n    margin: 0;\n    margin-top: -0.6em;\n    margin-bottom: -0.6em;\n    margin-left: -1em;\n    padding: 0;\n    display: block;\n    background: #e7ffcc;\n    color: #1c1c1c;\n    font-family: Arial, Helvetica, sans-serif;\n}\n\n.suggestButton {\n    justify-content: space-between;\n    color: rgb(51, 51, 51);\n    background-color: #cee9cd;\n    transition: 0.3s;\n\n    font-family: Arial, Helvetica, sans-serif;\n    font-size: 100%;\n}", ""]);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/DropZone/DropZone.css":
+/*!*************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./app/properties-panel/fields/DropZone/DropZone.css ***!
+  \*************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
+// Module
+exports.push([module.i, ".dropzone {\n    background-color: #FFF5EE;\n    box-shadow: 0 0 5px 1px #ccc;\n    border-radius: 8px;\n    border: 3px dashed #c0c0c0;\n    color: rgb(65, 45, 20);\n    text-align: center;\n    font-weight: bold;\n}", ""]);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/@pathofdev/react-tag-input/build/index.css":
+/*!*******************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/@pathofdev/react-tag-input/build/index.css ***!
+  \*******************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js")(false);
+// Module
+exports.push([module.i, ".react-tag-input{box-sizing:border-box;position:relative;width:100%;height:auto;min-height:2.375em;padding:.1875em .375em;overflow-y:auto;display:flex;flex-wrap:wrap;align-items:center;font-size:1rem;background:#fff;color:#333;border:1px solid #e1e1e1;border-radius:3px}.react-tag-input *{box-sizing:border-box}.react-tag-input>*{margin:.1875em}.react-tag-input__input{width:auto;flex-grow:1;height:1.875em;padding:0 0 0 .1875em;margin:0 .1875em;font-size:1em;line-height:1;background:transparent;color:#333;border:none;border-radius:3px;outline:0;box-shadow:none;-webkit-appearance:none}.react-tag-input__input::placeholder,.react-tag-input__input:-moz-placeholder,.react-tag-input__input:-ms-input-placeholder,.react-tag-input__input::-moz-placeholder,.react-tag-input__input::-webkit-input-placeholder{color:#333}.react-tag-input__input:focus{border:none}.react-tag-input__tag{position:relative;display:flex;align-items:center;font-size:.85em;line-height:1;background:#e1e1e1;border-radius:3px}.react-tag-input__tag__content{outline:0;border:none;white-space:nowrap;padding:0 .46875em}.react-tag-input__tag__remove{position:relative;height:2em;width:2em;font-size:.85em;cursor:pointer;background:#d4d4d4;border-top-right-radius:3px;border-bottom-right-radius:3px}.react-tag-input__tag__remove:before,.react-tag-input__tag__remove:after{position:absolute;top:50%;left:50%;content:\" \";height:.9em;width:.15em;background-color:#333}.react-tag-input__tag__remove:before{transform:translateX(-50%) translateY(-50%) rotate(45deg)}.react-tag-input__tag__remove:after{transform:translateX(-50%) translateY(-50%) rotate(-45deg)}.react-tag-input__tag__remove-readonly{width:0}.react-tag-input__tag__remove-readonly:before,.react-tag-input__tag__remove-readonly:after{content:\"\";width:0}\n", ""]);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/api.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function (useSourceMap) {
+  var list = []; // return the list of modules as css string
+
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = cssWithMappingToString(item, useSourceMap);
+
+      if (item[2]) {
+        return '@media ' + item[2] + '{' + content + '}';
+      } else {
+        return content;
+      }
+    }).join('');
+  }; // import a list of modules into the list
+
+
+  list.i = function (modules, mediaQuery) {
+    if (typeof modules === 'string') {
+      modules = [[null, modules, '']];
+    }
+
+    var alreadyImportedModules = {};
+
+    for (var i = 0; i < this.length; i++) {
+      var id = this[i][0];
+
+      if (id != null) {
+        alreadyImportedModules[id] = true;
+      }
+    }
+
+    for (i = 0; i < modules.length; i++) {
+      var item = modules[i]; // skip already imported module
+      // this implementation is not 100% perfect for weird media query combinations
+      // when a module is imported multiple times with different media queries.
+      // I hope this will never occur (Hey this way we have smaller bundles)
+
+      if (item[0] == null || !alreadyImportedModules[item[0]]) {
+        if (mediaQuery && !item[2]) {
+          item[2] = mediaQuery;
+        } else if (mediaQuery) {
+          item[2] = '(' + item[2] + ') and (' + mediaQuery + ')';
+        }
+
+        list.push(item);
+      }
+    }
+  };
+
+  return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+  var content = item[1] || '';
+  var cssMapping = item[3];
+
+  if (!cssMapping) {
+    return content;
+  }
+
+  if (useSourceMap && typeof btoa === 'function') {
+    var sourceMapping = toComment(cssMapping);
+    var sourceURLs = cssMapping.sources.map(function (source) {
+      return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */';
+    });
+    return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+  }
+
+  return [content].join('\n');
+} // Adapted from convert-source-map (MIT)
+
+
+function toComment(sourceMap) {
+  // eslint-disable-next-line no-undef
+  var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+  var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+  return '/*# ' + data + ' */';
+}
+
+/***/ }),
+
+/***/ "./node_modules/css.escape/css.escape.js":
+/*!***********************************************!*\
+  !*** ./node_modules/css.escape/css.escape.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {/*! https://mths.be/cssescape v1.5.1 by @mathias | MIT license */
+;(function(root, factory) {
+	// https://github.com/umdjs/umd/blob/master/returnExports.js
+	if (true) {
+		// For Node.js.
+		module.exports = factory(root);
+	} else {}
+}(typeof global != 'undefined' ? global : this, function(root) {
+
+	if (root.CSS && root.CSS.escape) {
+		return root.CSS.escape;
+	}
+
+	// https://drafts.csswg.org/cssom/#serialize-an-identifier
+	var cssEscape = function(value) {
+		if (arguments.length == 0) {
+			throw new TypeError('`CSS.escape` requires an argument.');
+		}
+		var string = String(value);
+		var length = string.length;
+		var index = -1;
+		var codeUnit;
+		var result = '';
+		var firstCodeUnit = string.charCodeAt(0);
+		while (++index < length) {
+			codeUnit = string.charCodeAt(index);
+			// Note: there’s no need to special-case astral symbols, surrogate
+			// pairs, or lone surrogates.
+
+			// If the character is NULL (U+0000), then the REPLACEMENT CHARACTER
+			// (U+FFFD).
+			if (codeUnit == 0x0000) {
+				result += '\uFFFD';
+				continue;
+			}
+
+			if (
+				// If the character is in the range [\1-\1F] (U+0001 to U+001F) or is
+				// U+007F, […]
+				(codeUnit >= 0x0001 && codeUnit <= 0x001F) || codeUnit == 0x007F ||
+				// If the character is the first character and is in the range [0-9]
+				// (U+0030 to U+0039), […]
+				(index == 0 && codeUnit >= 0x0030 && codeUnit <= 0x0039) ||
+				// If the character is the second character and is in the range [0-9]
+				// (U+0030 to U+0039) and the first character is a `-` (U+002D), […]
+				(
+					index == 1 &&
+					codeUnit >= 0x0030 && codeUnit <= 0x0039 &&
+					firstCodeUnit == 0x002D
+				)
+			) {
+				// https://drafts.csswg.org/cssom/#escape-a-character-as-code-point
+				result += '\\' + codeUnit.toString(16) + ' ';
+				continue;
+			}
+
+			if (
+				// If the character is the first character and is a `-` (U+002D), and
+				// there is no second character, […]
+				index == 0 &&
+				length == 1 &&
+				codeUnit == 0x002D
+			) {
+				result += '\\' + string.charAt(index);
+				continue;
+			}
+
+			// If the character is not handled by one of the above rules and is
+			// greater than or equal to U+0080, is `-` (U+002D) or `_` (U+005F), or
+			// is in one of the ranges [0-9] (U+0030 to U+0039), [A-Z] (U+0041 to
+			// U+005A), or [a-z] (U+0061 to U+007A), […]
+			if (
+				codeUnit >= 0x0080 ||
+				codeUnit == 0x002D ||
+				codeUnit == 0x005F ||
+				codeUnit >= 0x0030 && codeUnit <= 0x0039 ||
+				codeUnit >= 0x0041 && codeUnit <= 0x005A ||
+				codeUnit >= 0x0061 && codeUnit <= 0x007A
+			) {
+				// the character itself
+				result += string.charAt(index);
+				continue;
+			}
+
+			// Otherwise, the escaped character.
+			// https://drafts.csswg.org/cssom/#escape-a-character
+			result += '\\' + string.charAt(index);
+
+		}
+		return result;
+	};
+
+	if (!root.CSS) {
+		root.CSS = {};
+	}
+
+	root.CSS.escape = cssEscape;
+	return cssEscape;
+
+}));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/diagram-js/lib/command/CommandInterceptor.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/diagram-js/lib/command/CommandInterceptor.js ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CommandInterceptor; });
+/* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "./node_modules/min-dash/dist/index.esm.js");
+
+
+
+var DEFAULT_PRIORITY = 1000;
+
+/**
+ * A utility that can be used to plug-in into the command execution for
+ * extension and/or validation.
+ *
+ * @param {EventBus} eventBus
+ *
+ * @example
+ *
+ * import inherits from 'inherits-browser';
+ *
+ * import CommandInterceptor from 'diagram-js/lib/command/CommandInterceptor';
+ *
+ * function CommandLogger(eventBus) {
+ *   CommandInterceptor.call(this, eventBus);
+ *
+ *   this.preExecute(function(event) {
+ *     console.log('command pre-execute', event);
+ *   });
+ * }
+ *
+ * inherits(CommandLogger, CommandInterceptor);
+ *
+ */
+function CommandInterceptor(eventBus) {
+  this._eventBus = eventBus;
+}
+
+CommandInterceptor.$inject = [ 'eventBus' ];
+
+function unwrapEvent(fn, that) {
+  return function(event) {
+    return fn.call(that || null, event.context, event.command, event);
+  };
+}
+
+/**
+ * Register an interceptor for a command execution
+ *
+ * @param {string|Array<string>} [events] list of commands to register on
+ * @param {string} [hook] command hook, i.e. preExecute, executed to listen on
+ * @param {number} [priority] the priority on which to hook into the execution
+ * @param {Function} handlerFn interceptor to be invoked with (event)
+ * @param {boolean} unwrap if true, unwrap the event and pass (context, command, event) to the
+ *                          listener instead
+ * @param {Object} [that] Pass context (`this`) to the handler function
+ */
+CommandInterceptor.prototype.on = function(events, hook, priority, handlerFn, unwrap, that) {
+
+  if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(hook) || Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isNumber"])(hook)) {
+    that = unwrap;
+    unwrap = handlerFn;
+    handlerFn = priority;
+    priority = hook;
+    hook = null;
+  }
+
+  if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(priority)) {
+    that = unwrap;
+    unwrap = handlerFn;
+    handlerFn = priority;
+    priority = DEFAULT_PRIORITY;
+  }
+
+  if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isObject"])(unwrap)) {
+    that = unwrap;
+    unwrap = false;
+  }
+
+  if (!Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(handlerFn)) {
+    throw new Error('handlerFn must be a function');
+  }
+
+  if (!Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isArray"])(events)) {
+    events = [ events ];
+  }
+
+  var eventBus = this._eventBus;
+
+  Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["forEach"])(events, function(event) {
+
+    // concat commandStack(.event)?(.hook)?
+    var fullEvent = [ 'commandStack', event, hook ].filter(function(e) { return e; }).join('.');
+
+    eventBus.on(fullEvent, priority, unwrap ? unwrapEvent(handlerFn, that) : handlerFn, that);
+  });
+};
+
+
+var hooks = [
+  'canExecute',
+  'preExecute',
+  'preExecuted',
+  'execute',
+  'executed',
+  'postExecute',
+  'postExecuted',
+  'revert',
+  'reverted'
+];
+
+/*
+ * Install hook shortcuts
+ *
+ * This will generate the CommandInterceptor#(preExecute|...|reverted) methods
+ * which will in term forward to CommandInterceptor#on.
+ */
+Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["forEach"])(hooks, function(hook) {
+
+  /**
+   * {canExecute|preExecute|preExecuted|execute|executed|postExecute|postExecuted|revert|reverted}
+   *
+   * A named hook for plugging into the command execution
+   *
+   * @param {string|Array<string>} [events] list of commands to register on
+   * @param {number} [priority] the priority on which to hook into the execution
+   * @param {Function} handlerFn interceptor to be invoked with (event)
+   * @param {boolean} [unwrap=false] if true, unwrap the event and pass (context, command, event) to the
+   *                          listener instead
+   * @param {Object} [that] Pass context (`this`) to the handler function
+   */
+  CommandInterceptor.prototype[hook] = function(events, priority, handlerFn, unwrap, that) {
+
+    if (Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isFunction"])(events) || Object(min_dash__WEBPACK_IMPORTED_MODULE_0__["isNumber"])(events)) {
+      that = unwrap;
+      unwrap = handlerFn;
+      handlerFn = priority;
+      priority = events;
+      events = null;
+    }
+
+    this.on(events, hook, priority, handlerFn, unwrap, that);
+  };
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/diagram-js/lib/features/rules/RuleProvider.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/diagram-js/lib/features/rules/RuleProvider.js ***!
+  \********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RuleProvider; });
+/* harmony import */ var inherits_browser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! inherits-browser */ "./node_modules/inherits-browser/dist/index.es.js");
+/* harmony import */ var _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../command/CommandInterceptor */ "./node_modules/diagram-js/lib/command/CommandInterceptor.js");
+
+
+
+
+/**
+ * A basic provider that may be extended to implement modeling rules.
+ *
+ * Extensions should implement the init method to actually add their custom
+ * modeling checks. Checks may be added via the #addRule(action, fn) method.
+ *
+ * @param {EventBus} eventBus
+ */
+function RuleProvider(eventBus) {
+  _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__["default"].call(this, eventBus);
+
+  this.init();
+}
+
+RuleProvider.$inject = [ 'eventBus' ];
+
+Object(inherits_browser__WEBPACK_IMPORTED_MODULE_0__["default"])(RuleProvider, _command_CommandInterceptor__WEBPACK_IMPORTED_MODULE_1__["default"]);
+
+
+/**
+ * Adds a modeling rule for the given action, implemented through
+ * a callback function.
+ *
+ * The function will receive the modeling specific action context
+ * to perform its check. It must return `false` to disallow the
+ * action from happening or `true` to allow the action.
+ *
+ * A rule provider may pass over the evaluation to lower priority
+ * rules by returning return nothing (or <code>undefined</code>).
+ *
+ * @example
+ *
+ * ResizableRules.prototype.init = function() {
+ *
+ *   \/**
+ *    * Return `true`, `false` or nothing to denote
+ *    * _allowed_, _not allowed_ and _continue evaluating_.
+ *    *\/
+ *   this.addRule('shape.resize', function(context) {
+ *
+ *     var shape = context.shape;
+ *
+ *     if (!context.newBounds) {
+ *       // check general resizability
+ *       if (!shape.resizable) {
+ *         return false;
+ *       }
+ *
+ *       // not returning anything (read: undefined)
+ *       // will continue the evaluation of other rules
+ *       // (with lower priority)
+ *       return;
+ *     } else {
+ *       // element must have minimum size of 10*10 points
+ *       return context.newBounds.width > 10 && context.newBounds.height > 10;
+ *     }
+ *   });
+ * };
+ *
+ * @param {string|Array<string>} actions the identifier for the modeling action to check
+ * @param {number} [priority] the priority at which this rule is being applied
+ * @param {Function} fn the callback function that performs the actual check
+ */
+RuleProvider.prototype.addRule = function(actions, priority, fn) {
+
+  var self = this;
+
+  if (typeof actions === 'string') {
+    actions = [ actions ];
+  }
+
+  actions.forEach(function(action) {
+
+    self.canExecute(action, priority, function(context, action, event) {
+      return fn(context);
+    }, true);
+  });
+};
+
+/**
+ * Implement this method to add new rules during provider initialization.
+ */
+RuleProvider.prototype.init = function() {};
 
 /***/ }),
 
@@ -53414,6 +54925,22 @@ Ids.prototype.clear = function() {
 
 /***/ }),
 
+/***/ "./node_modules/inherits-browser/dist/index.es.js":
+/*!********************************************************!*\
+  !*** ./node_modules/inherits-browser/dist/index.es.js ***!
+  \********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return e; });
+function e(e,t){t&&(e.super_=t,e.prototype=Object.create(t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}))}
+//# sourceMappingURL=index.es.js.map
+
+
+/***/ }),
+
 /***/ "./node_modules/inherits/inherits_browser.js":
 /*!***************************************************!*\
   !*** ./node_modules/inherits/inherits_browser.js ***!
@@ -58036,1148 +59563,6 @@ module.exports = Refs;
  * @property {boolean} [collection=false]
  * @property {boolean} [enumerable=false]
  */
-
-/***/ }),
-
-/***/ "./node_modules/path-intersection/intersect.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/path-intersection/intersect.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * This file contains portions that got extraced from Snap.svg (licensed Apache-2.0).
- *
- * @see https://github.com/adobe-webplatform/Snap.svg/blob/master/src/path.js
- */
-
-/* eslint no-fallthrough: "off" */
-
-var has = 'hasOwnProperty',
-    p2s = /,?([a-z]),?/gi,
-    toFloat = parseFloat,
-    math = Math,
-    PI = math.PI,
-    mmin = math.min,
-    mmax = math.max,
-    pow = math.pow,
-    abs = math.abs,
-    pathCommand = /([a-z])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?[\s]*,?[\s]*)+)/ig,
-    pathValues = /(-?\d*\.?\d*(?:e[-+]?\\d+)?)[\s]*,?[\s]*/ig;
-
-function is(o, type) {
-  type = String.prototype.toLowerCase.call(type);
-
-  if (type == 'finite') {
-    return isFinite(o);
-  }
-
-  if (type == 'array' && (o instanceof Array || Array.isArray && Array.isArray(o))) {
-    return true;
-  }
-
-  return (type == 'null' && o === null) ||
-         (type == typeof o && o !== null) ||
-         (type == 'object' && o === Object(o)) ||
-         Object.prototype.toString.call(o).slice(8, -1).toLowerCase() == type;
-}
-
-function clone(obj) {
-
-  if (typeof obj == 'function' || Object(obj) !== obj) {
-    return obj;
-  }
-
-  var res = new obj.constructor;
-
-  for (var key in obj) if (obj[has](key)) {
-    res[key] = clone(obj[key]);
-  }
-
-  return res;
-}
-
-function repush(array, item) {
-  for (var i = 0, ii = array.length; i < ii; i++) if (array[i] === item) {
-    return array.push(array.splice(i, 1)[0]);
-  }
-}
-
-function cacher(f, scope, postprocessor) {
-
-  function newf() {
-
-    var arg = Array.prototype.slice.call(arguments, 0),
-        args = arg.join('\u2400'),
-        cache = newf.cache = newf.cache || {},
-        count = newf.count = newf.count || [];
-
-    if (cache[has](args)) {
-      repush(count, args);
-      return postprocessor ? postprocessor(cache[args]) : cache[args];
-    }
-
-    count.length >= 1e3 && delete cache[count.shift()];
-    count.push(args);
-    cache[args] = f.apply(scope, arg);
-
-    return postprocessor ? postprocessor(cache[args]) : cache[args];
-  }
-  return newf;
-}
-
-function parsePathString(pathString) {
-
-  if (!pathString) {
-    return null;
-  }
-
-  var pth = paths(pathString);
-
-  if (pth.arr) {
-    return clone(pth.arr);
-  }
-
-  var paramCounts = { a: 7, c: 6, o: 2, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, u: 3, z: 0 },
-      data = [];
-
-  if (is(pathString, 'array') && is(pathString[0], 'array')) { // rough assumption
-    data = clone(pathString);
-  }
-
-  if (!data.length) {
-
-    String(pathString).replace(pathCommand, function(a, b, c) {
-      var params = [],
-          name = b.toLowerCase();
-
-      c.replace(pathValues, function(a, b) {
-        b && params.push(+b);
-      });
-
-      if (name == 'm' && params.length > 2) {
-        data.push([b].concat(params.splice(0, 2)));
-        name = 'l';
-        b = b == 'm' ? 'l' : 'L';
-      }
-
-      if (name == 'o' && params.length == 1) {
-        data.push([b, params[0]]);
-      }
-
-      if (name == 'r') {
-        data.push([b].concat(params));
-      } else while (params.length >= paramCounts[name]) {
-        data.push([b].concat(params.splice(0, paramCounts[name])));
-        if (!paramCounts[name]) {
-          break;
-        }
-      }
-    });
-  }
-
-  data.toString = paths.toString;
-  pth.arr = clone(data);
-
-  return data;
-}
-
-function paths(ps) {
-  var p = paths.ps = paths.ps || {};
-
-  if (p[ps]) {
-    p[ps].sleep = 100;
-  } else {
-    p[ps] = {
-      sleep: 100
-    };
-  }
-
-  setTimeout(function() {
-    for (var key in p) if (p[has](key) && key != ps) {
-      p[key].sleep--;
-      !p[key].sleep && delete p[key];
-    }
-  });
-
-  return p[ps];
-}
-
-function box(x, y, width, height) {
-  if (x == null) {
-    x = y = width = height = 0;
-  }
-
-  if (y == null) {
-    y = x.y;
-    width = x.width;
-    height = x.height;
-    x = x.x;
-  }
-
-  return {
-    x: x,
-    y: y,
-    width: width,
-    w: width,
-    height: height,
-    h: height,
-    x2: x + width,
-    y2: y + height,
-    cx: x + width / 2,
-    cy: y + height / 2,
-    r1: math.min(width, height) / 2,
-    r2: math.max(width, height) / 2,
-    r0: math.sqrt(width * width + height * height) / 2,
-    path: rectPath(x, y, width, height),
-    vb: [x, y, width, height].join(' ')
-  };
-}
-
-function pathToString() {
-  return this.join(',').replace(p2s, '$1');
-}
-
-function pathClone(pathArray) {
-  var res = clone(pathArray);
-  res.toString = pathToString;
-  return res;
-}
-
-function findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
-  var t1 = 1 - t,
-      t13 = pow(t1, 3),
-      t12 = pow(t1, 2),
-      t2 = t * t,
-      t3 = t2 * t,
-      x = t13 * p1x + t12 * 3 * t * c1x + t1 * 3 * t * t * c2x + t3 * p2x,
-      y = t13 * p1y + t12 * 3 * t * c1y + t1 * 3 * t * t * c2y + t3 * p2y,
-      mx = p1x + 2 * t * (c1x - p1x) + t2 * (c2x - 2 * c1x + p1x),
-      my = p1y + 2 * t * (c1y - p1y) + t2 * (c2y - 2 * c1y + p1y),
-      nx = c1x + 2 * t * (c2x - c1x) + t2 * (p2x - 2 * c2x + c1x),
-      ny = c1y + 2 * t * (c2y - c1y) + t2 * (p2y - 2 * c2y + c1y),
-      ax = t1 * p1x + t * c1x,
-      ay = t1 * p1y + t * c1y,
-      cx = t1 * c2x + t * p2x,
-      cy = t1 * c2y + t * p2y,
-      alpha = (90 - math.atan2(mx - nx, my - ny) * 180 / PI);
-
-  return {
-    x: x,
-    y: y,
-    m: { x: mx, y: my },
-    n: { x: nx, y: ny },
-    start: { x: ax, y: ay },
-    end: { x: cx, y: cy },
-    alpha: alpha
-  };
-}
-
-function bezierBBox(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
-
-  if (!is(p1x, 'array')) {
-    p1x = [p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y];
-  }
-
-  var bbox = curveBBox.apply(null, p1x);
-
-  return box(
-    bbox.min.x,
-    bbox.min.y,
-    bbox.max.x - bbox.min.x,
-    bbox.max.y - bbox.min.y
-  );
-}
-
-function isPointInsideBBox(bbox, x, y) {
-  return x >= bbox.x &&
-    x <= bbox.x + bbox.width &&
-    y >= bbox.y &&
-    y <= bbox.y + bbox.height;
-}
-
-function isBBoxIntersect(bbox1, bbox2) {
-  bbox1 = box(bbox1);
-  bbox2 = box(bbox2);
-  return isPointInsideBBox(bbox2, bbox1.x, bbox1.y)
-    || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y)
-    || isPointInsideBBox(bbox2, bbox1.x, bbox1.y2)
-    || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y2)
-    || isPointInsideBBox(bbox1, bbox2.x, bbox2.y)
-    || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y)
-    || isPointInsideBBox(bbox1, bbox2.x, bbox2.y2)
-    || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y2)
-    || (bbox1.x < bbox2.x2 && bbox1.x > bbox2.x
-        || bbox2.x < bbox1.x2 && bbox2.x > bbox1.x)
-    && (bbox1.y < bbox2.y2 && bbox1.y > bbox2.y
-        || bbox2.y < bbox1.y2 && bbox2.y > bbox1.y);
-}
-
-function base3(t, p1, p2, p3, p4) {
-  var t1 = -3 * p1 + 9 * p2 - 9 * p3 + 3 * p4,
-      t2 = t * t1 + 6 * p1 - 12 * p2 + 6 * p3;
-  return t * t2 - 3 * p1 + 3 * p2;
-}
-
-function bezlen(x1, y1, x2, y2, x3, y3, x4, y4, z) {
-
-  if (z == null) {
-    z = 1;
-  }
-
-  z = z > 1 ? 1 : z < 0 ? 0 : z;
-
-  var z2 = z / 2,
-      n = 12,
-      Tvalues = [-.1252,.1252,-.3678,.3678,-.5873,.5873,-.7699,.7699,-.9041,.9041,-.9816,.9816],
-      Cvalues = [0.2491,0.2491,0.2335,0.2335,0.2032,0.2032,0.1601,0.1601,0.1069,0.1069,0.0472,0.0472],
-      sum = 0;
-
-  for (var i = 0; i < n; i++) {
-    var ct = z2 * Tvalues[i] + z2,
-        xbase = base3(ct, x1, x2, x3, x4),
-        ybase = base3(ct, y1, y2, y3, y4),
-        comb = xbase * xbase + ybase * ybase;
-
-    sum += Cvalues[i] * math.sqrt(comb);
-  }
-
-  return z2 * sum;
-}
-
-
-function intersectLines(x1, y1, x2, y2, x3, y3, x4, y4) {
-
-  if (
-    mmax(x1, x2) < mmin(x3, x4) ||
-      mmin(x1, x2) > mmax(x3, x4) ||
-      mmax(y1, y2) < mmin(y3, y4) ||
-      mmin(y1, y2) > mmax(y3, y4)
-  ) {
-    return;
-  }
-
-  var nx = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4),
-      ny = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4),
-      denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-
-  if (!denominator) {
-    return;
-  }
-
-  var px = nx / denominator,
-      py = ny / denominator,
-      px2 = +px.toFixed(2),
-      py2 = +py.toFixed(2);
-
-  if (
-    px2 < +mmin(x1, x2).toFixed(2) ||
-      px2 > +mmax(x1, x2).toFixed(2) ||
-      px2 < +mmin(x3, x4).toFixed(2) ||
-      px2 > +mmax(x3, x4).toFixed(2) ||
-      py2 < +mmin(y1, y2).toFixed(2) ||
-      py2 > +mmax(y1, y2).toFixed(2) ||
-      py2 < +mmin(y3, y4).toFixed(2) ||
-      py2 > +mmax(y3, y4).toFixed(2)
-  ) {
-    return;
-  }
-
-  return { x: px, y: py };
-}
-
-function findBezierIntersections(bez1, bez2, justCount) {
-  var bbox1 = bezierBBox(bez1),
-      bbox2 = bezierBBox(bez2);
-
-  if (!isBBoxIntersect(bbox1, bbox2)) {
-    return justCount ? 0 : [];
-  }
-
-  var l1 = bezlen.apply(0, bez1),
-      l2 = bezlen.apply(0, bez2),
-      n1 = ~~(l1 / 5),
-      n2 = ~~(l2 / 5),
-      dots1 = [],
-      dots2 = [],
-      xy = {},
-      res = justCount ? 0 : [];
-
-  for (var i = 0; i < n1 + 1; i++) {
-    var p = findDotsAtSegment.apply(0, bez1.concat(i / n1));
-    dots1.push({ x: p.x, y: p.y, t: i / n1 });
-  }
-
-  for (i = 0; i < n2 + 1; i++) {
-    p = findDotsAtSegment.apply(0, bez2.concat(i / n2));
-    dots2.push({ x: p.x, y: p.y, t: i / n2 });
-  }
-
-  for (i = 0; i < n1; i++) {
-
-    for (var j = 0; j < n2; j++) {
-      var di = dots1[i],
-          di1 = dots1[i + 1],
-          dj = dots2[j],
-          dj1 = dots2[j + 1],
-          ci = abs(di1.x - di.x) < .01 ? 'y' : 'x',
-          cj = abs(dj1.x - dj.x) < .01 ? 'y' : 'x',
-          is = intersectLines(di.x, di.y, di1.x, di1.y, dj.x, dj.y, dj1.x, dj1.y);
-
-      if (is) {
-
-        if (xy[is.x.toFixed(0)] == is.y.toFixed(0)) {
-          continue;
-        }
-
-        xy[is.x.toFixed(0)] = is.y.toFixed(0);
-
-        var t1 = di.t + abs((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
-            t2 = dj.t + abs((is[cj] - dj[cj]) / (dj1[cj] - dj[cj])) * (dj1.t - dj.t);
-
-        if (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1) {
-
-          if (justCount) {
-            res++;
-          } else {
-            res.push({
-              x: is.x,
-              y: is.y,
-              t1: t1,
-              t2: t2
-            });
-          }
-        }
-      }
-    }
-  }
-
-  return res;
-}
-
-
-/**
- * Find or counts the intersections between two SVG paths.
- *
- * Returns a number in counting mode and a list of intersections otherwise.
- *
- * A single intersection entry contains the intersection coordinates (x, y)
- * as well as additional information regarding the intersecting segments
- * on each path (segment1, segment2) and the relative location of the
- * intersection on these segments (t1, t2).
- *
- * The path may be an SVG path string or a list of path components
- * such as `[ [ 'M', 0, 10 ], [ 'L', 20, 0 ] ]`.
- *
- * @example
- *
- * var intersections = findPathIntersections(
- *   'M0,0L100,100',
- *   [ [ 'M', 0, 100 ], [ 'L', 100, 0 ] ]
- * );
- *
- * // intersections = [
- * //   { x: 50, y: 50, segment1: 1, segment2: 1, t1: 0.5, t2: 0.5 }
- * //
- *
- * @param {String|Array<PathDef>} path1
- * @param {String|Array<PathDef>} path2
- * @param {Boolean} [justCount=false]
- *
- * @return {Array<Intersection>|Number}
- */
-function findPathIntersections(path1, path2, justCount) {
-  path1 = pathToCurve(path1);
-  path2 = pathToCurve(path2);
-
-  var x1, y1, x2, y2, x1m, y1m, x2m, y2m, bez1, bez2,
-      res = justCount ? 0 : [];
-
-  for (var i = 0, ii = path1.length; i < ii; i++) {
-    var pi = path1[i];
-
-    if (pi[0] == 'M') {
-      x1 = x1m = pi[1];
-      y1 = y1m = pi[2];
-    } else {
-
-      if (pi[0] == 'C') {
-        bez1 = [x1, y1].concat(pi.slice(1));
-        x1 = bez1[6];
-        y1 = bez1[7];
-      } else {
-        bez1 = [x1, y1, x1, y1, x1m, y1m, x1m, y1m];
-        x1 = x1m;
-        y1 = y1m;
-      }
-
-      for (var j = 0, jj = path2.length; j < jj; j++) {
-        var pj = path2[j];
-
-        if (pj[0] == 'M') {
-          x2 = x2m = pj[1];
-          y2 = y2m = pj[2];
-        } else {
-
-          if (pj[0] == 'C') {
-            bez2 = [x2, y2].concat(pj.slice(1));
-            x2 = bez2[6];
-            y2 = bez2[7];
-          } else {
-            bez2 = [x2, y2, x2, y2, x2m, y2m, x2m, y2m];
-            x2 = x2m;
-            y2 = y2m;
-          }
-
-          var intr = findBezierIntersections(bez1, bez2, justCount);
-
-          if (justCount) {
-            res += intr;
-          } else {
-
-            for (var k = 0, kk = intr.length; k < kk; k++) {
-              intr[k].segment1 = i;
-              intr[k].segment2 = j;
-              intr[k].bez1 = bez1;
-              intr[k].bez2 = bez2;
-            }
-
-            res = res.concat(intr);
-          }
-        }
-      }
-    }
-  }
-
-  return res;
-}
-
-
-function rectPath(x, y, w, h, r) {
-  if (r) {
-    return [
-      ['M', +x + (+r), y],
-      ['l', w - r * 2, 0],
-      ['a', r, r, 0, 0, 1, r, r],
-      ['l', 0, h - r * 2],
-      ['a', r, r, 0, 0, 1, -r, r],
-      ['l', r * 2 - w, 0],
-      ['a', r, r, 0, 0, 1, -r, -r],
-      ['l', 0, r * 2 - h],
-      ['a', r, r, 0, 0, 1, r, -r],
-      ['z']
-    ];
-  }
-
-  var res = [['M', x, y], ['l', w, 0], ['l', 0, h], ['l', -w, 0], ['z']];
-  res.toString = pathToString;
-
-  return res;
-}
-
-function ellipsePath(x, y, rx, ry, a) {
-  if (a == null && ry == null) {
-    ry = rx;
-  }
-
-  x = +x;
-  y = +y;
-  rx = +rx;
-  ry = +ry;
-
-  if (a != null) {
-    var rad = Math.PI / 180,
-        x1 = x + rx * Math.cos(-ry * rad),
-        x2 = x + rx * Math.cos(-a * rad),
-        y1 = y + rx * Math.sin(-ry * rad),
-        y2 = y + rx * Math.sin(-a * rad),
-        res = [['M', x1, y1], ['A', rx, rx, 0, +(a - ry > 180), 0, x2, y2]];
-  } else {
-    res = [
-      ['M', x, y],
-      ['m', 0, -ry],
-      ['a', rx, ry, 0, 1, 1, 0, 2 * ry],
-      ['a', rx, ry, 0, 1, 1, 0, -2 * ry],
-      ['z']
-    ];
-  }
-
-  res.toString = pathToString;
-
-  return res;
-}
-
-
-function pathToAbsolute(pathArray) {
-  var pth = paths(pathArray);
-
-  if (pth.abs) {
-    return pathClone(pth.abs);
-  }
-
-  if (!is(pathArray, 'array') || !is(pathArray && pathArray[0], 'array')) { // rough assumption
-    pathArray = parsePathString(pathArray);
-  }
-
-  if (!pathArray || !pathArray.length) {
-    return [['M', 0, 0]];
-  }
-
-  var res = [],
-      x = 0,
-      y = 0,
-      mx = 0,
-      my = 0,
-      start = 0,
-      pa0;
-
-  if (pathArray[0][0] == 'M') {
-    x = +pathArray[0][1];
-    y = +pathArray[0][2];
-    mx = x;
-    my = y;
-    start++;
-    res[0] = ['M', x, y];
-  }
-
-  var crz = pathArray.length == 3 &&
-      pathArray[0][0] == 'M' &&
-      pathArray[1][0].toUpperCase() == 'R' &&
-      pathArray[2][0].toUpperCase() == 'Z';
-
-  for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
-    res.push(r = []);
-    pa = pathArray[i];
-    pa0 = pa[0];
-
-    if (pa0 != pa0.toUpperCase()) {
-      r[0] = pa0.toUpperCase();
-
-      switch (r[0]) {
-      case 'A':
-        r[1] = pa[1];
-        r[2] = pa[2];
-        r[3] = pa[3];
-        r[4] = pa[4];
-        r[5] = pa[5];
-        r[6] = +pa[6] + x;
-        r[7] = +pa[7] + y;
-        break;
-      case 'V':
-        r[1] = +pa[1] + y;
-        break;
-      case 'H':
-        r[1] = +pa[1] + x;
-        break;
-      case 'R':
-        var dots = [x, y].concat(pa.slice(1));
-
-        for (var j = 2, jj = dots.length; j < jj; j++) {
-          dots[j] = +dots[j] + x;
-          dots[++j] = +dots[j] + y;
-        }
-
-        res.pop();
-        res = res.concat(catmulRomToBezier(dots, crz));
-        break;
-      case 'O':
-        res.pop();
-        dots = ellipsePath(x, y, pa[1], pa[2]);
-        dots.push(dots[0]);
-        res = res.concat(dots);
-        break;
-      case 'U':
-        res.pop();
-        res = res.concat(ellipsePath(x, y, pa[1], pa[2], pa[3]));
-        r = ['U'].concat(res[res.length - 1].slice(-2));
-        break;
-      case 'M':
-        mx = +pa[1] + x;
-        my = +pa[2] + y;
-      default:
-
-        for (j = 1, jj = pa.length; j < jj; j++) {
-          r[j] = +pa[j] + ((j % 2) ? x : y);
-        }
-      }
-    } else if (pa0 == 'R') {
-      dots = [x, y].concat(pa.slice(1));
-      res.pop();
-      res = res.concat(catmulRomToBezier(dots, crz));
-      r = ['R'].concat(pa.slice(-2));
-    } else if (pa0 == 'O') {
-      res.pop();
-      dots = ellipsePath(x, y, pa[1], pa[2]);
-      dots.push(dots[0]);
-      res = res.concat(dots);
-    } else if (pa0 == 'U') {
-      res.pop();
-      res = res.concat(ellipsePath(x, y, pa[1], pa[2], pa[3]));
-      r = ['U'].concat(res[res.length - 1].slice(-2));
-    } else {
-
-      for (var k = 0, kk = pa.length; k < kk; k++) {
-        r[k] = pa[k];
-      }
-    }
-    pa0 = pa0.toUpperCase();
-
-    if (pa0 != 'O') {
-      switch (r[0]) {
-      case 'Z':
-        x = +mx;
-        y = +my;
-        break;
-      case 'H':
-        x = r[1];
-        break;
-      case 'V':
-        y = r[1];
-        break;
-      case 'M':
-        mx = r[r.length - 2];
-        my = r[r.length - 1];
-      default:
-        x = r[r.length - 2];
-        y = r[r.length - 1];
-      }
-    }
-  }
-
-  res.toString = pathToString;
-  pth.abs = pathClone(res);
-
-  return res;
-}
-
-function lineToCurve(x1, y1, x2, y2) {
-  return [
-    x1, y1, x2,
-    y2, x2, y2
-  ];
-}
-
-function qubicToCurve(x1, y1, ax, ay, x2, y2) {
-  var _13 = 1 / 3,
-      _23 = 2 / 3;
-
-  return [
-    _13 * x1 + _23 * ax,
-    _13 * y1 + _23 * ay,
-    _13 * x2 + _23 * ax,
-    _13 * y2 + _23 * ay,
-    x2,
-    y2
-  ];
-}
-
-function arcToCurve(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
-
-  // for more information of where this math came from visit:
-  // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
-  var _120 = PI * 120 / 180,
-      rad = PI / 180 * (+angle || 0),
-      res = [],
-      xy,
-      rotate = cacher(function(x, y, rad) {
-        var X = x * math.cos(rad) - y * math.sin(rad),
-            Y = x * math.sin(rad) + y * math.cos(rad);
-
-        return { x: X, y: Y };
-      });
-
-  if (!recursive) {
-    xy = rotate(x1, y1, -rad);
-    x1 = xy.x;
-    y1 = xy.y;
-    xy = rotate(x2, y2, -rad);
-    x2 = xy.x;
-    y2 = xy.y;
-
-    var x = (x1 - x2) / 2,
-        y = (y1 - y2) / 2;
-
-    var h = (x * x) / (rx * rx) + (y * y) / (ry * ry);
-
-    if (h > 1) {
-      h = math.sqrt(h);
-      rx = h * rx;
-      ry = h * ry;
-    }
-
-    var rx2 = rx * rx,
-        ry2 = ry * ry,
-        k = (large_arc_flag == sweep_flag ? -1 : 1) *
-            math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
-        cx = k * rx * y / ry + (x1 + x2) / 2,
-        cy = k * -ry * x / rx + (y1 + y2) / 2,
-        f1 = math.asin(((y1 - cy) / ry).toFixed(9)),
-        f2 = math.asin(((y2 - cy) / ry).toFixed(9));
-
-    f1 = x1 < cx ? PI - f1 : f1;
-    f2 = x2 < cx ? PI - f2 : f2;
-    f1 < 0 && (f1 = PI * 2 + f1);
-    f2 < 0 && (f2 = PI * 2 + f2);
-
-    if (sweep_flag && f1 > f2) {
-      f1 = f1 - PI * 2;
-    }
-    if (!sweep_flag && f2 > f1) {
-      f2 = f2 - PI * 2;
-    }
-  } else {
-    f1 = recursive[0];
-    f2 = recursive[1];
-    cx = recursive[2];
-    cy = recursive[3];
-  }
-
-  var df = f2 - f1;
-
-  if (abs(df) > _120) {
-    var f2old = f2,
-        x2old = x2,
-        y2old = y2;
-
-    f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
-    x2 = cx + rx * math.cos(f2);
-    y2 = cy + ry * math.sin(f2);
-    res = arcToCurve(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
-  }
-
-  df = f2 - f1;
-
-  var c1 = math.cos(f1),
-      s1 = math.sin(f1),
-      c2 = math.cos(f2),
-      s2 = math.sin(f2),
-      t = math.tan(df / 4),
-      hx = 4 / 3 * rx * t,
-      hy = 4 / 3 * ry * t,
-      m1 = [x1, y1],
-      m2 = [x1 + hx * s1, y1 - hy * c1],
-      m3 = [x2 + hx * s2, y2 - hy * c2],
-      m4 = [x2, y2];
-
-  m2[0] = 2 * m1[0] - m2[0];
-  m2[1] = 2 * m1[1] - m2[1];
-
-  if (recursive) {
-    return [m2, m3, m4].concat(res);
-  } else {
-    res = [m2, m3, m4].concat(res).join().split(',');
-    var newres = [];
-
-    for (var i = 0, ii = res.length; i < ii; i++) {
-      newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
-    }
-
-    return newres;
-  }
-}
-
-// http://schepers.cc/getting-to-the-point
-function catmulRomToBezier(crp, z) {
-  var d = [];
-
-  for (var i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2) {
-    var p = [
-      { x: +crp[i - 2], y: +crp[i - 1] },
-      { x: +crp[i], y: +crp[i + 1] },
-      { x: +crp[i + 2], y: +crp[i + 3] },
-      { x: +crp[i + 4], y: +crp[i + 5] }
-    ];
-
-    if (z) {
-
-      if (!i) {
-        p[0] = { x: +crp[iLen - 2], y: +crp[iLen - 1] };
-      } else if (iLen - 4 == i) {
-        p[3] = { x: +crp[0], y: +crp[1] };
-      } else if (iLen - 2 == i) {
-        p[2] = { x: +crp[0], y: +crp[1] };
-        p[3] = { x: +crp[2], y: +crp[3] };
-      }
-
-    } else {
-
-      if (iLen - 4 == i) {
-        p[3] = p[2];
-      } else if (!i) {
-        p[0] = { x: +crp[i], y: +crp[i + 1] };
-      }
-
-    }
-
-    d.push(['C',
-      (-p[0].x + 6 * p[1].x + p[2].x) / 6,
-      (-p[0].y + 6 * p[1].y + p[2].y) / 6,
-      (p[1].x + 6 * p[2].x - p[3].x) / 6,
-      (p[1].y + 6*p[2].y - p[3].y) / 6,
-      p[2].x,
-      p[2].y
-    ]);
-  }
-
-  return d;
-}
-
-// Returns bounding box of cubic bezier curve.
-// Source: http://blog.hackers-cafe.net/2009/06/how-to-calculate-bezier-curves-bounding.html
-// Original version: NISHIO Hirokazu
-// Modifications: https://github.com/timo22345
-function curveBBox(x0, y0, x1, y1, x2, y2, x3, y3) {
-  var tvalues = [],
-      bounds = [[], []],
-      a, b, c, t, t1, t2, b2ac, sqrtb2ac;
-
-  for (var i = 0; i < 2; ++i) {
-
-    if (i == 0) {
-      b = 6 * x0 - 12 * x1 + 6 * x2;
-      a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
-      c = 3 * x1 - 3 * x0;
-    } else {
-      b = 6 * y0 - 12 * y1 + 6 * y2;
-      a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
-      c = 3 * y1 - 3 * y0;
-    }
-
-    if (abs(a) < 1e-12) {
-
-      if (abs(b) < 1e-12) {
-        continue;
-      }
-
-      t = -c / b;
-
-      if (0 < t && t < 1) {
-        tvalues.push(t);
-      }
-
-      continue;
-    }
-
-    b2ac = b * b - 4 * c * a;
-    sqrtb2ac = math.sqrt(b2ac);
-
-    if (b2ac < 0) {
-      continue;
-    }
-
-    t1 = (-b + sqrtb2ac) / (2 * a);
-
-    if (0 < t1 && t1 < 1) {
-      tvalues.push(t1);
-    }
-
-    t2 = (-b - sqrtb2ac) / (2 * a);
-
-    if (0 < t2 && t2 < 1) {
-      tvalues.push(t2);
-    }
-  }
-
-  var j = tvalues.length,
-      jlen = j,
-      mt;
-
-  while (j--) {
-    t = tvalues[j];
-    mt = 1 - t;
-    bounds[0][j] = (mt * mt * mt * x0) + (3 * mt * mt * t * x1) + (3 * mt * t * t * x2) + (t * t * t * x3);
-    bounds[1][j] = (mt * mt * mt * y0) + (3 * mt * mt * t * y1) + (3 * mt * t * t * y2) + (t * t * t * y3);
-  }
-
-  bounds[0][jlen] = x0;
-  bounds[1][jlen] = y0;
-  bounds[0][jlen + 1] = x3;
-  bounds[1][jlen + 1] = y3;
-  bounds[0].length = bounds[1].length = jlen + 2;
-
-  return {
-    min: { x: mmin.apply(0, bounds[0]), y: mmin.apply(0, bounds[1]) },
-    max: { x: mmax.apply(0, bounds[0]), y: mmax.apply(0, bounds[1]) }
-  };
-}
-
-function pathToCurve(path, path2) {
-  var pth = !path2 && paths(path);
-
-  if (!path2 && pth.curve) {
-    return pathClone(pth.curve);
-  }
-
-  var p = pathToAbsolute(path),
-      p2 = path2 && pathToAbsolute(path2),
-      attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
-      attrs2 = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
-      processPath = function(path, d, pcom) {
-        var nx, ny;
-
-        if (!path) {
-          return ['C', d.x, d.y, d.x, d.y, d.x, d.y];
-        }
-
-        !(path[0] in { T: 1, Q: 1 }) && (d.qx = d.qy = null);
-
-        switch (path[0]) {
-        case 'M':
-          d.X = path[1];
-          d.Y = path[2];
-          break;
-        case 'A':
-          path = ['C'].concat(arcToCurve.apply(0, [d.x, d.y].concat(path.slice(1))));
-          break;
-        case 'S':
-          if (pcom == 'C' || pcom == 'S') {
-            // In 'S' case we have to take into account, if the previous command is C/S.
-            nx = d.x * 2 - d.bx;
-            // And reflect the previous
-            ny = d.y * 2 - d.by;
-            // command's control point relative to the current point.
-          }
-          else {
-            // or some else or nothing
-            nx = d.x;
-            ny = d.y;
-          }
-          path = ['C', nx, ny].concat(path.slice(1));
-          break;
-        case 'T':
-          if (pcom == 'Q' || pcom == 'T') {
-            // In 'T' case we have to take into account, if the previous command is Q/T.
-            d.qx = d.x * 2 - d.qx;
-            // And make a reflection similar
-            d.qy = d.y * 2 - d.qy;
-            // to case 'S'.
-          }
-          else {
-            // or something else or nothing
-            d.qx = d.x;
-            d.qy = d.y;
-          }
-          path = ['C'].concat(qubicToCurve(d.x, d.y, d.qx, d.qy, path[1], path[2]));
-          break;
-        case 'Q':
-          d.qx = path[1];
-          d.qy = path[2];
-          path = ['C'].concat(qubicToCurve(d.x, d.y, path[1], path[2], path[3], path[4]));
-          break;
-        case 'L':
-          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], path[2]));
-          break;
-        case 'H':
-          path = ['C'].concat(lineToCurve(d.x, d.y, path[1], d.y));
-          break;
-        case 'V':
-          path = ['C'].concat(lineToCurve(d.x, d.y, d.x, path[1]));
-          break;
-        case 'Z':
-          path = ['C'].concat(lineToCurve(d.x, d.y, d.X, d.Y));
-          break;
-        }
-
-        return path;
-      },
-
-      fixArc = function(pp, i) {
-
-        if (pp[i].length > 7) {
-          pp[i].shift();
-          var pi = pp[i];
-
-          while (pi.length) {
-            pcoms1[i] = 'A'; // if created multiple C:s, their original seg is saved
-            p2 && (pcoms2[i] = 'A'); // the same as above
-            pp.splice(i++, 0, ['C'].concat(pi.splice(0, 6)));
-          }
-
-          pp.splice(i, 1);
-          ii = mmax(p.length, p2 && p2.length || 0);
-        }
-      },
-
-      fixM = function(path1, path2, a1, a2, i) {
-
-        if (path1 && path2 && path1[i][0] == 'M' && path2[i][0] != 'M') {
-          path2.splice(i, 0, ['M', a2.x, a2.y]);
-          a1.bx = 0;
-          a1.by = 0;
-          a1.x = path1[i][1];
-          a1.y = path1[i][2];
-          ii = mmax(p.length, p2 && p2.length || 0);
-        }
-      },
-
-      pcoms1 = [], // path commands of original path p
-      pcoms2 = [], // path commands of original path p2
-      pfirst = '', // temporary holder for original path command
-      pcom = ''; // holder for previous path command of original path
-
-  for (var i = 0, ii = mmax(p.length, p2 && p2.length || 0); i < ii; i++) {
-    p[i] && (pfirst = p[i][0]); // save current path command
-
-    if (pfirst != 'C') // C is not saved yet, because it may be result of conversion
-    {
-      pcoms1[i] = pfirst; // Save current path command
-      i && (pcom = pcoms1[i - 1]); // Get previous path command pcom
-    }
-    p[i] = processPath(p[i], attrs, pcom); // Previous path command is inputted to processPath
-
-    if (pcoms1[i] != 'A' && pfirst == 'C') pcoms1[i] = 'C'; // A is the only command
-    // which may produce multiple C:s
-    // so we have to make sure that C is also C in original path
-
-    fixArc(p, i); // fixArc adds also the right amount of A:s to pcoms1
-
-    if (p2) { // the same procedures is done to p2
-      p2[i] && (pfirst = p2[i][0]);
-
-      if (pfirst != 'C') {
-        pcoms2[i] = pfirst;
-        i && (pcom = pcoms2[i - 1]);
-      }
-
-      p2[i] = processPath(p2[i], attrs2, pcom);
-
-      if (pcoms2[i] != 'A' && pfirst == 'C') {
-        pcoms2[i] = 'C';
-      }
-
-      fixArc(p2, i);
-    }
-
-    fixM(p, p2, attrs, attrs2, i);
-    fixM(p2, p, attrs2, attrs, i);
-
-    var seg = p[i],
-        seg2 = p2 && p2[i],
-        seglen = seg.length,
-        seg2len = p2 && seg2.length;
-
-    attrs.x = seg[seglen - 2];
-    attrs.y = seg[seglen - 1];
-    attrs.bx = toFloat(seg[seglen - 4]) || attrs.x;
-    attrs.by = toFloat(seg[seglen - 3]) || attrs.y;
-    attrs2.bx = p2 && (toFloat(seg2[seg2len - 4]) || attrs2.x);
-    attrs2.by = p2 && (toFloat(seg2[seg2len - 3]) || attrs2.y);
-    attrs2.x = p2 && seg2[seg2len - 2];
-    attrs2.y = p2 && seg2[seg2len - 1];
-  }
-
-  if (!p2) {
-    pth.curve = pathClone(p);
-  }
-
-  return p2 ? [p, p2] : p;
-}
-
-module.exports = findPathIntersections;
 
 /***/ }),
 
