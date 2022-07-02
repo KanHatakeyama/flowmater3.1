@@ -1,23 +1,26 @@
 import networkx as nx
 import copy
-from .utils import fill_numbers, get_fp_key, NUM_CHAR, search_for_target_node_name_id
+from .utils import fill_numbers,  NUM_CHAR, search_for_target_node_name_id
+from .utils import get_fp_key_pre_suc, get_fp_key_pre_suc_2
+from tqdm import tqdm
 
 
 class GraphFingerprint:
-    def __init__(self, g_list: list):
+    def __init__(self, g_list: list, fp_key_algorithm=get_fp_key_pre_suc_2):
         self.key_list = []
         self.g_list = g_list
+        self.fp_key_algorithm = fp_key_algorithm
 
         self.add_keys()
         self.key_list = sorted(self.key_list)
         self._init_fp_template()
 
     def add_keys(self):
-        for g in self.g_list:
+        for g in (self.g_list):
             fp_g = copy.deepcopy(g)
             fill_numbers(fp_g)
-            for node_id in fp_g.nodes:
-                fp_key = get_fp_key(fp_g, node_id)
+            for node_id in (fp_g.nodes):
+                fp_key = self.fp_key_algorithm(fp_g, node_id)
 
                 if fp_key not in self.key_list:
                     self.key_list.append(fp_key)
@@ -51,7 +54,7 @@ class GraphFingerprint:
         end_node_id = search_for_target_node_name_id(g, node_name="end")
 
         for node_id in fp_g.nodes:
-            fp_key = get_fp_key(fp_g, node_id)
+            fp_key = self.fp_key_algorithm(fp_g, node_id)
             node_val = fp_g.nodes[node_id]["node_name"]
 
             if node_val == NUM_CHAR:
@@ -63,7 +66,7 @@ class GraphFingerprint:
 
                 # check for duplicated fps
                 if fp_key in dup_dict:
-                    # print("dup",fp_key,distance)
+                    #print("dup", fp_key, distance)
                     # use the node val with smaller distance to the "end" node
                     if distance < dup_dict[fp_key]:
                         dup_dict[fp_key] = distance
