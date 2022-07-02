@@ -88,7 +88,7 @@ def get_fp_key_K_neighbor(fp_g: nx.digraph, node_id: str, K=2):
 """
 
 
-def get_node_id_with_fp_key(g: nx.DiGraph, target_fp_key: str):
+def get_node_id_with_fp_key(g: nx.DiGraph, target_fp_key: str, fp_class):
     """
     get node id having a specific fp_key. return a node which is nearest to the "end" node
     """
@@ -103,7 +103,7 @@ def get_node_id_with_fp_key(g: nx.DiGraph, target_fp_key: str):
 
     #node_id_list = []
     for node_id in fp_g.nodes:
-        fp_key = get_fp_key(fp_g, node_id)
+        fp_key = fp_class.fp_key_algorithm(fp_g, node_id)
         if fp_key == target_fp_key:
             # node_id_list.append(node_id)
             distance = len(nx.shortest_path(
