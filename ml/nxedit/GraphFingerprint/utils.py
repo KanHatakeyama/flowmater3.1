@@ -50,3 +50,11 @@ def get_node_id_with_fp_key(g: nx.DiGraph, target_fp_key: str):
             node_id_list.append(node_id)
 
     return node_id_list
+
+
+def search_for_target_node_name_id(g: nx.DiGraph, node_name="end"):
+    for k in g.nodes:
+        if g.nodes[k]["node_name"] == node_name:
+            return k
+
+    raise ValueError(f"{node_name} not found in {g}")

@@ -1,6 +1,6 @@
 import networkx as nx
 import copy
-from .utils import fill_numbers, get_fp_key, NUM_CHAR
+from .utils import fill_numbers, get_fp_key, NUM_CHAR, search_for_target_node_name_id
 
 
 class GraphFingerprint:
@@ -36,17 +36,44 @@ class GraphFingerprint:
         return self.calc_fingerprint(g)
 
     def calc_fingerprint(self, g: nx.DiGraph):
+        """
+        calc FP
+        if multiple nodes are available with numeric vals, use the one which is the closest to the "end" node
+        """
+
         fp_g = copy.deepcopy(g)
         fill_numbers(fp_g)
         fp = copy.deepcopy(self._fp_template)
 
+        # check for duplicates
+        dup_dict = {}
+
+        end_node_id = search_for_target_node_name_id(g, node_name="end")
+
         for node_id in fp_g.nodes:
             fp_key = get_fp_key(fp_g, node_id)
-
             node_val = fp_g.nodes[node_id]["node_name"]
 
             if node_val == NUM_CHAR:
-                fp[fp_key] = float(g.nodes[node_id]["node_name"])
+                val = float(g.nodes[node_id]["node_name"])
+
+                # calc distance between the node and "end" node
+                distance = len(nx.shortest_path(
+                    g, source=node_id, target=end_node_id))
+
+                # check for duplicated fps
+                if fp_key in dup_dict:
+                    # print("dup",fp_key,distance)
+                    # use the node val with smaller distance to the "end" node
+                    if distance < dup_dict[fp_key]:
+                        dup_dict[fp_key] = distance
+                        fp[fp_key] = val
+                        # print("updated")
+
+                else:
+                    # first occurence
+                    fp[fp_key] = val
+                    dup_dict[fp_key] = distance
 
             else:
                 fp[fp_key] = 1
