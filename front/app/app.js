@@ -5,6 +5,7 @@ import customModdleExtension from './moddle/custom.json';
 import { getTargetGraph } from './network/api';
 import { AuthForm } from './properties-panel/auth';
 import BpmnColorPickerModule from 'bpmn-js-color-picker';
+import resizeTask from 'bpmn-js-task-resize/lib';
 
 const $modelerContainer = document.querySelector('#modeler-container');
 const $propertiesContainer = document.querySelector('#properties-container');
@@ -18,8 +19,10 @@ const modeler = new Modeler({
     bindTo: document.body
   },
   additionalModules: [
-    BpmnColorPickerModule
-  ]
+    BpmnColorPickerModule,
+    resizeTask
+  ],
+  taskResizingEnabled: true,
 });
 
 
