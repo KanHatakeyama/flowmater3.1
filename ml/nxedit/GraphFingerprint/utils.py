@@ -40,16 +40,31 @@ def get_fp_key(fp_g: nx.DiGraph, node_id: str):
 
 
 def get_node_id_with_fp_key(g: nx.DiGraph, target_fp_key: str):
+    """
+    get node id having a specific fp_key. return a node which is nearest to the "end" node
+    """
+
     fp_g = copy.deepcopy(g)
     fill_numbers(fp_g)
 
-    node_id_list = []
+    end_node_id = search_for_target_node_name_id(g, node_name="end")
+
+    final_node_id = None
+    final_dist = 10**5
+
+    #node_id_list = []
     for node_id in fp_g.nodes:
         fp_key = get_fp_key(fp_g, node_id)
         if fp_key == target_fp_key:
-            node_id_list.append(node_id)
+            # node_id_list.append(node_id)
+            distance = len(nx.shortest_path(
+                g, source=node_id, target=end_node_id))
 
-    return node_id_list
+            if distance < final_dist:
+                final_node_id = node_id
+                final_dist = distance
+    return final_node_id
+    # return node_id_list
 
 
 def search_for_target_node_name_id(g: nx.DiGraph, node_name="end"):
