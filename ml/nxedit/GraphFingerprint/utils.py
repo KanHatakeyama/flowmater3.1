@@ -38,7 +38,7 @@ def get_fp_key_pre_suc(fp_g: nx.digraph, node_id: str):
     return fp_key
 
 
-def get_fp_key_pre_suc_k(fp_g: nx.digraph, node_id: str, k=3):
+def get_fp_key_pre_suc_k(fp_g: nx.digraph, node_id: str, k=2):
     """
     calc fp key according to the "node_name" of the target node and neighboring nodes (K=2)
     """
