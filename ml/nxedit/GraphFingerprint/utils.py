@@ -38,7 +38,7 @@ def get_fp_key_pre_suc(fp_g: nx.digraph, node_id: str):
     return fp_key
 
 
-def get_fp_key_pre_suc_2(fp_g: nx.digraph, node_id: str):
+def get_fp_key_pre_suc_k(fp_g: nx.digraph, node_id: str, k=3):
     """
     calc fp key according to the "node_name" of the target node and neighboring nodes (K=2)
     """
@@ -46,10 +46,19 @@ def get_fp_key_pre_suc_2(fp_g: nx.digraph, node_id: str):
     current_node_id = node_id
 
     for f, d in zip([fp_g.predecessors, fp_g.successors], ("b", "f")):
+
+        #TODO: recursion
         for n_node in list(f(current_node_id)):
             val += f" 1{d}:"+fp_g.nodes[n_node]["node_name"]
-            for n_n_node in list(f(n_node)):
-                val += f" 2{d}:"+fp_g.nodes[n_n_node]["node_name"]
+
+            if k >= 2:
+                for n_n_node in list(f(n_node)):
+                    val += f" 2{d}:"+fp_g.nodes[n_n_node]["node_name"]
+
+                    if k >= 3:
+                        for n_n_n_node in list(f(n_n_node)):
+                            val += f" 3{d}:" + \
+                                fp_g.nodes[n_n_n_node]["node_name"]
 
     return val
 

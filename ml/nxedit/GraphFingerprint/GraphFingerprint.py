@@ -1,12 +1,12 @@
 import networkx as nx
 import copy
 from .utils import fill_numbers,  NUM_CHAR, search_for_target_node_name_id
-from .utils import get_fp_key_pre_suc, get_fp_key_pre_suc_2
+from .utils import get_fp_key_pre_suc, get_fp_key_pre_suc_k
 from tqdm import tqdm
 
 
 class GraphFingerprint:
-    def __init__(self, g_list: list, fp_key_algorithm=get_fp_key_pre_suc_2):
+    def __init__(self, g_list: list, fp_key_algorithm=get_fp_key_pre_suc_k):
         self.key_list = []
         self.g_list = g_list
         self.fp_key_algorithm = fp_key_algorithm
