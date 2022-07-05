@@ -147,6 +147,8 @@ class ExpGraph:
                 # parse line
                 title, prop, unit = parse_command(content)
 
+                #print(content, title, prop, unit)
+
                 # add new nodes
                 title_node = random_name()+"_title"
                 prop_node = random_name()+"_prop"

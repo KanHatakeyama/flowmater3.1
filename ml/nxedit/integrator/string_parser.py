@@ -28,6 +28,11 @@ def parse_command(content: str):
         """
         unit = re.sub(
             "[+-]?(?:\d+\.?\d*|\.\d+)(?:(?:[eE][+-]?\d+)|(?:\*10\^[+-]?\d+))?", "", vals)
+
+        # in the case of no units (then unit will be ";;;...". it should be modified as "")
+        if unit in [";"*i for i in range(100)]:
+            unit = ""
+
         prop = vals.replace(unit, "").replace(" ", "")
         unit = re.sub("^\ ?", "", unit)
 

@@ -9,7 +9,7 @@ def load_another_graph(command_id: int, pk: str, exp: ExpGraph,  manager):
 
     load_command = exp.load_commands[command_id]
 
-    # load command must be in the first line
+    # sort commands so that "load command" comes on the first line
     load_command = sort_command(load_command)
     load_pk = str(load_command[5:].split("_")[0])
 
